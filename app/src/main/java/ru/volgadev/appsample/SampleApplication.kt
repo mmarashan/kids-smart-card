@@ -7,9 +7,9 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
 import org.koin.dsl.module
-import ru.volgadev.appsample.data.repository.Repositories
 import ru.volgadev.common.log.Logger
-import ru.volgadev.samplefeature.data.repository.SampleRepository
+import ru.volgadev.sampledata.repository.SampleRepository
+import ru.volgadev.sampledata.repository.SampleRepositoryImpl
 import ru.volgadev.samplefeature.ui.SampleViewModel
 
 class SampleApplication : Application() {
@@ -17,7 +17,7 @@ class SampleApplication : Application() {
     private val logger = Logger.get("SampleApplication")
 
     private val sampleModule = module {
-        single<SampleRepository> { Repositories.getSampleRepository(context = get()) }
+        single<SampleRepository> { SampleRepositoryImpl.getInstance(context = get()) }
         viewModel {
             SampleViewModel(
                 sampleRepository = get()

@@ -4,4 +4,5 @@ include ':app',
         ':common',
         ':core',
         ':feature',
-        ':feature:samplefeature'
+        ':feature:samplefeature',
+        ':core:sampledata'

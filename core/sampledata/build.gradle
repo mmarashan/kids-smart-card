@@ -3,7 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion versions.compileSdkVersion
 
     defaultConfig {
         minSdkVersion versions.minSdkVersion
@@ -15,7 +15,6 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 }
@@ -24,15 +23,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
     implementation "androidx.core:core-ktx:${versions.corektx}"
-    implementation "androidx.constraintlayout:constraintlayout:${versions.constraintlayout}"
-
-    implementation "org.koin:koin-android:${versions.koin}"
-    implementation "org.koin:koin-androidx-viewmodel:${versions.koin}"
-    implementation "androidx.lifecycle:lifecycle-extensions:${versions.androidxlifecycle}"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${versions.androidxlifecycle}"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:${versions.androidxlifecycle}"
 
     implementation project(':common')
-    implementation project(':core:sampledata')
-
 }
