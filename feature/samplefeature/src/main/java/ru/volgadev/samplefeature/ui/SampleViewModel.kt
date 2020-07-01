@@ -1,4 +1,4 @@
-package ru.volgadev.samplefeature.main
+package ru.volgadev.samplefeature.ui
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel

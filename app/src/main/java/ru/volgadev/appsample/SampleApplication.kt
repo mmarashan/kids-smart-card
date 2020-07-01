@@ -10,7 +10,7 @@ import org.koin.dsl.module
 import ru.volgadev.appsample.data.repository.Repositories
 import ru.volgadev.common.log.Logger
 import ru.volgadev.samplefeature.data.repository.SampleRepository
-import ru.volgadev.samplefeature.main.SampleViewModel
+import ru.volgadev.samplefeature.ui.SampleViewModel
 
 class SampleApplication : Application() {
 

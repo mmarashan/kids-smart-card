@@ -3,7 +3,7 @@ package ru.volgadev.appsample.ui
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import ru.volgadev.appsample.R
-import ru.volgadev.samplefeature.main.SampleFragment
+import ru.volgadev.samplefeature.ui.SampleFragment
 
 class MainActivity : AppCompatActivity() {
 
