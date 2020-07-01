@@ -2,6 +2,7 @@ package ru.volgadev.samplefeature.ui
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import ru.volgadev.sampledata.model.Article
 import ru.volgadev.sampledata.repository.SampleRepository
 

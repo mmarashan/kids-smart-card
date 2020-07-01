@@ -1,30 +1,39 @@
 package ru.volgadev.samplefeature.ui
 
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import android.widget.TextView
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import ru.volgadev.common.log.Logger
 import ru.volgadev.samplefeature.R
 
-class SampleFragment : Fragment() {
+class SampleFragment : Fragment(R.layout.main_fragment) {
+
+    private val logger = Logger.get("SampleFragment")
 
     companion object {
         fun newInstance() = SampleFragment()
     }
 
-    private lateinit var viewModel: SampleViewModel
+    private val viewModel: SampleViewModel by viewModel()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View {
-        return inflater.inflate(R.layout.main_fragment, container, false)
-    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        logger.debug("On fragment created")
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(SampleViewModel::class.java)
-        // TODO: Use the ViewModel
+        val message: TextView = view.findViewById(R.id.message)
+
+        viewModel.articles.observe(viewLifecycleOwner, Observer { articles ->
+            val resultString = StringBuilder()
+            articles.forEach { article ->
+                resultString.append(article.id.toString()).append(" ").append(article.title)
+                    .append("\n")
+            }
+            message.text = resultString.toString()
+
+        })
     }
 
 }
