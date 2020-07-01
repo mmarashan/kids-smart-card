@@ -1,4 +1,4 @@
-package ru.volgadev.livebanner.common.util
+package ru.volgadev.common.util
 
 import android.os.Handler
 import android.os.HandlerThread

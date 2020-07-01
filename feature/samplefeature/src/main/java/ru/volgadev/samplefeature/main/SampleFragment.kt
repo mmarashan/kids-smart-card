@@ -1,4 +1,4 @@
-package ru.volgadev.appsample.ui.main
+package ru.volgadev.samplefeature.main
 
 import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
@@ -6,15 +6,15 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import ru.volgadev.appsample.R
+import ru.volgadev.samplefeature.R
 
-class MainFragment : Fragment() {
+class SampleFragment : Fragment() {
 
     companion object {
-        fun newInstance() = MainFragment()
+        fun newInstance() = SampleFragment()
     }
 
-    private lateinit var viewModel: MainViewModel
+    private lateinit var viewModel: SampleViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View {
@@ -23,7 +23,7 @@ class MainFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
+        viewModel = ViewModelProviders.of(this).get(SampleViewModel::class.java)
         // TODO: Use the ViewModel
     }
 

@@ -1,8 +1,9 @@
-package ru.volgadev.appsample
+package ru.volgadev.appsample.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import ru.volgadev.appsample.ui.main.MainFragment
+import ru.volgadev.appsample.R
+import ru.volgadev.samplefeature.main.SampleFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -11,7 +12,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.main_activity)
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                    .replace(R.id.container, MainFragment.newInstance())
+                    .replace(R.id.container, SampleFragment.newInstance())
                     .commitNow()
         }
     }

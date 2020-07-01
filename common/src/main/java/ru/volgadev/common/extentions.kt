@@ -1,4 +1,4 @@
-package ru.volgadev.livebanner.common
+package ru.volgadev.common
 
 import android.content.Context
 import android.content.pm.PackageInfo

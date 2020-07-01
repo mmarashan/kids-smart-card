@@ -1,4 +1,3 @@
-package ru.volgadev.livebanner.common
+package ru.volgadev.common
 
-const val VIDEO_FORMAT_SUFFIX = ".mp4"
-const val RESULT_VIDEOS_PATH = "LiveBannerVideo"
+const val SAMPLE_CONST = "SAMPLE_CONST"

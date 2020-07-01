@@ -1,6 +1,7 @@
-package ru.volgadev.livebanner.common.log
+package ru.volgadev.common.log
 
 import android.util.Log
+import ru.volgadev.common.log.LoggerDelegate
 
 class AndroidLoggerDelegate(val TAG: String): LoggerDelegate {
     override fun debug(m: String) {

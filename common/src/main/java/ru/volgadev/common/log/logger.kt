@@ -1,4 +1,4 @@
-package ru.volgadev.livebanner.common.log
+package ru.volgadev.common.log
 
 interface LoggerDelegate {
     fun debug(m: String)
