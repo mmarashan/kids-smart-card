@@ -2,6 +2,7 @@ package ru.volgadev.samplefeature.ui
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.AnyThread
 import androidx.cardview.widget.CardView
@@ -11,10 +12,16 @@ import ru.volgadev.common.log.Logger
 import ru.volgadev.sampledata.model.Article
 import ru.volgadev.samplefeature.R
 
-class ArticleCardAdapter() :
+class ArticleCardAdapter :
     RecyclerView.Adapter<ArticleCardAdapter.ViewHolder>() {
 
     class ViewHolder(val card: CardView) : RecyclerView.ViewHolder(card)
+
+    interface OnItemClickListener {
+        fun onClick(itemId: Int)
+    }
+    @Volatile
+    private var onItemClicklistener: OnItemClickListener? = null
 
     private val logger = Logger.get("ArticleCardAdapter")
 
@@ -41,10 +48,21 @@ class ArticleCardAdapter() :
         return ViewHolder(card)
     }
 
+    @AnyThread
+    fun setOnItemClickListener(listener: OnItemClickListener){
+        onItemClicklistener = listener
+    }
+
     // Replace the contents of a view (invoked by the layout manager)
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val textView = holder.card.findViewById<TextView>(R.id.cardInfoText)
-        textView.text = articleList[position].text
+        val article = articleList[position]
+        val textView = holder.card.findViewById<TextView>(R.id.card_view_title)
+        val image = holder.card.findViewById<ImageView>(R.id.card_view_image)
+        textView.text = article.text
+        holder.card.setOnClickListener {
+            logger.debug("On click ${article.id}")
+            onItemClicklistener?.onClick(article.id)
+        }
     }
 
     // Return the size of your dataset (invoked by the layout manager)

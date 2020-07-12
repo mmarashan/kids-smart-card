@@ -2,13 +2,15 @@ package ru.volgadev.samplefeature.ui
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.GridLayoutManager
 import kotlinx.android.synthetic.main.main_fragment.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import ru.volgadev.common.log.Logger
 import ru.volgadev.samplefeature.R
+
 
 class SampleFragment : Fragment(R.layout.main_fragment) {
 
@@ -24,15 +26,21 @@ class SampleFragment : Fragment(R.layout.main_fragment) {
         super.onViewCreated(view, savedInstanceState)
         logger.debug("On fragment created")
 
-        val viewManager = LinearLayoutManager(context)
-        val viewAdapter = ArticleCardAdapter()
+        val gridLayoutManager = GridLayoutManager(context, 2)
+        val viewAdapter = ArticleCardAdapter().apply {
+            setOnItemClickListener(object : ArticleCardAdapter.OnItemClickListener {
+                override fun onClick(itemId: Int) {
+                    Toast.makeText(context, "On click $itemId", Toast.LENGTH_LONG).show()
+                }
+            })
+        }
 
         contentRecyclerView.run {
             // use this setting to improve performance if you know that changes
             // in content do not change the layout size of the RecyclerView
             setHasFixedSize(true)
 
-            layoutManager = viewManager
+            layoutManager = gridLayoutManager
             adapter = viewAdapter
         }
 
