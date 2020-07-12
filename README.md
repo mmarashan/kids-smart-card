@@ -5,3 +5,4 @@
 3. Koin DI
 4. ":common" module with logger and custom util
 5. Dependency versions in versions.gradle
+6. RecyclerView with CardView in sample feature
