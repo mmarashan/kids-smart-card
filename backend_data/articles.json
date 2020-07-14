@@ -2,11 +2,30 @@
   "articles": [
     {
       "id": 0,
-      "tags": ["coroutines"],
-      "title": "title",
-      "text": "text",
-      "iconUrl": "iconUrl",
+      "tags": ["base"],
+      "title": "Жизненный цикл Activity",
+      "text": "\n    OnCreate() Создаётся view.\n    OnStart() Активити становится видно\n    OnResume() Активити становится доступным для ввода пользователя\n    OnPause() Активити видно, но недоступо для ввода пользователя (важно для многооконного режима)\n    OnStop() Активити больше не видно\n    OnDestroy() Активити уничтожается\n    OnRestart() Активити пересоздаётся, вызывается после уничтожения и перед созданием\n\nКакие методы вызываются при переходе между активити\n\n    A: onCreate, onStart, onResume A: (переход) onPause B: onCreate, onStart, onResume A: onStop B: (обратный переход) onPause A: onRestart, onStart, onResume B: onStop, onDestroy ",
+      "iconUrl": "https://camo.githubusercontent.com/fd652817b45d2423e58a58173b5eb5644d6ffa0c/68747470733a2f2f6c68352e676f6f676c6575736572636f6e74656e742e636f6d2f2d4d4d58336f3470647364302f546f79625574712d4546492f41414141414141414162772f7269354d51314a673573492f733830302f32303131313030355f4c303032345f4c5f54776f416374536368656d612e6a7067",
+      "averageTimeReadingMin": 3,
+      "hardLevel": 3
+    },
+    {
+      "id": 0,
+      "tags": ["base"],
+      "title": "Activity launch modes",
+      "text": "\n    Standard При вызове, активити создаётся заново.\n    SingleTop Активити создаётся заново, только если она не вверху активити-стека.\n    SingleTask Стек стирается до момента, пока эта активити не окажется наверху стека.\n    SingleInstance Похож на SingleTask, но при создании активити, она уйдёт в новый таск.\n",
+      "iconUrl": "https://camo.githubusercontent.com/fd652817b45d2423e58a58173b5eb5644d6ffa0c/68747470733a2f2f6c68352e676f6f676c6575736572636f6e74656e742e636f6d2f2d4d4d58336f3470647364302f546f79625574712d4546492f41414141414141414162772f7269354d51314a673573492f733830302f32303131313030355f4c303032345f4c5f54776f416374536368656d612e6a7067",
       "averageTimeReadingMin": 1,
       "hardLevel": 3
-    }]
+    },
+    {
+      "id": 0,
+      "tags": ["mvvm"],
+      "title": "ViewModel",
+      "text": "\n    В активити мы получаем ссылку на ViewModel, используя\n\n      ViewModelProvider(this).get(ViewModel::class.java);\n\n    ViewModelProvider создаёт вью-модель и сохраняет её во ViewModelStore.\n    Параметр, который мы передаём как this при получении ViewModelProvider имеет тип ViewModelStoreOwner, который как раз и хранит ViewModelStore. Если отследить, какие классы наследует наша активити, то видно, что она наследуется от ComponentActivity, которая реализует интерфейс ViewModelStoreOwner.\n    Когда активити пересоздаётся, она сохраняет текущий ViewModelStore, используя свои методы onRetainNonConfigurationInstance() и getLastCustomNonConfigurationInstance(), а также статический класс NonConfigurationInstances.\n    Также активити имеет LifecycleEventObserver, который слушает изменения жизненного цикла и, при уничтожении активити, вызывает getViewModelStore().clear().\n",
+      "iconUrl": "https://camo.githubusercontent.com/cc8e389164c78cfc67cc1affed574ef9a10c46f9/68747470733a2f2f63646e2e686173686e6f64652e636f6d2f7265732f686173686e6f64652f696d6167652f75706c6f61642f76313538353437383338363532362f6568345654704171502e706e673f6175746f3d666f726d617426713d3630",
+      "averageTimeReadingMin": 1,
+      "hardLevel": 3
+    }
+  ]
 }
