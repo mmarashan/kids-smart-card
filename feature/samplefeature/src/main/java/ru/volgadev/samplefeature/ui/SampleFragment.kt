@@ -29,7 +29,7 @@ class SampleFragment : Fragment(R.layout.main_fragment) {
         val gridLayoutManager = GridLayoutManager(context, 2)
         val viewAdapter = ArticleCardAdapter().apply {
             setOnItemClickListener(object : ArticleCardAdapter.OnItemClickListener {
-                override fun onClick(itemId: Int) {
+                override fun onClick(itemId: Long) {
                     Toast.makeText(context, "On click $itemId", Toast.LENGTH_LONG).show()
                 }
             })

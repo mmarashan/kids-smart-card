@@ -8,6 +8,8 @@ import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
 import org.koin.dsl.module
 import ru.volgadev.common.log.Logger
+import ru.volgadev.sampledata.api.ArticleBackendApi
+import ru.volgadev.sampledata.api.ArticleBackendApiImpl
 import ru.volgadev.sampledata.repository.SampleRepository
 import ru.volgadev.sampledata.repository.SampleRepositoryImpl
 import ru.volgadev.samplefeature.ui.SampleViewModel
@@ -17,7 +19,13 @@ class SampleApplication : Application() {
     private val logger = Logger.get("SampleApplication")
 
     private val sampleModule = module {
-        single<SampleRepository> { SampleRepositoryImpl.getInstance(context = get()) }
+        single<SampleRepository> {
+            SampleRepositoryImpl.getInstance(
+                context = get(),
+                articleBackendApi = get()
+            )
+        }
+        single<ArticleBackendApi> { ArticleBackendApiImpl() }
         viewModel {
             SampleViewModel(
                 sampleRepository = get()
