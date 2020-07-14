@@ -31,13 +31,13 @@ class ArticleBackendApiImpl : ArticleBackendApi {
             logger.debug("stringResponse $stringResponse")
             val json = JSONObject(stringResponse)
             val articlesArray = json.getJSONArray("articles")
-            for (i in 0..articlesArray.length()) {
+            for (i in 0 until articlesArray.length()) {
                 val articleJson = articlesArray[i] as JSONObject
                 val id = articleJson.optLong("id")
                 val tags = arrayListOf<String>()
                 val tagsJson = articleJson.optJSONArray("tags")
                 tagsJson?.let { tagsJs ->
-                    for (t in 0..tagsJs.length()) {
+                    for (t in 0 until tagsJs.length()) {
                         tags.add(tagsJs[t] as String)
                     }
                 }
