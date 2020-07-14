@@ -19,7 +19,7 @@ class ArticleCardAdapter :
     class ViewHolder(val card: CardView) : RecyclerView.ViewHolder(card)
 
     interface OnItemClickListener {
-        fun onClick(itemId: Int)
+        fun onClick(itemId: Long)
     }
     @Volatile
     private var onItemClicklistener: OnItemClickListener? = null

@@ -25,5 +25,9 @@ dependencies {
     implementation "androidx.core:core-ktx:${versions.corektx}"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:${versions.androidxlifecycle}"
 
+    implementation "androidx.room:room-runtime:${versions.room}"
+    implementation "androidx.room:room-ktx:${versions.room}"
+    implementation "com.squareup.okhttp3:okhttp:${versions.okhttp}"
+
     implementation project(':common')
 }

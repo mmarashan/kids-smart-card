@@ -1,0 +1,12 @@
+{
+  "articles": [
+    {
+      "id": 0,
+      "tags": ["coroutines"],
+      "title": "title",
+      "text": "text",
+      "iconUrl": "iconUrl",
+      "averageTimeReadingMin": 1,
+      "hardLevel": 3
+    }]
+}
