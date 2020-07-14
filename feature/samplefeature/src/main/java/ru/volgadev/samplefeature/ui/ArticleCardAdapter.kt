@@ -59,8 +59,8 @@ class ArticleCardAdapter :
         val article = articleList[position]
         val textView = holder.card.findViewById<TextView>(R.id.card_view_title)
         val image = holder.card.findViewById<ImageView>(R.id.card_view_image)
-        Glide.with(image.context).load("http://goo.gl/gEgYUd").into(image)
-        textView.text = article.text
+        Glide.with(image.context).load(article.iconUrl).into(image)
+        textView.text = article.title
         holder.card.setOnClickListener {
             logger.debug("On click ${article.id}")
             onItemClicklistener?.onClick(article.id)
