@@ -1,4 +1,4 @@
-package ru.volgadev.samplefeature.ui
+package ru.volgadev.article_galery.ui
 
 import android.os.Bundle
 import android.view.View
@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import kotlinx.android.synthetic.main.main_fragment.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import ru.volgadev.common.log.Logger
-import ru.volgadev.samplefeature.R
+import ru.volgadev.article_galery.R
 
 
 class SampleFragment : Fragment(R.layout.main_fragment) {
