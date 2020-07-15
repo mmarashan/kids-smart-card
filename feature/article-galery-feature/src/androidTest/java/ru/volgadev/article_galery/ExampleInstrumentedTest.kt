@@ -1,4 +1,4 @@
-package ru.volgadev.samplefeature
+package ru.volgadev.article_galery
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

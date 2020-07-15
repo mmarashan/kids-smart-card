@@ -1,4 +1,4 @@
-package ru.volgadev.sampledata.repository
+package ru.volgadev.article_data.repository
 
 import android.content.Context
 import kotlinx.coroutines.Dispatchers
@@ -9,19 +9,23 @@ import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.volgadev.common.log.Logger
-import ru.volgadev.sampledata.api.ArticleBackendApi
-import ru.volgadev.sampledata.model.Article
+import ru.volgadev.article_data.api.ArticleBackendApi
+import ru.volgadev.article_data.model.Article
 import java.net.ConnectException
 
-class SampleRepositoryImpl private constructor(
+class ArticleRepositoryImpl private constructor(
     private val context: Context,
     private val articleBackendApi: ArticleBackendApi
-) : SampleRepository {
+) : ArticleRepository {
 
     private val logger = Logger.get("SampleRepositoryImpl")
     private val articleChannel = Channel<ArrayList<Article>>(Channel.CONFLATED)
 
     override fun articles(): Flow<ArrayList<Article>> = articleChannel.consumeAsFlow()
+
+    override suspend fun getArticle(id: Long): Article  = withContext(Dispatchers.Default) {
+        TODO("Not yet implemented")
+    }
 
     init {
         logger.debug("Init")
@@ -36,11 +40,11 @@ class SampleRepositoryImpl private constructor(
 
         // For Singleton instantiation
         @Volatile
-        private var instance: SampleRepositoryImpl? = null
+        private var instance: ArticleRepositoryImpl? = null
 
         fun getInstance(context: Context, articleBackendApi: ArticleBackendApi) =
             instance ?: synchronized(this) {
-                instance ?: SampleRepositoryImpl(context, articleBackendApi).also { instance = it }
+                instance ?: ArticleRepositoryImpl(context, articleBackendApi).also { instance = it }
             }
     }
 

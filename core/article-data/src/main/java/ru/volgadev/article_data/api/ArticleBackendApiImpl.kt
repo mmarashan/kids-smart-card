@@ -1,4 +1,4 @@
-package ru.volgadev.sampledata.api
+package ru.volgadev.article_data.api
 
 import androidx.annotation.WorkerThread
 import okhttp3.OkHttpClient
@@ -7,7 +7,7 @@ import okhttp3.Response
 import org.json.JSONObject
 import ru.volgadev.common.BACKEND_URL
 import ru.volgadev.common.log.Logger
-import ru.volgadev.sampledata.model.Article
+import ru.volgadev.article_data.model.Article
 import java.net.ConnectException
 
 

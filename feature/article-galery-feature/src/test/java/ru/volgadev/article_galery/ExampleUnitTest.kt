@@ -1,4 +1,4 @@
-package ru.volgadev.samplefeature
+package ru.volgadev.article_galery
 
 import org.junit.Test
 

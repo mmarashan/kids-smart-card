@@ -16,13 +16,21 @@
         android:orientation="vertical">
 
         <ImageView
-            android:id="@+id/card_view_image"
+            android:id="@+id/articleImage"
             android:layout_width="match_parent"
             android:layout_height="100dp"
             android:scaleType="centerCrop"/>
 
         <TextView
-            android:id="@+id/card_view_title"
+            android:id="@+id/articleTitle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="10dp"
+            android:layout_gravity="center_horizontal"
+            android:textSize="24dp"/>
+
+        <TextView
+            android:id="@+id/articleText"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_margin="10dp"

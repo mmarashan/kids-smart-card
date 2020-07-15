@@ -4,7 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import ru.volgadev.appsample.R
 import ru.volgadev.common.log.Logger
-import ru.volgadev.samplefeature.ui.SampleFragment
+import ru.volgadev.article_galery.ui.ArticleGaleryFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                    .replace(R.id.container, SampleFragment.newInstance())
+                    .replace(R.id.container, ArticleGaleryFragment.newInstance())
                     .commitNow()
         }
     }

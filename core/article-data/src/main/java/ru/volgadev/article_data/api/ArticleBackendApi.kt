@@ -1,8 +1,7 @@
-package ru.volgadev.sampledata.api
+package ru.volgadev.article_data.api
 
 import androidx.annotation.WorkerThread
-import ru.volgadev.sampledata.model.Article
-import java.util.*
+import ru.volgadev.article_data.model.Article
 
 @WorkerThread
 interface ArticleBackendApi {

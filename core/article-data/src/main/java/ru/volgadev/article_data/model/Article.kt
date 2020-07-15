@@ -1,4 +1,4 @@
-package ru.volgadev.sampledata.model
+package ru.volgadev.article_data.model
 
 data class Article(
     val id: Long,

@@ -1,4 +1,4 @@
-package ru.volgadev.samplefeature.ui
+package ru.volgadev.article_galery.ui
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -8,10 +8,9 @@ import androidx.annotation.AnyThread
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import kotlinx.android.synthetic.main.card_article.view.*
 import ru.volgadev.common.log.Logger
-import ru.volgadev.sampledata.model.Article
-import ru.volgadev.samplefeature.R
+import ru.volgadev.article_data.model.Article
+import ru.volgadev.article_galery.R
 
 class ArticleCardAdapter :
     RecyclerView.Adapter<ArticleCardAdapter.ViewHolder>() {

@@ -12,15 +12,15 @@ import ru.volgadev.common.log.Logger
 import ru.volgadev.article_galery.R
 
 
-class SampleFragment : Fragment(R.layout.main_fragment) {
+class ArticleGaleryFragment : Fragment(R.layout.main_fragment) {
 
     private val logger = Logger.get("SampleFragment")
 
     companion object {
-        fun newInstance() = SampleFragment()
+        fun newInstance() = ArticleGaleryFragment()
     }
 
-    private val viewModel: SampleViewModel by viewModel()
+    private val viewModel: ArticleGaleryViewModel by viewModel()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

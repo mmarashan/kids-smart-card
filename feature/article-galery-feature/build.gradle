@@ -36,5 +36,5 @@ dependencies {
     annotationProcessor "com.github.bumptech.glide:compiler:${versions.glide}"
 
     implementation project(':common')
-    implementation project(':core:sampledata')
+    implementation project(':core:article-data')
 }

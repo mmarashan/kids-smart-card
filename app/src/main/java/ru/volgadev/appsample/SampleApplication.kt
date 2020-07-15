@@ -7,28 +7,28 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
 import org.koin.dsl.module
+import ru.volgadev.article_galery.ui.ArticleGaleryViewModel
 import ru.volgadev.common.log.Logger
-import ru.volgadev.sampledata.api.ArticleBackendApi
-import ru.volgadev.sampledata.api.ArticleBackendApiImpl
-import ru.volgadev.sampledata.repository.SampleRepository
-import ru.volgadev.sampledata.repository.SampleRepositoryImpl
-import ru.volgadev.samplefeature.ui.SampleViewModel
+import ru.volgadev.article_data.api.ArticleBackendApi
+import ru.volgadev.article_data.api.ArticleBackendApiImpl
+import ru.volgadev.article_data.repository.ArticleRepository
+import ru.volgadev.article_data.repository.ArticleRepositoryImpl
 
 class SampleApplication : Application() {
 
     private val logger = Logger.get("SampleApplication")
 
     private val sampleModule = module {
-        single<SampleRepository> {
-            SampleRepositoryImpl.getInstance(
+        single<ArticleRepository> {
+            ArticleRepositoryImpl.getInstance(
                 context = get(),
                 articleBackendApi = get()
             )
         }
         single<ArticleBackendApi> { ArticleBackendApiImpl() }
         viewModel {
-            SampleViewModel(
-                sampleRepository = get()
+            ArticleGaleryViewModel(
+                get()
             )
         }
     }

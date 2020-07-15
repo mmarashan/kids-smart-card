@@ -1,8 +1,10 @@
+include ':feature:article-page'
 rootProject.name = "appsample"
 
 include ':app',
         ':common',
         ':core',
         ':feature',
-        ':feature:samplefeature',
-        ':core:sampledata'
+        ':feature:article-galery-feature',
+        ':feature:article-page-feature',
+        ':core:article-data'
