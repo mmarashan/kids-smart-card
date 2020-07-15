@@ -46,10 +46,12 @@ class ArticleBackendApiImpl : ArticleBackendApi {
                 val iconUrl = articleJson.optString("iconUrl")
                 val averageTimeReadingMin = articleJson.optInt("averageTimeReadingMin")
                 val hardLevel = articleJson.optInt("hardLevel")
+                val timestamp = articleJson.optLong("timestamp")
                 result.add(
                     Article(
                         id = id, tags = tags, title = title, text = text, iconUrl = iconUrl,
-                        averageTimeReadingMin = averageTimeReadingMin, hardLevel = hardLevel
+                        averageTimeReadingMin = averageTimeReadingMin, hardLevel = hardLevel,
+                        timestamp = timestamp
                     )
                 )
             }

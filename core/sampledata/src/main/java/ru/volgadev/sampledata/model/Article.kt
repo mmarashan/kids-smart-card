@@ -7,5 +7,6 @@ data class Article(
     val text: String,
     val iconUrl: String? = null,
     val averageTimeReadingMin: Int? = 0,
-    val hardLevel: Int? = 0
+    val hardLevel: Int? = 0,
+    val timestamp: Long
 )

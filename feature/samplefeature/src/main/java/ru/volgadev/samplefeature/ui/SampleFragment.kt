@@ -30,7 +30,7 @@ class SampleFragment : Fragment(R.layout.main_fragment) {
         val viewAdapter = ArticleCardAdapter().apply {
             setOnItemClickListener(object : ArticleCardAdapter.OnItemClickListener {
                 override fun onClick(itemId: Long) {
-                    Toast.makeText(context, "On click $itemId", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, "On click $itemId", Toast.LENGTH_SHORT).show()
                 }
             })
         }
