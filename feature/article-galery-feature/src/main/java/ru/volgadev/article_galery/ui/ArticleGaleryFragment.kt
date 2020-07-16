@@ -2,14 +2,14 @@ package ru.volgadev.article_galery.ui
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
+import androidx.annotation.AnyThread
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
 import kotlinx.android.synthetic.main.main_fragment.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import ru.volgadev.common.log.Logger
 import ru.volgadev.article_galery.R
+import ru.volgadev.common.log.Logger
 
 
 class ArticleGaleryFragment : Fragment(R.layout.main_fragment) {
@@ -22,6 +22,18 @@ class ArticleGaleryFragment : Fragment(R.layout.main_fragment) {
 
     private val viewModel: ArticleGaleryViewModel by viewModel()
 
+    interface OnItemClickListener {
+        fun onClick(itemId: Long)
+    }
+
+    @Volatile
+    private var onItemClickListener: OnItemClickListener? = null
+
+    @AnyThread
+    fun setOnItemClickListener(listener: OnItemClickListener) {
+        onItemClickListener = listener
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         logger.debug("On fragment created")
@@ -30,7 +42,7 @@ class ArticleGaleryFragment : Fragment(R.layout.main_fragment) {
         val viewAdapter = ArticleCardAdapter().apply {
             setOnItemClickListener(object : ArticleCardAdapter.OnItemClickListener {
                 override fun onClick(itemId: Long) {
-                    Toast.makeText(context, "On click $itemId", Toast.LENGTH_SHORT).show()
+                    onItemClickListener?.onClick(itemId)
                 }
             })
         }

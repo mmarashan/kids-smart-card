@@ -4,8 +4,10 @@ import android.content.Context
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.toList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.volgadev.common.log.Logger
@@ -23,8 +25,11 @@ class ArticleRepositoryImpl private constructor(
 
     override fun articles(): Flow<ArrayList<Article>> = articleChannel.consumeAsFlow()
 
-    override suspend fun getArticle(id: Long): Article  = withContext(Dispatchers.Default) {
-        TODO("Not yet implemented")
+    override suspend fun getArticle(id: Long): Article?  = withContext(Dispatchers.Default) {
+        logger.debug("Get article with id $id")
+        // TODO: return last value!
+        val articles = articles().first()
+        return@withContext articles.first { article -> article.id == id }
     }
 
     init {

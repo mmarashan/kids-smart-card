@@ -7,12 +7,13 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
 import org.koin.dsl.module
-import ru.volgadev.article_galery.ui.ArticleGaleryViewModel
-import ru.volgadev.common.log.Logger
 import ru.volgadev.article_data.api.ArticleBackendApi
 import ru.volgadev.article_data.api.ArticleBackendApiImpl
 import ru.volgadev.article_data.repository.ArticleRepository
 import ru.volgadev.article_data.repository.ArticleRepositoryImpl
+import ru.volgadev.article_galery.ui.ArticleGaleryViewModel
+import ru.volgadev.article_page.ArticlePageViewModel
+import ru.volgadev.common.log.Logger
 
 class SampleApplication : Application() {
 
@@ -27,9 +28,10 @@ class SampleApplication : Application() {
         }
         single<ArticleBackendApi> { ArticleBackendApiImpl() }
         viewModel {
-            ArticleGaleryViewModel(
-                get()
-            )
+            ArticleGaleryViewModel(get())
+        }
+        viewModel {
+            ArticlePageViewModel(get())
         }
     }
 

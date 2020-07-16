@@ -4,9 +4,12 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import com.bumptech.glide.Glide
+import kotlinx.android.synthetic.main.layout_article_page.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import ru.volgadev.common.log.Logger
 
+const val ITEM_ID_KEY = "ITEM_ID"
 
 class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
 
@@ -22,8 +25,20 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
         super.onViewCreated(view, savedInstanceState)
         logger.debug("On fragment created")
 
+        val args = arguments
+        if (args != null && args.containsKey(ITEM_ID_KEY)) {
+            val itemId = args.getLong(ITEM_ID_KEY)
+            viewModel.onChooseArticle(itemId)
+        } else {
+            throw IllegalStateException("You should set ITEM_ID_KEY in fragment attributes!")
+        }
+
         viewModel.article.observe(viewLifecycleOwner, Observer { article ->
-            logger.debug("Set new ${article} article")
+            logger.debug("Set new ${article.id} article")
+
+            articleTitle.text = article.title
+            articleText.text = article.text
+            Glide.with(context!!).load(article.iconUrl).into(articleImage)
         })
     }
 
