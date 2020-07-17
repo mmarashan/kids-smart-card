@@ -24,16 +24,15 @@ dependencies {
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
     implementation "androidx.core:core-ktx:${versions.corektx}"
     implementation "androidx.constraintlayout:constraintlayout:${versions.constraintlayout}"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:${versions.coordinatorlayout}"
+    implementation "com.google.android.material:material:${versions.material}"
 
     implementation "org.koin:koin-android:${versions.koin}"
     implementation "org.koin:koin-androidx-viewmodel:${versions.koin}"
     implementation "androidx.lifecycle:lifecycle-extensions:${versions.androidxlifecycle}"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${versions.androidxlifecycle}"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:${versions.androidxlifecycle}"
-    implementation "androidx.recyclerview:recyclerview:${versions.recyclerview}"
-    implementation "androidx.cardview:cardview:${versions.cardview}"
     implementation "com.github.bumptech.glide:glide:${versions.glide}"
-    annotationProcessor "com.github.bumptech.glide:compiler:${versions.glide}"
 
     implementation project(':common')
     implementation project(':core:article-data')

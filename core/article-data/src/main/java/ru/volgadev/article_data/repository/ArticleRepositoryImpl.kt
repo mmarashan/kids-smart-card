@@ -4,8 +4,10 @@ import android.content.Context
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.channels.toList
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -21,14 +23,13 @@ class ArticleRepositoryImpl private constructor(
 ) : ArticleRepository {
 
     private val logger = Logger.get("SampleRepositoryImpl")
-    private val articleChannel = Channel<ArrayList<Article>>(Channel.CONFLATED)
+    private val articleChannel = ConflatedBroadcastChannel<ArrayList<Article>>()
 
-    override fun articles(): Flow<ArrayList<Article>> = articleChannel.consumeAsFlow()
+    override fun articles(): Flow<ArrayList<Article>> = articleChannel.asFlow()
 
     override suspend fun getArticle(id: Long): Article?  = withContext(Dispatchers.Default) {
         logger.debug("Get article with id $id")
-        // TODO: return last value!
-        val articles = articles().first()
+        val articles = articleChannel.value
         return@withContext articles.first { article -> article.id == id }
     }
 
