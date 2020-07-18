@@ -12,12 +12,12 @@ import ru.volgadev.article_galery.R
 import ru.volgadev.common.log.Logger
 
 
-class ArticleGaleryFragment : Fragment(R.layout.main_fragment) {
+class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
 
-    private val logger = Logger.get("SampleFragment")
+    private val logger = Logger.get("ArticleGalleryFragment")
 
     companion object {
-        fun newInstance() = ArticleGaleryFragment()
+        fun newInstance() = ArticleGalleryFragment()
     }
 
     private val viewModel: ArticleGaleryViewModel by viewModel()

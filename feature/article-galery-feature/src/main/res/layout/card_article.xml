@@ -6,7 +6,7 @@
     android:id="@+id/card_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="10dp"
+    android:layout_margin="12dp"
     card_view:cardCornerRadius="8dp"
     card_view:cardElevation="10dp">
 
@@ -18,8 +18,8 @@
         <ImageView
             android:id="@+id/card_view_image"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:scaleType="centerCrop"/>
+            android:layout_height="256dp"
+            android:scaleType="centerInside"/>
 
         <TextView
             android:id="@+id/card_view_title"
@@ -27,7 +27,8 @@
             android:layout_height="match_parent"
             android:layout_margin="10dp"
             android:layout_gravity="center_horizontal"
-            android:textSize="20dp"/>
+            android:layout_marginStart="4dp"
+            android:textSize="28sp"/>
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>

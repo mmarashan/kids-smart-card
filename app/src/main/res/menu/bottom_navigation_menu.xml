@@ -6,7 +6,7 @@
         android:id="@+id/action_galery"
         android:enabled="true"
         android:icon="@drawable/ic_galery_24"
-        android:title="@string/galery"
+        android:title="@string/gallery"
         app:showAsAction="ifRoom" />
 
     <item

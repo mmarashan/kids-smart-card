@@ -33,10 +33,15 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
             throw IllegalStateException("You should set ITEM_ID_KEY in fragment attributes!")
         }
 
+        backButton.setOnClickListener {
+            logger.debug("On click back")
+            activity?.onBackPressed()
+        }
+
         viewModel.article.observe(viewLifecycleOwner, Observer { article ->
             logger.debug("Set new ${article.id} article")
 
-            articleTitle.text = article.title
+            toolbarLayout.title = article.title
             articleText.text = article.text
             Glide.with(context!!).load(article.iconUrl).into(articleImage)
         })

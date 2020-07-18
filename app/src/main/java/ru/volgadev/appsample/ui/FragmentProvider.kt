@@ -1,7 +1,7 @@
 package ru.volgadev.appsample.ui
 
 import androidx.fragment.app.Fragment
-import ru.volgadev.article_galery.ui.ArticleGaleryFragment
+import ru.volgadev.article_galery.ui.ArticleGalleryFragment
 import ru.volgadev.article_page.ArticlePageFragment
 
 enum class AppFragment {
@@ -13,23 +13,25 @@ class FragmentProvider {
     companion object {
 
         private val FULLSCREEN_FRAGMENTS_CLASS_NAMES =
-            listOf(ArticlePageFragment.javaClass.canonicalName)
+            // TODO: решить проблему с backstack
+            // listOf(ArticlePageFragment::class.java.canonicalName)
+            listOf<String>()
 
-        private val articleGaleryFragment by lazy { ArticleGaleryFragment.newInstance() }
+        private val articleGalleryFragment by lazy { ArticleGalleryFragment.newInstance() }
 
         fun get(code: AppFragment): Fragment {
-            when (code) {
+            return when (code) {
                 AppFragment.GALERY_FRAGMENT -> {
-                    return articleGaleryFragment
+                    articleGalleryFragment
                 }
                 AppFragment.ARTICLE_PAGE_FRAGMENT -> {
-                    return ArticlePageFragment.newInstance()
+                    ArticlePageFragment.newInstance()
                 }
             }
         }
 
         fun isFullscreen(fragment: Fragment): Boolean {
-            return fragment.javaClass.canonicalName in FULLSCREEN_FRAGMENTS_CLASS_NAMES
+            return fragment::class.java.canonicalName in FULLSCREEN_FRAGMENTS_CLASS_NAMES
         }
     }
 }
