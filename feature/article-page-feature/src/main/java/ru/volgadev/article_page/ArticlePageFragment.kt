@@ -40,10 +40,10 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
 
         viewModel.article.observe(viewLifecycleOwner, Observer { article ->
             logger.debug("Set new ${article.id} article")
-
-            toolbarLayout.title = article.title
+            toolbarText.text = article.title
             articleText.text = article.text
-            Glide.with(context!!).load(article.iconUrl).into(articleImage)
+            if (article.iconUrl != null) Glide.with(articleImage.context).load(article.iconUrl)
+                .into(articleImage)
         })
     }
 

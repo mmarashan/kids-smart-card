@@ -1,22 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <!-- Per Material Design specs: -->
-    <!-- https://material.io/design/components/buttons-floating-action-button.html#specs -->
-    <dimen name="fab_margin">16dp</dimen>
-
-    <!-- Padding on the bottom of a screen so that the FAB won't overlap scrolled text. -->
     <dimen name="fab_bottom_padding">72dp</dimen>
-
     <dimen name="detail_app_bar_height">512dp</dimen>
-
     <dimen name="margin_big">24dp</dimen>
     <dimen name="margin_normal">16dp</dimen>
     <dimen name="margin_small">8dp</dimen>
     <dimen name="margin_extra_small">4dp</dimen>
-
     <dimen name="toolbar_elevation">5dp</dimen>
-    <dimen name="header_margin">24dp</dimen>
     <dimen name="description_min_height">555dp</dimen>
-
 </resources>

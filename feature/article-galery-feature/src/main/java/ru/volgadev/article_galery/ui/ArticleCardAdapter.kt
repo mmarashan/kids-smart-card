@@ -8,9 +8,9 @@ import androidx.annotation.AnyThread
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import ru.volgadev.common.log.Logger
 import ru.volgadev.article_data.model.Article
 import ru.volgadev.article_galery.R
+import ru.volgadev.common.log.Logger
 
 class ArticleCardAdapter :
     RecyclerView.Adapter<ArticleCardAdapter.ViewHolder>() {
@@ -58,7 +58,7 @@ class ArticleCardAdapter :
         val article = articleList[position]
         val textView = holder.card.findViewById<TextView>(R.id.card_view_title)
         val image = holder.card.findViewById<ImageView>(R.id.card_view_image)
-        Glide.with(image.context).load(article.iconUrl).into(image)
+        if (article.iconUrl != null) Glide.with(image.context).load(article.iconUrl).into(image)
         textView.text = article.title
         holder.card.setOnClickListener {
             logger.debug("On click ${article.id}")
