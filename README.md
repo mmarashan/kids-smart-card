@@ -5,5 +5,9 @@
 3. Koin DI
 4. ":common" module with logger and custom util
 5. Dependency versions in versions.gradle
-6. RecyclerView with CardView in sample feature
+6. RecyclerView with CardView in gallery feature
+6. CoordinatorLayout and Toolbar in page feature
 7. Room and OkHttp in data module
+
+
+![Demo](demo.gif)
