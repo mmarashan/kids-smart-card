@@ -1,4 +1,3 @@
-include ':core:user-device-data'
 rootProject.name = "appsample"
 
 include ':app',
