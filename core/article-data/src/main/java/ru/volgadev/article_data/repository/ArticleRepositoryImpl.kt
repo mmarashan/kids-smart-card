@@ -3,18 +3,14 @@ package ru.volgadev.article_data.repository
 import android.content.Context
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
-import kotlinx.coroutines.channels.toList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.consumeAsFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import ru.volgadev.common.log.Logger
 import ru.volgadev.article_data.api.ArticleBackendApi
 import ru.volgadev.article_data.model.Article
+import ru.volgadev.common.log.Logger
 import java.net.ConnectException
 
 class ArticleRepositoryImpl private constructor(
@@ -22,12 +18,12 @@ class ArticleRepositoryImpl private constructor(
     private val articleBackendApi: ArticleBackendApi
 ) : ArticleRepository {
 
-    private val logger = Logger.get("SampleRepositoryImpl")
+    private val logger = Logger.get("ArticleRepositoryImpl")
     private val articleChannel = ConflatedBroadcastChannel<ArrayList<Article>>()
 
     override fun articles(): Flow<ArrayList<Article>> = articleChannel.asFlow()
 
-    override suspend fun getArticle(id: Long): Article?  = withContext(Dispatchers.Default) {
+    override suspend fun getArticle(id: Long): Article? = withContext(Dispatchers.Default) {
         logger.debug("Get article with id $id")
         val articles = articleChannel.value
         return@withContext articles.first { article -> article.id == id }
@@ -58,7 +54,7 @@ class ArticleRepositoryImpl private constructor(
         try {
             val newArticles = articleBackendApi.getUpdates(System.currentTimeMillis())
             articleChannel.offer(ArrayList(newArticles))
-        } catch (e: ConnectException){
+        } catch (e: ConnectException) {
             logger.error("Exception when update article $e")
         }
     }
