@@ -16,6 +16,7 @@
             android:layout_height="wrap_content"
             android:animateLayoutChanges="true"
             android:fitsSystemWindows="true"
+            android:background="@android:color/transparent"
             android:stateListAnimator="@animator/show_toolbar">
 
             <com.google.android.material.appbar.CollapsingToolbarLayout
@@ -24,9 +25,9 @@
                 android:layout_height="match_parent"
                 android:fitsSystemWindows="true"
                 app:collapsedTitleGravity="center"
-                app:contentScrim="@color/colorWhite"
+                app:contentScrim="@android:color/transparent"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed"
-                app:statusBarScrim="@color/colorWhite"
+                app:statusBarScrim="@android:color/transparent"
                 app:title="CollapsingToolbarLayout title"
                 app:titleEnabled="true"
                 app:toolbarId="@id/pageToolbar">
@@ -62,7 +63,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
-                            android:layout_marginStart="@dimen/margin_big"
+                            android:layout_marginStart="@dimen/margin_normal"
                             android:textAlignment="center"
                             android:textSize="24sp"
                             tools:text="Article title" />
@@ -87,7 +88,7 @@
                 android:layout_height="match_parent"
                 android:layout_margin="@dimen/margin_normal"
                 android:minHeight="@dimen/description_min_height"
-                android:textIsSelectable="true"
+                android:textIsSelectable="false"
                 android:textSize="18sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
