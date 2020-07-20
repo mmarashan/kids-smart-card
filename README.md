@@ -10,5 +10,4 @@
 7. Room and OkHttp in data module
 8. Splash screen with logo when app is starting
 
-
-![Demo](demo.gif| width=256)
+<img src="demo.gif" width="256">
