@@ -11,7 +11,7 @@
         android:bottom="48dp">
         <bitmap
             android:gravity="center"
-            android:src="@drawable/android_icon"
+            android:src="@drawable/ic_launcher"
             android:tileMode="disabled" />
     </item>
 </layer-list>
