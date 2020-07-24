@@ -20,7 +20,7 @@ class ArticleBackendApiImpl : ArticleBackendApi {
     @Throws(ConnectException::class)
     override fun getUpdates(lastUpdateTime: Long): List<Article>  {
         val request: Request = Request.Builder().apply {
-            url("$BACKEND_URL/articles.json")
+            url("$BACKEND_URL/articles")
         }.build()
 
         val result = arrayListOf<Article>()
