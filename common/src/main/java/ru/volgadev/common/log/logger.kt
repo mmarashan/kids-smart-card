@@ -9,22 +9,29 @@ interface LoggerDelegate {
 
 class Logger(private val delegate: LoggerDelegate) {
 
-    fun debug(m: String){
+    fun debug(m: String) {
         delegate.debug(m)
     }
-    fun info(m: String){
+
+    fun info(m: String) {
         delegate.info(m)
     }
-    fun warn(m: String){
+
+    fun warn(m: String) {
         delegate.warn(m)
     }
-    fun error(m: String){
+
+    fun error(m: String) {
         delegate.error(m)
     }
 
     companion object {
-        fun get(TAG: String, delegate: LoggerDelegate = AndroidLoggerDelegate(TAG) ): Logger {
+        fun get(delegate: LoggerDelegate): Logger {
             return Logger(delegate)
+        }
+
+        fun get(TAG: String): Logger {
+            return Logger(AndroidLoggerDelegate(TAG))
         }
     }
 
