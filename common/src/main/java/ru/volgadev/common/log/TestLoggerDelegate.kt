@@ -1,19 +1,19 @@
 package ru.volgadev.common.log
 
-class TestLoggerDelegate(val TAG: String) : LoggerDelegate {
-    override fun debug(m: String) {
+class TestLoggerDelegate: LoggerDelegate {
+    override fun debug(TAG: String, m: String) {
         println("$TAG $m")
     }
 
-    override fun info(m: String) {
+    override fun info(TAG: String, m: String) {
         println("$TAG $m")
     }
 
-    override fun warn(m: String) {
+    override fun warn(TAG: String, m: String) {
         println("$TAG $m")
     }
 
-    override fun error(m: String) {
+    override fun error(TAG: String, m: String) {
         println("$TAG $m")
     }
 }

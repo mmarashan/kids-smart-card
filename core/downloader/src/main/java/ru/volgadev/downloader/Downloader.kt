@@ -1,11 +1,10 @@
 package ru.volgadev.downloader
 
 import android.content.Context
-import android.os.Environment
 import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.WorkerParameters
-import androidx.work.workDataOf
+import ru.volgadev.common.log.Logger
 import java.io.File
 import java.io.FileOutputStream
 import java.net.URL
@@ -18,6 +17,9 @@ class DownloadWorker(
     context: Context,
     workerParams: WorkerParameters
 ) : CoroutineWorker(context, workerParams) {
+
+    private val logger =
+        Logger.get("DownloadWorker")
 
     override suspend fun doWork(): Result {
         try {
@@ -44,7 +46,8 @@ class DownloadWorker(
             var total: Long = 0
             while (inputStream.read(buffer).also { len1 = it } > 0) {
                 total += len1.toLong()
-                val percentage = (total * 100 / fileLength).toInt()
+                logger.debug("Download total $total bytes")
+                val percentage = (1f * total * 100 / fileLength).toInt()
                 fos.write(buffer, 0, len1)
                 val progress = Data.Builder().putInt(PROGRESS_KEY, percentage).build()
                 setProgress(progress)
@@ -52,6 +55,7 @@ class DownloadWorker(
             fos.close()
             inputStream.close()
         } catch (e: Exception) {
+            logger.error(e.toString())
             e.printStackTrace()
             return Result.failure()
         }

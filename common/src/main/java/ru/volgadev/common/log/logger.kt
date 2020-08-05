@@ -1,37 +1,45 @@
 package ru.volgadev.common.log
 
 interface LoggerDelegate {
-    fun debug(m: String)
-    fun info(m: String)
-    fun warn(m: String)
-    fun error(m: String)
+    fun debug(TAG: String, m: String)
+    fun info(TAG: String, m: String)
+    fun warn(TAG: String, m: String)
+    fun error(TAG: String, m: String)
 }
 
-class Logger(private val delegate: LoggerDelegate) {
+class Logger(private val TAG: String,
+             private val delegates: List<LoggerDelegate>) {
 
     fun debug(m: String) {
-        delegate.debug(m)
+        delegates.forEach {delegate -> delegate.debug(TAG, m) }
     }
 
     fun info(m: String) {
-        delegate.info(m)
+        delegates.forEach {delegate -> delegate.info(TAG, m) }
     }
 
     fun warn(m: String) {
-        delegate.warn(m)
+        delegates.forEach {delegate -> delegate.warn(TAG, m) }
     }
 
     fun error(m: String) {
-        delegate.error(m)
+        delegates.forEach {delegate -> delegate.error(TAG, m) }
     }
 
     companion object {
-        fun get(delegate: LoggerDelegate): Logger {
-            return Logger(delegate)
+
+        @Volatile
+        private var delegates: List<LoggerDelegate> = listOf()
+
+        fun setDelegates(vararg delegates: LoggerDelegate) {
+            if (delegates.isEmpty()){
+                throw AssertionError("Empty delegates")
+            }
+            Companion.delegates = delegates.toList()
         }
 
         fun get(TAG: String): Logger {
-            return Logger(AndroidLoggerDelegate(TAG))
+            return Logger(TAG, delegates)
         }
     }
 
