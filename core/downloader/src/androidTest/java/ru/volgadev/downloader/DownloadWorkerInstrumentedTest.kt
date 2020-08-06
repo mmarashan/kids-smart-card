@@ -24,6 +24,12 @@ class DownloadWorkerInstrumentedTest {
 
     private var logger: Logger
 
+    private val IMAGE_FILE_PATH = Environment.getExternalStoragePublicDirectory(
+        Environment.DIRECTORY_PICTURES
+    ).absolutePath + "/1.jpg"
+    private val IMAGE_URL =
+        "https://i.pinimg.com/236x/c0/b7/7f/c0b77faeb2cb3e67fd1b423c4535f6c3.jpg"
+
     @Rule
     @JvmField
     var mRuntimePermissionRule: GrantPermissionRule =
@@ -39,13 +45,9 @@ class DownloadWorkerInstrumentedTest {
     }
 
     @Test
-    fun downloadTest() {
-        logger.debug("downloadTest()")
+    fun downloadWorkerTest() {
+        logger.debug("downloadWorkerTest()")
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        val filePath = Environment.getExternalStoragePublicDirectory(
-            Environment.DIRECTORY_PICTURES
-        ).absolutePath + "/1.jpg"
-        val url = "https://i.pinimg.com/236x/c0/b7/7f/c0b77faeb2cb3e67fd1b423c4535f6c3.jpg"
 
         val constraints: Constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -55,10 +57,10 @@ class DownloadWorkerInstrumentedTest {
             OneTimeWorkRequest.Builder(DownloadWorker::class.java)
                 .setInputData(
                     Data.Builder()
-                        .putString(FILE_PATH_KEY, filePath)
+                        .putString(FILE_PATH_KEY, IMAGE_FILE_PATH)
                         .putString(
                             URL_KEY,
-                            url
+                            IMAGE_URL
                         )
                         .build()
                 )
@@ -94,7 +96,21 @@ class DownloadWorkerInstrumentedTest {
         }
         latch.await(2, TimeUnit.SECONDS)
 
-        assert(File(filePath).exists())
+        assert(File(IMAGE_FILE_PATH).exists())
+
+        logger.debug("downloadWorkerTest() end")
+    }
+
+    @Test
+    fun downloadTest() {
+        logger.debug("downloadTest()")
+        val appContext = InstrumentationRegistry.getInstrumentation().targetContext
+
+        val downloader = Downloader(appContext, GlobalScope)
+        GlobalScope.launch(Dispatchers.Default) {
+            val result = downloader.download(IMAGE_URL, IMAGE_FILE_PATH)
+            logger.debug("Result ${result.name}")
+        }
 
         logger.debug("downloadTest() end")
     }

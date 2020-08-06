@@ -1,64 +1,77 @@
 package ru.volgadev.downloader
 
 import android.content.Context
-import androidx.work.CoroutineWorker
-import androidx.work.Data
-import androidx.work.WorkerParameters
+import androidx.annotation.WorkerThread
+import androidx.lifecycle.Observer
+import androidx.work.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import ru.volgadev.common.log.Logger
-import java.io.File
-import java.io.FileOutputStream
-import java.net.URL
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
-const val FILE_PATH_KEY = "file_path"
-const val URL_KEY = "url_str"
-const val PROGRESS_KEY = "progress"
+enum class DownloadResult {
+    SUCCESS, FILE_SYSTEM_ERROR, CONNECTION_ERROR
+}
 
-class DownloadWorker(
-    context: Context,
-    workerParams: WorkerParameters
-) : CoroutineWorker(context, workerParams) {
+// TODO: make it!
+class Downloader(private val context: Context, private val scope: CoroutineScope) {
 
-    private val logger =
-        Logger.get("DownloadWorker")
+    private val logger = Logger.get("Downloader")
 
-    override suspend fun doWork(): Result {
-        try {
-            val filePath = inputData.getString(FILE_PATH_KEY)
-            val urlStr = inputData.getString(URL_KEY)
+    @WorkerThread
+    suspend fun download(url: String, filePath: String): DownloadResult {
 
-            if (filePath == null) {
-                throw KotlinNullPointerException("$FILE_PATH_KEY is null")
+        logger.debug("download() filePath=$filePath")
+
+        val constraints: Constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .setRequiresStorageNotLow(true)
+            .build()
+        val oneTimeWorkRequest =
+            OneTimeWorkRequest.Builder(DownloadWorker::class.java)
+                .setInputData(
+                    Data.Builder()
+                        .putString(FILE_PATH_KEY, filePath)
+                        .putString(URL_KEY, url)
+                        .build()
+                )
+                .setConstraints(constraints).build()
+
+        logger.debug("Start download")
+        val workManager = WorkManager.getInstance(context)
+        workManager.enqueue(oneTimeWorkRequest)
+        var result: DownloadResult = DownloadResult.CONNECTION_ERROR
+        val latch = CountDownLatch(1)
+        val liveData = workManager
+            .getWorkInfoByIdLiveData(oneTimeWorkRequest.id)
+
+        var observer = Observer<WorkInfo> { logger.warn("Empty observer") }
+
+        scope.launch(Dispatchers.Main) {
+            observer =  Observer { workInfo: WorkInfo? ->
+                if (workInfo != null) {
+                    if (workInfo.state == WorkInfo.State.SUCCEEDED) {
+                        result = DownloadResult.SUCCESS
+                        liveData.removeObserver(observer)
+                        latch.countDown()
+                    }
+                    if (workInfo.state == WorkInfo.State.FAILED) {
+                        result = DownloadResult.CONNECTION_ERROR
+                        liveData.removeObserver(observer)
+                        latch.countDown()
+                    }
+
+                    val value = workInfo.progress.getInt(PROGRESS_KEY, 0)
+                    logger.debug("Download progress: $value")
+                }
             }
-
-            if (urlStr == null) {
-                throw KotlinNullPointerException("$URL_KEY is null")
-            }
-
-            val outputFile = File(filePath)
-            val url = URL(urlStr)
-            val urlConnection = url.openConnection()
-            urlConnection.connect()
-            val fileLength = urlConnection.contentLength
-            val fos = FileOutputStream(outputFile)
-            val inputStream = urlConnection.getInputStream()
-            val buffer = ByteArray(1024)
-            var len1: Int
-            var total: Long = 0
-            while (inputStream.read(buffer).also { len1 = it } > 0) {
-                total += len1.toLong()
-                logger.debug("Download total $total bytes")
-                val percentage = (1f * total * 100 / fileLength).toInt()
-                fos.write(buffer, 0, len1)
-                val progress = Data.Builder().putInt(PROGRESS_KEY, percentage).build()
-                setProgress(progress)
-            }
-            fos.close()
-            inputStream.close()
-        } catch (e: Exception) {
-            logger.error(e.toString())
-            e.printStackTrace()
-            return Result.failure()
+            liveData.observeForever(observer)
         }
-        return Result.success()
+        // TODO: remove it!
+        latch.await(100, TimeUnit.SECONDS)
+        logger.debug("result=${result.name}")
+        return result
     }
 }
