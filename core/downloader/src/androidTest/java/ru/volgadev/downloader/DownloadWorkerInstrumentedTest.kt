@@ -2,6 +2,7 @@ package ru.volgadev.downloader
 
 import android.Manifest
 import android.os.Environment
+import androidx.lifecycle.Observer
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
@@ -108,8 +109,28 @@ class DownloadWorkerInstrumentedTest {
 
         val downloader = Downloader(appContext, GlobalScope)
         GlobalScope.launch(Dispatchers.Default) {
-            val result = downloader.download(IMAGE_URL, IMAGE_FILE_PATH)
-            logger.debug("Result ${result.name}")
+            val liveData = downloader.download(IMAGE_URL, IMAGE_FILE_PATH)
+            val latch = CountDownLatch(1)
+            val observer = Observer { workInfo: WorkInfo? ->
+                if (workInfo != null) {
+                    if (workInfo.state == WorkInfo.State.SUCCEEDED) {
+                        latch.countDown()
+                    }
+                    if (workInfo.state == WorkInfo.State.FAILED) {
+                        latch.countDown()
+                    }
+
+                    val value = workInfo.progress.getInt(PROGRESS_KEY, 0)
+                    logger.debug("Download progress: $value")
+                }
+            }
+            launch(Dispatchers.Main) {liveData.observeForever(observer)}
+
+            latch.await(2, TimeUnit.SECONDS)
+            assert(File(IMAGE_FILE_PATH).exists())
+
+            logger.debug("downloadTest() end")
+
         }
 
         logger.debug("downloadTest() end")

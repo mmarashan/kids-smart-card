@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.WorkerParameters
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import ru.volgadev.common.log.Logger
 import java.io.File
 import java.io.FileOutputStream
@@ -21,7 +23,7 @@ class DownloadWorker(
     private val logger =
         Logger.get("DownloadWorker")
 
-    override suspend fun doWork(): Result {
+    override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         try {
             val filePath = inputData.getString(FILE_PATH_KEY)
             val urlStr = inputData.getString(URL_KEY)
@@ -57,8 +59,8 @@ class DownloadWorker(
         } catch (e: Exception) {
             logger.error(e.toString())
             e.printStackTrace()
-            return Result.failure()
+            Result.failure()
         }
-        return Result.success()
+        Result.success()
     }
 }
