@@ -14,14 +14,14 @@ class ArticlePageViewModel(private val articleRepository: ArticleRepository) : V
 
     private val logger = Logger.get("ArticlePageViewModel")
 
-    val _article = MutableLiveData<Article>()
+    private val _article = MutableLiveData<Article>()
     val article: LiveData<Article> = _article
 
     @AnyThread
     fun onChooseArticle(id: Long) {
         viewModelScope.launch {
             val article = articleRepository.getArticle(id)
-            if (article!=null) {
+            if (article != null) {
                 logger.debug("Use article ${article.id}")
                 _article.postValue(article)
             } else {
