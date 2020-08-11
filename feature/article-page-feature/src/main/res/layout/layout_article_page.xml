@@ -49,14 +49,14 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent">
 
-                        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        <ImageButton
                             android:id="@+id/backButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:layout_margin="4dp"
-                            android:tint="@android:color/white"
-                            app:srcCompat="@drawable/ic_baseline_chevron_left" />
+                            android:background="#00000000"
+                            android:src="@drawable/ic_baseline_chevron_left" />
 
                         <TextView
                             android:id="@+id/toolbarText"
@@ -95,6 +95,8 @@
                 tools:text="Details about the plant" />
 
         </androidx.core.widget.NestedScrollView>
+
+        <include layout="@layout/layout_bottom_controls"/>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

@@ -8,8 +8,13 @@ import android.view.View
 import androidx.annotation.WorkerThread
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.layout_article_page.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import org.koin.androidx.scope.currentScope
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.playAudio
@@ -46,22 +51,24 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
             activity?.onBackPressed()
         }
 
+
+
         viewModel.article.observe(viewLifecycleOwner, Observer { article ->
             logger.debug("Set new ${article.id} article")
             toolbarText.text = article.title
             articleText.text = article.text
             if (article.iconUrl != null) Glide.with(articleImage.context).load(article.iconUrl)
                 .into(articleImage)
-            playAudio("https://raw.githubusercontent.com/mmarashan/psdata/master/audio/1.mp3")
+            viewLifecycleOwner.lifecycleScope.launch {
+                playAudio("https://raw.githubusercontent.com/mmarashan/psdata/master/audio/1.mp3")
+            }
         })
     }
 
-    @WorkerThread
-    private fun playAudio(path: String) {
+    private suspend fun playAudio(path: String) = withContext(Dispatchers.Default){
         context?.applicationContext?.let { appContext ->
             logger.debug("Play $path")
             mediaPlayer.playAudio(appContext, path)
         }
     }
-
 }

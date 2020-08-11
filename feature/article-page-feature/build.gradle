@@ -26,6 +26,7 @@ dependencies {
     implementation "androidx.constraintlayout:constraintlayout:${versions.constraintlayout}"
     implementation "androidx.coordinatorlayout:coordinatorlayout:${versions.coordinatorlayout}"
     implementation "com.google.android.material:material:${versions.material}"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:${versions.androidxlifecycleruntime}"
 
     implementation "org.koin:koin-android:${versions.koin}"
     implementation "org.koin:koin-androidx-viewmodel:${versions.koin}"
