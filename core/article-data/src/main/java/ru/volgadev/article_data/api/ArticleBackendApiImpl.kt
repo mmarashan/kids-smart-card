@@ -41,6 +41,7 @@ class ArticleBackendApiImpl : ArticleBackendApi {
                         tags.add(tagsJs[t] as String)
                     }
                 }
+                val author = articleJson.optString("author")
                 val title = articleJson.optString("title")
                 val text = articleJson.optString("text")
                 val iconUrl = articleJson.optString("iconUrl")
@@ -49,7 +50,7 @@ class ArticleBackendApiImpl : ArticleBackendApi {
                 val timestamp = articleJson.optLong("timestamp")
                 result.add(
                     Article(
-                        id = id, tags = tags, title = title, text = text, iconUrl = iconUrl,
+                        id = id, tags = tags, author = author, title = title, text = text, iconUrl = iconUrl,
                         averageTimeReadingMin = averageTimeReadingMin, hardLevel = hardLevel,
                         timestamp = timestamp
                     )

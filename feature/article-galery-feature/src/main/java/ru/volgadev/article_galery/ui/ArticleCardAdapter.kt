@@ -6,11 +6,13 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.AnyThread
 import androidx.cardview.widget.CardView
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import ru.volgadev.article_data.model.Article
 import ru.volgadev.article_galery.R
 import ru.volgadev.common.log.Logger
+
 
 class ArticleCardAdapter :
     RecyclerView.Adapter<ArticleCardAdapter.ViewHolder>() {
@@ -20,6 +22,7 @@ class ArticleCardAdapter :
     interface OnItemClickListener {
         fun onClick(itemId: Long)
     }
+
     @Volatile
     private var onItemClicklistener: OnItemClickListener? = null
 
@@ -49,17 +52,27 @@ class ArticleCardAdapter :
     }
 
     @AnyThread
-    fun setOnItemClickListener(listener: OnItemClickListener){
+    fun setOnItemClickListener(listener: OnItemClickListener) {
         onItemClicklistener = listener
     }
 
     // Replace the contents of a view (invoked by the layout manager)
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val article = articleList[position]
-        val textView = holder.card.findViewById<TextView>(R.id.card_view_title)
-        val image = holder.card.findViewById<ImageView>(R.id.card_view_image)
+        val author = holder.card.findViewById<TextView>(R.id.cardAuthor)
+        val title = holder.card.findViewById<TextView>(R.id.cardTitle)
+        val image = holder.card.findViewById<ImageView>(R.id.cardImage)
+
+        val tagsRecyclerView =  holder.card.findViewById<RecyclerView>(R.id.cardTagsRecyclerView)
+        tagsRecyclerView.setHasFixedSize(true)
+        tagsRecyclerView.layoutManager = LinearLayoutManager(tagsRecyclerView.context, LinearLayoutManager.HORIZONTAL, false)
+
+
+
         if (article.iconUrl != null) Glide.with(image.context).load(article.iconUrl).into(image)
-        textView.text = article.title
+        author.text = article.author
+        title.text = article.title
+
         holder.card.setOnClickListener {
             logger.debug("On click ${article.id}")
             onItemClicklistener?.onClick(article.id)

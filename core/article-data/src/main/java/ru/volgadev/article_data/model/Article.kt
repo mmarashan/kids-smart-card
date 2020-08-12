@@ -8,6 +8,7 @@ data class Article(
     @PrimaryKey
     val id: Long,
     val tags: List<String> = listOf(),
+    val author: String,
     val title: String,
     val text: String,
     val iconUrl: String? = null,
