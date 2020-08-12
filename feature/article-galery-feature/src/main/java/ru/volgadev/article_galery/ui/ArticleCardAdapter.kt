@@ -63,6 +63,7 @@ class ArticleCardAdapter :
         val title = holder.card.findViewById<TextView>(R.id.cardTitle)
         val image = holder.card.findViewById<ImageView>(R.id.cardImage)
 
+        // TODO: add data
         val tagsRecyclerView =  holder.card.findViewById<RecyclerView>(R.id.cardTagsRecyclerView)
         tagsRecyclerView.setHasFixedSize(true)
         tagsRecyclerView.layoutManager = LinearLayoutManager(tagsRecyclerView.context, LinearLayoutManager.HORIZONTAL, false)
