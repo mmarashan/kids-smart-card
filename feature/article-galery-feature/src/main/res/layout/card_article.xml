@@ -39,7 +39,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginEnd="4dp"
             android:layout_marginTop="4dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="4dp"
             android:textSize="16sp"
             tools:text="Русская народная"/>
 
@@ -49,10 +49,13 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="4dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="2dp"
             android:layout_marginBottom="8dp"
             android:orientation="horizontal"
-            />
+            android:clipToPadding="false"
+            android:padding="2dp"
+            tools:listitem="@layout/card_tag"
+            tools:itemCount="1" />
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>

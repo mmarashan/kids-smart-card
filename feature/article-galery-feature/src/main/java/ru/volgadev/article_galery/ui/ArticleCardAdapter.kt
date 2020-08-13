@@ -6,6 +6,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.AnyThread
 import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -24,7 +26,7 @@ class ArticleCardAdapter :
     }
 
     @Volatile
-    private var onItemClicklistener: OnItemClickListener? = null
+    private var onItemClickListener: OnItemClickListener? = null
 
     private val logger = Logger.get("ArticleCardAdapter")
 
@@ -44,7 +46,6 @@ class ArticleCardAdapter :
         parent: ViewGroup,
         viewType: Int
     ): ViewHolder {
-
         val card = LayoutInflater.from(parent.context)
             .inflate(R.layout.card_article, parent, false) as CardView
 
@@ -53,7 +54,7 @@ class ArticleCardAdapter :
 
     @AnyThread
     fun setOnItemClickListener(listener: OnItemClickListener) {
-        onItemClicklistener = listener
+        onItemClickListener = listener
     }
 
     // Replace the contents of a view (invoked by the layout manager)
@@ -63,12 +64,19 @@ class ArticleCardAdapter :
         val title = holder.card.findViewById<TextView>(R.id.cardTitle)
         val image = holder.card.findViewById<ImageView>(R.id.cardImage)
 
-        // TODO: add data
         val tagsRecyclerView =  holder.card.findViewById<RecyclerView>(R.id.cardTagsRecyclerView)
-        tagsRecyclerView.setHasFixedSize(true)
-        tagsRecyclerView.layoutManager = LinearLayoutManager(tagsRecyclerView.context, LinearLayoutManager.HORIZONTAL, false)
-
-
+        tagsRecyclerView.run {
+            setHasFixedSize(true)
+            layoutManager = LinearLayoutManager(tagsRecyclerView.context, LinearLayoutManager.HORIZONTAL, false)
+            adapter = ArticleTagsAdapter().apply {
+                setDataset(article.tags)
+            }
+            val dividerDrawable = ContextCompat.getDrawable(context, R.drawable.empty_divider_4)!!
+            val dividerDecorator = DividerItemDecoration(context, DividerItemDecoration.HORIZONTAL).apply {
+                setDrawable(dividerDrawable)
+            }
+            addItemDecoration(dividerDecorator)
+        }
 
         if (article.iconUrl != null) Glide.with(image.context).load(article.iconUrl).into(image)
         author.text = article.author
@@ -76,7 +84,7 @@ class ArticleCardAdapter :
 
         holder.card.setOnClickListener {
             logger.debug("On click ${article.id}")
-            onItemClicklistener?.onClick(article.id)
+            onItemClickListener?.onClick(article.id)
         }
     }
 

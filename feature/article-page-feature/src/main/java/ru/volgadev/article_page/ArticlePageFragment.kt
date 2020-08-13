@@ -11,6 +11,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.layout_article_page.*
+import kotlinx.android.synthetic.main.layout_bottom_controls.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -51,7 +52,9 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
             activity?.onBackPressed()
         }
 
-
+        buttonMute.setOnClickListener { btn ->
+            btn.isPressed = true
+        }
 
         viewModel.article.observe(viewLifecycleOwner, Observer { article ->
             logger.debug("Set new ${article.id} article")
