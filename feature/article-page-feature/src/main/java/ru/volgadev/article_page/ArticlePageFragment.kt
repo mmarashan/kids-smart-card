@@ -1,24 +1,22 @@
 package ru.volgadev.article_page
 
-import android.media.AudioManager
 import android.media.MediaPlayer
-import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import androidx.annotation.WorkerThread
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.jackandphantom.customtogglebutton.CustomToggle
 import kotlinx.android.synthetic.main.layout_article_page.*
 import kotlinx.android.synthetic.main.layout_bottom_controls.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.koin.androidx.scope.currentScope
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.playAudio
+
 
 const val ITEM_ID_KEY = "ITEM_ID"
 
@@ -53,8 +51,36 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
         }
 
         buttonMute.setOnClickListener { btn ->
-            btn.isPressed = true
+            btn.postDelayed({
+                viewModel.onClickToggleMute()
+            }, 100)
         }
+
+        buttonAutoScroll.setOnClickListener { btn ->
+            btn.postDelayed({
+                viewModel.onClickToggleAutoScroll()
+            }, 100)
+        }
+
+        // TODO: избавиться от мигания
+        viewModel.isMute.observe(viewLifecycleOwner, Observer { isMute ->
+            buttonMute.isPressed = isMute
+        })
+
+        viewModel.isAutoScroll.observe(viewLifecycleOwner, Observer { isAutoScroll ->
+            buttonAutoScroll.isPressed = isAutoScroll
+        })
+
+        // TODO: разобраться с кастомным тоглом
+        customToggle.setOnToggleClickListener(object : CustomToggle.OnToggleClickListener {
+            override fun onLefToggleEnabled(enabled: Boolean) {
+                logger.debug("onLefToggleEnabled")
+            }
+
+            override fun onRightToggleEnabled(enabled: Boolean) {
+                logger.debug("onRightToggleEnabled")
+            }
+        })
 
         viewModel.article.observe(viewLifecycleOwner, Observer { article ->
             logger.debug("Set new ${article.id} article")
@@ -68,7 +94,7 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
         })
     }
 
-    private suspend fun playAudio(path: String) = withContext(Dispatchers.Default){
+    private suspend fun playAudio(path: String) = withContext(Dispatchers.Default) {
         context?.applicationContext?.let { appContext ->
             logger.debug("Play $path")
             mediaPlayer.playAudio(appContext, path)

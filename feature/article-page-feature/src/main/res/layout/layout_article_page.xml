@@ -54,7 +54,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
-                            android:layout_margin="4dp"
+                            android:layout_marginEnd="@dimen/margin_extra_small"
                             android:background="#00000000"
                             android:src="@drawable/ic_baseline_chevron_left" />
 
@@ -63,10 +63,10 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
-                            android:layout_marginStart="@dimen/margin_normal"
+                            android:layout_marginStart="@dimen/margin_extra_small"
                             android:textAlignment="center"
-                            android:textSize="24sp"
-                            tools:text="Article title" />
+                            android:textSize="22sp"
+                            tools:text="Иван-царевич и серый волк" />
 
                     </LinearLayout>
                 </androidx.appcompat.widget.Toolbar>
@@ -92,7 +92,7 @@
                 android:textSize="18sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                tools:text="Details about the plant" />
+                tools:text="Жили у бабуси три веселых гуся" />
 
         </androidx.core.widget.NestedScrollView>
 

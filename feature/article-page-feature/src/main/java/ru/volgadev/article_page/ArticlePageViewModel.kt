@@ -1,6 +1,7 @@
 package ru.volgadev.article_page
 
 import androidx.annotation.AnyThread
+import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -17,6 +18,12 @@ class ArticlePageViewModel(private val articleRepository: ArticleRepository) : V
     private val _article = MutableLiveData<Article>()
     val article: LiveData<Article> = _article
 
+    private val _mute = MutableLiveData<Boolean>().apply { value = false }
+    val isMute: LiveData<Boolean> = _mute
+
+    private val _autoScroll = MutableLiveData<Boolean>().apply { value = true }
+    val isAutoScroll: LiveData<Boolean> = _autoScroll
+
     @AnyThread
     fun onChooseArticle(id: Long) {
         viewModelScope.launch {
@@ -28,5 +35,17 @@ class ArticlePageViewModel(private val articleRepository: ArticleRepository) : V
                 logger.error("Article $id not found")
             }
         }
+    }
+
+    @MainThread
+    fun onClickToggleMute() {
+        logger.debug("onClickMute()")
+        _mute.value = !_mute.value!!
+    }
+
+    @MainThread
+    fun onClickToggleAutoScroll() {
+        logger.debug("onClickAutoScroll()")
+        _autoScroll.value = !_autoScroll.value!!
     }
 }

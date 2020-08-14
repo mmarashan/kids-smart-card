@@ -35,6 +35,9 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:${versions.androidxlifecycle}"
     implementation "com.github.bumptech.glide:glide:${versions.glide}"
 
+    // TODO: если зайдет, перенести исходники (сохранил в загрузки)
+    implementation 'com.jackandphantom.android:customtogglebutton:1.0.1'
+
     implementation project(':common')
     implementation project(':core:article-data')
 }
