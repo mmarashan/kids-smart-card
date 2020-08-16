@@ -96,7 +96,7 @@
 
         </androidx.core.widget.NestedScrollView>
 
-        <include layout="@layout/layout_bottom_controls"/>
+        <include layout="@layout/layout_bottom_controls" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
