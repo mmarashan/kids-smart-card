@@ -1,6 +1,5 @@
 package ru.volgadev.article_page
 
-import android.graphics.Color
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.View
@@ -31,7 +30,6 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
     private val viewModel: ArticlePageViewModel by viewModel()
 
     private val mediaPlayer: MediaPlayer = MediaPlayer()
-
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -73,7 +71,8 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
 
         viewModel.article.observe(viewLifecycleOwner, Observer { article ->
             logger.debug("Set new ${article.id} article")
-            toolbarText.text = article.title
+            val title = "${article .title}. ${article.author}"
+            titleText.text = title
             articleText.text = article.text
             if (article.iconUrl != null) Glide.with(articleImage.context).load(article.iconUrl)
                 .into(articleImage)
@@ -81,13 +80,21 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
                 playAudio("https://raw.githubusercontent.com/mmarashan/psdata/master/audio/1.mp3")
             }
         })
+        // TODO: autoscrolling
+        // articleTextNestedScrollView.scrollTo(0, 100)
+    }
+
+    override fun onDestroyView() {
+        logger.debug("onDestroyView()")
+        super.onDestroyView()
+        mediaPlayer.stop()
+        mediaPlayer.release()
     }
 
     private suspend fun playAudio(path: String) = withContext(Dispatchers.Default) {
         context?.applicationContext?.let { appContext ->
             logger.debug("Play $path")
             mediaPlayer.playAudio(appContext, path)
-            mediaPlayer
         }
     }
 }

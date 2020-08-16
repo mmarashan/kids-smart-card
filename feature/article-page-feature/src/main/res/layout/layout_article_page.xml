@@ -25,10 +25,9 @@
                 android:layout_height="match_parent"
                 android:fitsSystemWindows="true"
                 app:collapsedTitleGravity="center"
-                app:contentScrim="@android:color/transparent"
+                app:contentScrim="@color/colorPrimaryDark"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed"
                 app:statusBarScrim="@android:color/transparent"
-                app:title="CollapsingToolbarLayout title"
                 app:titleEnabled="true"
                 app:toolbarId="@id/pageToolbar">
 
@@ -36,12 +35,13 @@
                     android:id="@+id/articleImage"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/detail_app_bar_height"
+                    android:layout_marginTop="64dp"
                     android:scaleType="fitCenter" />
 
                 <androidx.appcompat.widget.Toolbar
                     android:id="@+id/pageToolbar"
                     android:layout_width="match_parent"
-                    android:layout_height="64dp"
+                    android:layout_height="48dp"
                     app:contentInsetStartWithNavigation="0dp"
                     app:layout_collapseMode="pin">
 
@@ -55,11 +55,11 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:layout_marginEnd="@dimen/margin_extra_small"
-                            android:background="#00000000"
+                            android:background="@android:color/transparent"
                             android:src="@drawable/ic_baseline_chevron_left" />
 
                         <TextView
-                            android:id="@+id/toolbarText"
+                            android:id="@+id/titleText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
@@ -76,6 +76,7 @@
         </com.google.android.material.appbar.AppBarLayout>
 
         <androidx.core.widget.NestedScrollView
+            android:id="@+id/articleTextNestedScrollView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"

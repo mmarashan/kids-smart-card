@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_gravity="bottom"
+    android:layout_gravity="end|bottom"
     android:divider="@drawable/empty_divider_24"
-    android:orientation="horizontal"
-    android:padding="24dp"
+    android:orientation="vertical"
     android:showDividers="middle">
 
     <androidx.appcompat.widget.AppCompatToggleButton
@@ -14,6 +13,7 @@
         android:layout_height="48dp"
         android:background="@drawable/selector_music"
         android:checked="false"
+        android:layout_margin="12dp"
         android:textOff=""
         android:textOn="" />
 
@@ -23,6 +23,7 @@
         android:layout_height="48dp"
         android:background="@drawable/selector_autoscroll"
         android:checked="false"
+        android:layout_margin="12dp"
         android:textOff=""
         android:textOn="" />
 </LinearLayout>
