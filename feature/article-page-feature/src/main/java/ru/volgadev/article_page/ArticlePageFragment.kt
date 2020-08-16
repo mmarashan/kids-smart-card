@@ -15,6 +15,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import ru.volgadev.common.log.Logger
+import ru.volgadev.common.mute
 import ru.volgadev.common.playAudio
 
 const val ITEM_ID_KEY = "ITEM_ID"
@@ -61,9 +62,9 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
             }, 100)
         }
 
-        // TODO: избавиться от мигания
         viewModel.isMute.observe(viewLifecycleOwner, Observer { isMute ->
             toggleButtonMute.isPressed = isMute
+            mediaPlayer.mute(isMute)
         })
 
         viewModel.isAutoScroll.observe(viewLifecycleOwner, Observer { isAutoScroll ->
@@ -86,6 +87,7 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
         context?.applicationContext?.let { appContext ->
             logger.debug("Play $path")
             mediaPlayer.playAudio(appContext, path)
+            mediaPlayer
         }
     }
 }
