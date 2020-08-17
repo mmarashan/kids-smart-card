@@ -23,7 +23,6 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
     implementation "androidx.core:core-ktx:${versions.corektx}"
-    implementation "androidx.constraintlayout:constraintlayout:${versions.constraintlayout}"
     implementation "androidx.coordinatorlayout:coordinatorlayout:${versions.coordinatorlayout}"
     implementation "com.google.android.material:material:${versions.material}"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:${versions.androidxlifecycleruntime}"
@@ -33,6 +32,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-extensions:${versions.androidxlifecycle}"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${versions.androidxlifecycle}"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:${versions.androidxlifecycle}"
+    implementation "androidx.cardview:cardview:${versions.cardview}"
     implementation "com.github.bumptech.glide:glide:${versions.glide}"
 
     implementation project(':common')

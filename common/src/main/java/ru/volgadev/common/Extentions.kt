@@ -1,7 +1,9 @@
 package ru.volgadev.common
 
+import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
@@ -10,10 +12,17 @@ import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
 import android.util.Log
+import android.view.View
+import androidx.core.app.ActivityCompat
 
 fun Context.applicationDataDir(): String {
     val p: PackageInfo = this.packageManager.getPackageInfo(this.packageName, 0)
     return p.applicationInfo.dataDir+"/"
+}
+
+fun Context.isPermissionGranted(permission: String): Boolean {
+    val permissionCheck = ActivityCompat.checkSelfPermission(this, permission)
+    return permissionCheck == PackageManager.PERMISSION_GRANTED
 }
 
 fun Drawable.toBitmap(): Bitmap {
@@ -46,4 +55,16 @@ fun MediaPlayer.playAudio(context: Context, path: String) {
 fun MediaPlayer.mute(mute: Boolean) {
     if (mute) setVolume(0f, 0f)
     else setVolume(1f, 1f)
+}
+
+fun Activity.hideNavBar() {
+    val decorView: View = window.decorView
+    val uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+    decorView.systemUiVisibility = uiOptions
+}
+
+fun Activity.showNavBar() {
+    val decorView: View = window.decorView
+    val uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+    decorView.systemUiVisibility = uiOptions
 }

@@ -13,6 +13,7 @@ import ru.volgadev.appsample.R
 import ru.volgadev.article_galery.ui.ArticleGalleryFragment
 import ru.volgadev.article_page.ArticlePageFragment
 import ru.volgadev.article_page.ITEM_ID_KEY
+import ru.volgadev.common.hideNavBar
 import ru.volgadev.common.log.Logger
 
 const val HOME_ITEM_ID = R.id.action_home
@@ -27,6 +28,7 @@ class MainActivity : AppCompatActivity() {
         setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
+        this.hideNavBar()
 
         val galleryFragment: ArticleGalleryFragment =
             FragmentProvider.get(AppFragment.GALERY_FRAGMENT) as ArticleGalleryFragment

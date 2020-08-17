@@ -15,8 +15,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:animateLayoutChanges="true"
-            android:fitsSystemWindows="true"
             android:background="@android:color/transparent"
+            android:fitsSystemWindows="true"
             android:stateListAnimator="@animator/show_toolbar">
 
             <com.google.android.material.appbar.CollapsingToolbarLayout
@@ -27,7 +27,7 @@
                 app:collapsedTitleGravity="center"
                 app:contentScrim="@color/colorPrimaryDark"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed"
-                app:statusBarScrim="@android:color/transparent"
+                app:statusBarScrim="@color/colorPrimaryDark"
                 app:titleEnabled="true"
                 app:toolbarId="@id/pageToolbar">
 
@@ -53,10 +53,10 @@
                             android:id="@+id/backButton"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center"
+                            android:layout_gravity="center|start"
                             android:layout_marginEnd="@dimen/margin_extra_small"
                             android:background="@android:color/transparent"
-                            android:src="@drawable/ic_baseline_chevron_left" />
+                            android:src="@drawable/ic_arrow_back" />
 
                         <TextView
                             android:id="@+id/titleText"
@@ -65,7 +65,7 @@
                             android:layout_gravity="center"
                             android:layout_marginStart="@dimen/margin_extra_small"
                             android:textAlignment="center"
-                            android:textSize="22sp"
+                            android:textSize="20sp"
                             tools:text="Иван-царевич и серый волк" />
 
                     </LinearLayout>
@@ -90,7 +90,7 @@
                 android:layout_margin="@dimen/margin_normal"
                 android:minHeight="@dimen/description_min_height"
                 android:textIsSelectable="false"
-                android:textSize="18sp"
+                android:textSize="20sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 tools:text="Жили у бабуси три веселых гуся" />

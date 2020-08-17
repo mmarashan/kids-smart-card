@@ -1,5 +1,6 @@
 package ru.volgadev.article_page
 
+import android.app.Activity
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.View
@@ -71,7 +72,7 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
 
         viewModel.article.observe(viewLifecycleOwner, Observer { article ->
             logger.debug("Set new ${article.id} article")
-            val title = "${article .title}. ${article.author}"
+            val title = "${article.title}. ${article.author}"
             titleText.text = title
             articleText.text = article.text
             if (article.iconUrl != null) Glide.with(articleImage.context).load(article.iconUrl)

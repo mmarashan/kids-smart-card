@@ -1,29 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_gravity="end|bottom"
-    android:divider="@drawable/empty_divider_24"
-    android:orientation="vertical"
-    android:showDividers="middle">
+    android:layout_gravity="center|bottom"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="6dp">
 
-    <androidx.appcompat.widget.AppCompatToggleButton
-        android:id="@+id/toggleButtonMute"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:background="@drawable/selector_music"
-        android:checked="false"
-        android:layout_margin="12dp"
-        android:textOff=""
-        android:textOn="" />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/control_button_size"
+        android:layout_margin="8dp"
+        android:divider="@drawable/empty_divider_24"
+        android:orientation="horizontal"
+        android:showDividers="middle">
 
-    <androidx.appcompat.widget.AppCompatToggleButton
-        android:id="@+id/toggleAutoScroll"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:background="@drawable/selector_autoscroll"
-        android:checked="false"
-        android:layout_margin="12dp"
-        android:textOff=""
-        android:textOn="" />
-</LinearLayout>
+        <androidx.appcompat.widget.AppCompatToggleButton
+            android:id="@+id/toggleButtonMute"
+            android:layout_width="@dimen/control_button_size"
+            android:layout_height="@dimen/control_button_size"
+            android:background="@drawable/selector_music"
+            android:backgroundTint="@color/colorPrimary"
+            android:checked="false"
+            android:textOff=""
+            android:textOn="" />
+
+        <androidx.appcompat.widget.AppCompatToggleButton
+            android:id="@+id/toggleAutoScroll"
+            android:layout_width="@dimen/control_button_size"
+            android:layout_height="@dimen/control_button_size"
+            android:background="@drawable/selector_autoscroll"
+            android:backgroundTint="@color/colorPrimary"
+            android:checked="false"
+            android:textOff=""
+            android:textOn="" />
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
