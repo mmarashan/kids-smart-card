@@ -5,4 +5,6 @@
     <color name="navigationBarColor">#052A51</color>
     <color name="colorAccent">#F5F0F6</color>
     <color name="colorControlsBackground">#052A51</color>
+    <color name="colorLightText">#EDEEF1</color>
+    <color name="colorDarkText">#39393E</color>
 </resources>

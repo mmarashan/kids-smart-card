@@ -11,7 +11,7 @@
         android:fitsSystemWindows="true">
 
         <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/appbar"
+            android:id="@+id/appBarLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:animateLayoutChanges="true"
@@ -25,9 +25,9 @@
                 android:layout_height="match_parent"
                 android:fitsSystemWindows="true"
                 app:collapsedTitleGravity="center"
-                app:contentScrim="@color/colorPrimaryDark"
+                app:contentScrim="@android:color/transparent"
                 app:layout_scrollFlags="scroll|exitUntilCollapsed"
-                app:statusBarScrim="@color/colorPrimaryDark"
+                app:statusBarScrim="@android:color/transparent"
                 app:titleEnabled="true"
                 app:toolbarId="@id/pageToolbar">
 
@@ -43,7 +43,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     app:contentInsetStartWithNavigation="0dp"
-                    app:layout_collapseMode="pin">
+                    app:layout_collapseMode="pin"
+                    android:background="@color/colorPrimary">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -55,6 +56,7 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center|start"
                             android:layout_marginEnd="@dimen/margin_extra_small"
+                            android:backgroundTint="@color/colorLightText"
                             android:background="@android:color/transparent"
                             android:src="@drawable/ic_arrow_back" />
 
@@ -66,6 +68,7 @@
                             android:layout_marginStart="@dimen/margin_extra_small"
                             android:textAlignment="center"
                             android:textSize="20sp"
+                            android:textColor="@color/colorLightText"
                             tools:text="Иван-царевич и серый волк" />
 
                     </LinearLayout>

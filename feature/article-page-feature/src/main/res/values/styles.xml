@@ -1,7 +1,3 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="ImageToggleButton">
-        <item name="android:textOn"></item>
-        <item name="android:textOff"></item>
-    </style>
 </resources>
