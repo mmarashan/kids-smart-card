@@ -1,6 +1,5 @@
 package ru.volgadev.article_page
 
-import android.graphics.Color
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.View
@@ -8,7 +7,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
-import com.google.android.material.appbar.AppBarLayout.OnOffsetChangedListener
 import kotlinx.android.synthetic.main.layout_article_page.*
 import kotlinx.android.synthetic.main.layout_bottom_controls.*
 import kotlinx.coroutines.Dispatchers
@@ -18,7 +16,6 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.mute
 import ru.volgadev.common.playAudio
-import kotlin.math.abs
 
 
 const val ITEM_ID_KEY = "ITEM_ID"
@@ -84,16 +81,6 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
                 playAudio("https://raw.githubusercontent.com/mmarashan/psdata/master/audio/1.mp3")
             }
         })
-
-//        appBarLayout.addOnOffsetChangedListener(OnOffsetChangedListener { appBarLayout, verticalOffset ->
-//            //  Collapsed
-//            if (abs(verticalOffset) - appBarLayout.totalScrollRange == 0) {
-//                titleText.setTextColor(Color.WHITE)
-//                //Expanded
-//            } else {
-//                titleText.setTextColor(Color.BLACK)
-//            }
-//        })
 
         // TODO: autoscrolling
         // articleTextNestedScrollView.scrollTo(0, 100)

@@ -17,10 +17,10 @@
         android:layout_width="match_parent"
         android:layout_height="96dp"
         android:layout_weight="5"
-        android:background="@color/colorPrimary"
-        app:itemBackground="@color/colorPrimary"
-        app:itemIconTint="@android:color/white"
-        app:itemTextColor="@android:color/white"
+        android:background="@color/navigationBarColor"
+        app:itemBackground="@color/navigationBarColor"
+        app:itemIconTint="@color/colorLightText"
+        app:itemTextColor="@color/colorLightText"
         app:menu="@menu/bottom_navigation_menu" />
 
 </LinearLayout>

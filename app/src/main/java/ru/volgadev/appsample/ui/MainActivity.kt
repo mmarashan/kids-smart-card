@@ -6,7 +6,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
+import androidx.transition.Fade
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.android.synthetic.main.main_activity.*
 import ru.volgadev.appsample.R
@@ -33,14 +33,16 @@ class MainActivity : AppCompatActivity() {
         val galleryFragment: ArticleGalleryFragment =
             FragmentProvider.get(AppFragment.GALERY_FRAGMENT) as ArticleGalleryFragment
         galleryFragment.setOnItemClickListener(object : ArticleGalleryFragment.OnItemClickListener {
-            override fun onClick(itemId: Long) {
+            override fun onClick(itemId: Long, clickedView: View) {
                 logger.debug("Choose $itemId item to show")
                 val itemPageFragment =
                     FragmentProvider.get(AppFragment.ARTICLE_PAGE_FRAGMENT) as ArticlePageFragment
+                itemPageFragment.enterTransition = Fade()
                 showFragment(
                     itemPageFragment,
                     Bundle().apply { putLong(ITEM_ID_KEY, itemId) },
-                    true
+                    true,
+                    clickedView
                 )
             }
         })
@@ -72,7 +74,8 @@ class MainActivity : AppCompatActivity() {
     private fun showFragment(
         fragment: Fragment,
         arguments: Bundle? = null,
-        addToBackStack: Boolean = false
+        addToBackStack: Boolean = false,
+        clickedView: View? = null
     ) {
         logger.debug("Show fragment ${fragment.javaClass.canonicalName}")
         fragment.arguments = arguments
@@ -81,8 +84,8 @@ class MainActivity : AppCompatActivity() {
         } else {
             showNavigationPanel()
         }
+
         val transaction = supportFragmentManager.beginTransaction()
-            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
             .replace(R.id.contentContainer, fragment)
 
         if (addToBackStack) transaction.addToBackStack(null)

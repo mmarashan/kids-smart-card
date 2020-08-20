@@ -23,7 +23,7 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
     private val viewModel: ArticleGaleryViewModel by viewModel()
 
     interface OnItemClickListener {
-        fun onClick(itemId: Long)
+        fun onClick(itemId: Long, clickedView: View)
     }
 
     @Volatile
@@ -41,8 +41,8 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
         val gridLayoutManager = GridLayoutManager(context, 2)
         val viewAdapter = ArticleCardAdapter().apply {
             setOnItemClickListener(object : ArticleCardAdapter.OnItemClickListener {
-                override fun onClick(itemId: Long) {
-                    onItemClickListener?.onClick(itemId)
+                override fun onClick(itemId: Long, clickedView: View) {
+                    onItemClickListener?.onClick(itemId, clickedView)
                 }
             })
         }

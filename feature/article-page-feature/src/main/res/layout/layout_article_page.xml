@@ -42,9 +42,9 @@
                     android:id="@+id/pageToolbar"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
+                    android:background="@color/colorPrimary"
                     app:contentInsetStartWithNavigation="0dp"
-                    app:layout_collapseMode="pin"
-                    android:background="@color/colorPrimary">
+                    app:layout_collapseMode="pin">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -56,8 +56,8 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center|start"
                             android:layout_marginEnd="@dimen/margin_extra_small"
-                            android:backgroundTint="@color/colorLightText"
                             android:background="@android:color/transparent"
+                            android:backgroundTint="@color/colorLightText"
                             android:src="@drawable/ic_arrow_back" />
 
                         <TextView
@@ -66,10 +66,11 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:layout_marginStart="@dimen/margin_extra_small"
+                            android:lineSpacingMultiplier="0.8"
                             android:textAlignment="center"
-                            android:textSize="20sp"
                             android:textColor="@color/colorLightText"
-                            tools:text="Иван-царевич и серый волк" />
+                            android:textSize="20sp"
+                            tools:text="Иван-царевич и серый волк. Русская народная" />
 
                     </LinearLayout>
                 </androidx.appcompat.widget.Toolbar>

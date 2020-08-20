@@ -15,7 +15,7 @@ import ru.volgadev.article_galery.ui.ArticleGaleryViewModel
 import ru.volgadev.article_page.ArticlePageViewModel
 import ru.volgadev.common.log.Logger
 
-class SampleApplication : Application() {
+class PapaStoryApplication : Application() {
 
     private val logger = Logger.get("SampleApplication")
 
@@ -41,7 +41,7 @@ class SampleApplication : Application() {
 
         val koin = startKoin {
             androidLogger(Level.DEBUG)
-            androidContext(this@SampleApplication)
+            androidContext(this@PapaStoryApplication)
             modules(sampleModule)
         }.koin
 

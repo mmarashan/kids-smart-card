@@ -1,6 +1,7 @@
 package ru.volgadev.article_galery.ui
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
@@ -22,7 +23,7 @@ class ArticleCardAdapter :
     class ViewHolder(val card: CardView) : RecyclerView.ViewHolder(card)
 
     interface OnItemClickListener {
-        fun onClick(itemId: Long)
+        fun onClick(itemId: Long, clickedView: View)
     }
 
     @Volatile
@@ -64,17 +65,19 @@ class ArticleCardAdapter :
         val title = holder.card.findViewById<TextView>(R.id.cardTitle)
         val image = holder.card.findViewById<ImageView>(R.id.cardImage)
 
-        val tagsRecyclerView =  holder.card.findViewById<RecyclerView>(R.id.cardTagsRecyclerView)
+        val tagsRecyclerView = holder.card.findViewById<RecyclerView>(R.id.cardTagsRecyclerView)
         tagsRecyclerView.run {
             setHasFixedSize(true)
-            layoutManager = LinearLayoutManager(tagsRecyclerView.context, LinearLayoutManager.HORIZONTAL, false)
+            layoutManager =
+                LinearLayoutManager(tagsRecyclerView.context, LinearLayoutManager.HORIZONTAL, false)
             adapter = ArticleTagsAdapter().apply {
                 setDataset(article.tags)
             }
             val dividerDrawable = ContextCompat.getDrawable(context, R.drawable.empty_divider_4)!!
-            val dividerDecorator = DividerItemDecoration(context, DividerItemDecoration.HORIZONTAL).apply {
-                setDrawable(dividerDrawable)
-            }
+            val dividerDecorator =
+                DividerItemDecoration(context, DividerItemDecoration.HORIZONTAL).apply {
+                    setDrawable(dividerDrawable)
+                }
             addItemDecoration(dividerDecorator)
         }
 
@@ -82,9 +85,9 @@ class ArticleCardAdapter :
         author.text = article.author
         title.text = article.title
 
-        holder.card.setOnClickListener {
+        holder.card.setOnClickListener { card ->
             logger.debug("On click ${article.id}")
-            onItemClickListener?.onClick(article.id)
+            onItemClickListener?.onClick(article.id, card)
         }
     }
 

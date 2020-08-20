@@ -12,7 +12,7 @@
     <!-- Кастомная AppTheme.Launcher. Устанавливает в качестве фона вашу drawable -->
     <style name="AppTheme.Launcher">
         <item name="android:windowBackground">@drawable/splash_screen</item>
-        <item name="android:colorPrimary">@color/colorPrimary</item>
+        <item name="android:colorPrimary">@color/colorPrimaryDark</item>
         <item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
     </style>
 </resources>
