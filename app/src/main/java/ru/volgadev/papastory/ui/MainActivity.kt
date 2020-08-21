@@ -1,4 +1,4 @@
-package ru.volgadev.appsample.ui
+package ru.volgadev.papastory.ui
 
 import android.os.Bundle
 import android.view.MenuItem
@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.transition.Fade
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.android.synthetic.main.main_activity.*
-import ru.volgadev.appsample.R
+import ru.volgadev.papastory.R
 import ru.volgadev.article_galery.ui.ArticleGalleryFragment
 import ru.volgadev.article_page.ArticlePageFragment
 import ru.volgadev.article_page.ITEM_ID_KEY

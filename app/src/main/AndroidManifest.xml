@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="ru.volgadev.appsample">
+    package="ru.volgadev.papastory">
 
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:name=".PapaStoryApplication"
+        android:name="ru.volgadev.papastory.PapaStoryApplication"
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.Launcher">
-        <activity android:name=".ui.MainActivity">
+        <activity android:name="ru.volgadev.papastory.ui.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

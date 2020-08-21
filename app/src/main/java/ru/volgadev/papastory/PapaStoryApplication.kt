@@ -1,4 +1,4 @@
-package ru.volgadev.appsample
+package ru.volgadev.papastory
 
 import android.app.Application
 import org.koin.android.ext.koin.androidContext
@@ -13,11 +13,16 @@ import ru.volgadev.article_data.repository.ArticleRepository
 import ru.volgadev.article_data.repository.ArticleRepositoryImpl
 import ru.volgadev.article_galery.ui.ArticleGaleryViewModel
 import ru.volgadev.article_page.ArticlePageViewModel
+import ru.volgadev.common.log.AndroidLoggerDelegate
 import ru.volgadev.common.log.Logger
 
 class PapaStoryApplication : Application() {
 
     private val logger = Logger.get("SampleApplication")
+
+    init {
+        Logger.setDelegates(AndroidLoggerDelegate())
+    }
 
     private val sampleModule = module {
         single<ArticleRepository> {

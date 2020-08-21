@@ -1,4 +1,4 @@
-package ru.volgadev.appsample.ui
+package ru.volgadev.papastory.ui
 
 import androidx.fragment.app.Fragment
 import ru.volgadev.article_galery.ui.ArticleGalleryFragment

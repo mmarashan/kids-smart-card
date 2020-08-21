@@ -1,4 +1,4 @@
-package ru.volgadev.appsample
+package ru.volgadev.papastory
 
 import org.junit.Test
 

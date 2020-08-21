@@ -1,4 +1,4 @@
-package ru.volgadev.appsample
+package ru.volgadev.papastory
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
