@@ -3,6 +3,7 @@ package ru.volgadev.article_page
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.View
+import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -16,6 +17,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.mute
 import ru.volgadev.common.playAudio
+import kotlin.math.abs
+import kotlin.math.roundToInt
 
 
 const val ITEM_ID_KEY = "ITEM_ID"
@@ -66,9 +69,41 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
             mediaPlayer.mute(isMute)
         })
 
+        var scrollProgressPix = 0
+        val deltaThresholdPix = 40
+        val scrollStepDurationMs = 1000
+        val scrollVelocityPixPerSec =
+            (1f * deltaThresholdPix / (1f * scrollStepDurationMs / 1000)).roundToInt()
+
         viewModel.isAutoScroll.observe(viewLifecycleOwner, Observer { isAutoScroll ->
             toggleAutoScroll.isPressed = isAutoScroll
+            if (isAutoScroll) {
+                articleTextNestedScrollView.scrollDown(
+                    scrollVelocityPixPerSec,
+                    scrollStepDurationMs
+                )
+            }
         })
+
+        articleText.setOnClickListener {
+            viewModel.onClickText()
+        }
+
+        articleTextNestedScrollView.setOnScrollChangeListener { _: NestedScrollView?,
+                                                                _: Int, scrollY: Int,
+                                                                _: Int, oldScrollY: Int ->
+            val isAutoScroll = viewModel.isAutoScroll.value ?: false
+            val isScrollDown = scrollY > scrollProgressPix
+            val delta = abs(scrollY - scrollProgressPix)
+            if (delta >= deltaThresholdPix) {
+                scrollProgressPix = scrollY
+                logger.debug("OnScrollChange scrollY=$scrollY, oldScrollY=$oldScrollY")
+                if (isAutoScroll && isScrollDown) articleTextNestedScrollView.scrollDown(
+                    scrollVelocityPixPerSec,
+                    scrollStepDurationMs
+                )
+            }
+        }
 
         viewModel.article.observe(viewLifecycleOwner, Observer { article ->
             logger.debug("Set new ${article.id} article")
@@ -81,9 +116,6 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
                 playAudio("https://raw.githubusercontent.com/mmarashan/psdata/master/audio/1.mp3")
             }
         })
-
-        // TODO: autoscrolling
-        // articleTextNestedScrollView.scrollTo(0, 100)
     }
 
     override fun onDestroyView() {
@@ -98,5 +130,10 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
             logger.debug("Play $path")
             mediaPlayer.playAudio(appContext, path)
         }
+    }
+
+    private fun NestedScrollView.scrollDown(velocityPixPerSec: Int, durationMs: Int) {
+        val dy = velocityPixPerSec * durationMs / 1000
+        smoothScrollBy(0, dy, durationMs)
     }
 }

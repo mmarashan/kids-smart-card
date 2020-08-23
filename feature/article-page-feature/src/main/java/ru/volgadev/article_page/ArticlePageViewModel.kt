@@ -2,10 +2,7 @@ package ru.volgadev.article_page
 
 import androidx.annotation.AnyThread
 import androidx.annotation.MainThread
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import kotlinx.coroutines.launch
 import ru.volgadev.article_data.model.Article
 import ru.volgadev.article_data.repository.ArticleRepository
@@ -22,7 +19,7 @@ class ArticlePageViewModel(private val articleRepository: ArticleRepository) : V
     val isMute: LiveData<Boolean> = _mute
 
     private val _autoScroll = MutableLiveData<Boolean>().apply { value = true }
-    val isAutoScroll: LiveData<Boolean> = _autoScroll
+    val isAutoScroll: LiveData<Boolean> = _autoScroll.distinctUntilChanged()
 
     @AnyThread
     fun onChooseArticle(id: Long) {
@@ -47,5 +44,10 @@ class ArticlePageViewModel(private val articleRepository: ArticleRepository) : V
     fun onClickToggleAutoScroll() {
         logger.debug("onClickAutoScroll()")
         _autoScroll.value = !_autoScroll.value!!
+    }
+
+    @MainThread
+    fun onClickText(){
+        _autoScroll.value = false
     }
 }
