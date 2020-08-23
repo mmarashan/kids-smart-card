@@ -16,10 +16,13 @@ class ArticlePageViewModel(private val articleRepository: ArticleRepository) : V
     val article: LiveData<Article> = _article
 
     private val _mute = MutableLiveData<Boolean>().apply { value = false }
-    val isMute: LiveData<Boolean> = _mute
+    val isMute: LiveData<Boolean> = _mute.distinctUntilChanged()
 
     private val _autoScroll = MutableLiveData<Boolean>().apply { value = true }
     val isAutoScroll: LiveData<Boolean> = _autoScroll.distinctUntilChanged()
+
+    private val _progressPercent = MutableLiveData<Float>()
+    val progressPercent: LiveData<Float> = _progressPercent.distinctUntilChanged()
 
     @AnyThread
     fun onChooseArticle(id: Long) {
@@ -41,13 +44,13 @@ class ArticlePageViewModel(private val articleRepository: ArticleRepository) : V
     }
 
     @MainThread
-    fun onClickToggleAutoScroll() {
-        logger.debug("onClickAutoScroll()")
-        _autoScroll.value = !_autoScroll.value!!
+    fun onToggleAutoScroll(value: Boolean = !_autoScroll.value!!) {
+        logger.debug("onClickAutoScroll(value=$value)")
+        _autoScroll.value = value
     }
 
     @MainThread
-    fun onClickText(){
-        _autoScroll.value = false
+    fun onScrollProgress(progressPercent: Float) {
+        _progressPercent.value = progressPercent
     }
 }

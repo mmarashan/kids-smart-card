@@ -17,11 +17,12 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.mute
 import ru.volgadev.common.playAudio
-import kotlin.math.abs
-import kotlin.math.roundToInt
+import java.util.*
 
 
 const val ITEM_ID_KEY = "ITEM_ID"
+private const val SCROLL_STEP_DURATION_MS = 1000
+private const val SCROLL_VELOCITY_PIX_PER_SEC = 70
 
 class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
 
@@ -34,6 +35,8 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
     private val viewModel: ArticlePageViewModel by viewModel()
 
     private val mediaPlayer: MediaPlayer = MediaPlayer()
+
+    private val autoScrollTimer = Timer()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -60,7 +63,7 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
 
         toggleAutoScroll.setOnClickListener { btn ->
             btn.postDelayed({
-                viewModel.onClickToggleAutoScroll()
+                viewModel.onToggleAutoScroll()
             }, 100)
         }
 
@@ -69,41 +72,36 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
             mediaPlayer.mute(isMute)
         })
 
-        var scrollProgressPix = 0
-        val deltaThresholdPix = 40
-        val scrollStepDurationMs = 1000
-        val scrollVelocityPixPerSec =
-            (1f * deltaThresholdPix / (1f * scrollStepDurationMs / 1000)).roundToInt()
-
         viewModel.isAutoScroll.observe(viewLifecycleOwner, Observer { isAutoScroll ->
+            logger.debug("isAutoScroll=$isAutoScroll")
             toggleAutoScroll.isPressed = isAutoScroll
             if (isAutoScroll) {
                 articleTextNestedScrollView.scrollDown(
-                    scrollVelocityPixPerSec,
-                    scrollStepDurationMs
+                    SCROLL_VELOCITY_PIX_PER_SEC,
+                    SCROLL_STEP_DURATION_MS
                 )
             }
         })
 
-        articleText.setOnClickListener {
-            viewModel.onClickText()
-        }
-
         articleTextNestedScrollView.setOnScrollChangeListener { _: NestedScrollView?,
                                                                 _: Int, scrollY: Int,
-                                                                _: Int, oldScrollY: Int ->
-            val isAutoScroll = viewModel.isAutoScroll.value ?: false
-            val isScrollDown = scrollY > scrollProgressPix
-            val delta = abs(scrollY - scrollProgressPix)
-            if (delta >= deltaThresholdPix) {
-                scrollProgressPix = scrollY
-                logger.debug("OnScrollChange scrollY=$scrollY, oldScrollY=$oldScrollY")
-                if (isAutoScroll && isScrollDown) articleTextNestedScrollView.scrollDown(
-                    scrollVelocityPixPerSec,
-                    scrollStepDurationMs
-                )
+                                                                _: Int, _: Int ->
+            if (articleText.height != 0) {
+                viewModel.onScrollProgress(1f * scrollY / articleText.height)
             }
         }
+
+        autoScrollTimer.schedule(object : TimerTask() {
+            override fun run() {
+                val isAutoScroll = viewModel.isAutoScroll.value ?: false
+                if (isAutoScroll) {
+                    articleTextNestedScrollView?.scrollDown(
+                        SCROLL_VELOCITY_PIX_PER_SEC,
+                        SCROLL_STEP_DURATION_MS
+                    )
+                }
+            }
+        }, 0, SCROLL_STEP_DURATION_MS * 1L)
 
         viewModel.article.observe(viewLifecycleOwner, Observer { article ->
             logger.debug("Set new ${article.id} article")
@@ -121,6 +119,7 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
     override fun onDestroyView() {
         logger.debug("onDestroyView()")
         super.onDestroyView()
+        autoScrollTimer.cancel()
         mediaPlayer.stop()
         mediaPlayer.release()
     }
