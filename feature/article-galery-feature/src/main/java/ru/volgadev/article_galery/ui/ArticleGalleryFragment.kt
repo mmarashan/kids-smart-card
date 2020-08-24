@@ -38,7 +38,8 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
         super.onViewCreated(view, savedInstanceState)
         logger.debug("On fragment created")
 
-        val gridLayoutManager = GridLayoutManager(context, 2)
+        val gridlayoutManager = GridLayoutManager(context, 2)
+
         val viewAdapter = ArticleCardAdapter().apply {
             setOnItemClickListener(object : ArticleCardAdapter.OnItemClickListener {
                 override fun onClick(itemId: Long, clickedView: View) {
@@ -52,7 +53,7 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
             // in content do not change the layout size of the RecyclerView
             setHasFixedSize(true)
 
-            layoutManager = gridLayoutManager
+            layoutManager = gridlayoutManager
             adapter = viewAdapter
         }
 

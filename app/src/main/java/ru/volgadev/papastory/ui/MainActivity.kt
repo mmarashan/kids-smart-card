@@ -1,10 +1,12 @@
 package ru.volgadev.papastory.ui
 
 import android.Manifest
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.annotation.MainThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
@@ -18,6 +20,7 @@ import ru.volgadev.common.hideNavBar
 import ru.volgadev.common.isPermissionGranted
 import ru.volgadev.common.log.Logger
 import ru.volgadev.papastory.R
+
 
 const val HOME_ITEM_ID = R.id.action_home
 const val GALERY_ITEM_ID = R.id.action_galery
@@ -44,17 +47,13 @@ class MainActivity : AppCompatActivity() {
                 .contains(false)
         if (needRequestPermission) {
 
-            Toast.makeText(
-                this,
-                "You should get permissions for better perfomance",
-                Toast.LENGTH_SHORT
-            ).show()
-
-            ActivityCompat.requestPermissions(
-                this,
-                NEEDED_PERMISSIONS,
-                REQUEST_CODE
-            )
+            showPermissionAlertDialog {
+                ActivityCompat.requestPermissions(
+                    this,
+                    NEEDED_PERMISSIONS,
+                    REQUEST_CODE
+                )
+            }
         }
 
         val galleryFragment: ArticleGalleryFragment =
@@ -125,5 +124,16 @@ class MainActivity : AppCompatActivity() {
 
     private fun hideNavigationPanel() {
         bottomNavigation.visibility = View.GONE
+    }
+
+    @MainThread
+    private fun showPermissionAlertDialog(onClose: () -> Unit) {
+        AlertDialog.Builder(this)
+            .setMessage(R.string.request_storage_permission_text)
+            .setPositiveButton(android.R.string.yes) { _, _ ->
+                onClose.invoke()
+            }
+            .setIcon(android.R.drawable.ic_dialog_alert)
+            .show()
     }
 }

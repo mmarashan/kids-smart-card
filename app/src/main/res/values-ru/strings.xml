@@ -1,0 +1,3 @@
+<resources>
+    <string name="request_storage_permission_text">Это приложение может работать оффлайн. Для этого ему нужно ваше разрешение хранить данные в памяти устройства</string>
+</resources>
