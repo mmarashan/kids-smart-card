@@ -1,23 +1,32 @@
 package ru.volgadev.papastory.ui
 
+import android.Manifest
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.transition.Fade
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.android.synthetic.main.main_activity.*
-import ru.volgadev.papastory.R
 import ru.volgadev.article_galery.ui.ArticleGalleryFragment
 import ru.volgadev.article_page.ArticlePageFragment
 import ru.volgadev.article_page.ITEM_ID_KEY
 import ru.volgadev.common.hideNavBar
+import ru.volgadev.common.isPermissionGranted
 import ru.volgadev.common.log.Logger
+import ru.volgadev.papastory.R
 
 const val HOME_ITEM_ID = R.id.action_home
 const val GALERY_ITEM_ID = R.id.action_galery
+
+private val NEEDED_PERMISSIONS = arrayOf(
+    Manifest.permission.READ_EXTERNAL_STORAGE,
+    Manifest.permission.WRITE_EXTERNAL_STORAGE
+)
+private const val REQUEST_CODE = 123
 
 class MainActivity : AppCompatActivity() {
 
@@ -29,6 +38,24 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
         this.hideNavBar()
+
+        val needRequestPermission =
+            NEEDED_PERMISSIONS.map { permission -> this.isPermissionGranted(permission) }
+                .contains(false)
+        if (needRequestPermission) {
+
+            Toast.makeText(
+                this,
+                "You should get permissions for better perfomance",
+                Toast.LENGTH_SHORT
+            ).show()
+
+            ActivityCompat.requestPermissions(
+                this,
+                NEEDED_PERMISSIONS,
+                REQUEST_CODE
+            )
+        }
 
         val galleryFragment: ArticleGalleryFragment =
             FragmentProvider.get(AppFragment.GALERY_FRAGMENT) as ArticleGalleryFragment

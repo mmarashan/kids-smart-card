@@ -14,6 +14,7 @@ import android.net.Uri
 import android.util.Log
 import android.view.View
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 
 fun Context.applicationDataDir(): String {
     val p: PackageInfo = this.packageManager.getPackageInfo(this.packageName, 0)
@@ -21,7 +22,7 @@ fun Context.applicationDataDir(): String {
 }
 
 fun Context.isPermissionGranted(permission: String): Boolean {
-    val permissionCheck = ActivityCompat.checkSelfPermission(this, permission)
+    val permissionCheck = ContextCompat.checkSelfPermission(this, permission)
     return permissionCheck == PackageManager.PERMISSION_GRANTED
 }
 

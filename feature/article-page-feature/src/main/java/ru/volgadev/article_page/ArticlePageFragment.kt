@@ -108,7 +108,7 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
             val title = "${article.title}. ${article.author}"
             titleText.text = title
             articleText.text = article.text
-            if (article.iconUrl != null) Glide.with(articleImage.context).load(article.iconUrl)
+            article.iconUrl ?: Glide.with(articleImage.context).load(article.iconUrl)
                 .into(articleImage)
             viewLifecycleOwner.lifecycleScope.launch {
                 playAudio("https://raw.githubusercontent.com/mmarashan/psdata/master/audio/1.mp3")

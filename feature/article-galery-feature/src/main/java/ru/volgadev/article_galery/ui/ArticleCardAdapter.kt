@@ -81,7 +81,7 @@ class ArticleCardAdapter :
             addItemDecoration(dividerDecorator)
         }
 
-        if (article.iconUrl != null) Glide.with(image.context).load(article.iconUrl).into(image)
+        article.iconUrl ?: Glide.with(image.context).load(article.iconUrl).into(image)
         author.text = article.author
         title.text = article.title
 
