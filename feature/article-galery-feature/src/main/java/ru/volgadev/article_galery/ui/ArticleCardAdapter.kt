@@ -1,9 +1,12 @@
 package ru.volgadev.article_galery.ui
 
+import android.graphics.drawable.Drawable
+import android.transition.*
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.AnyThread
 import androidx.cardview.widget.CardView
@@ -12,6 +15,10 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import ru.volgadev.article_data.model.Article
 import ru.volgadev.article_galery.R
 import ru.volgadev.common.log.Logger
@@ -61,9 +68,17 @@ class ArticleCardAdapter :
     // Replace the contents of a view (invoked by the layout manager)
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val article = articleList[position]
+
+        val cardArticleView = holder.card.findViewById<CardView>(R.id.cardArticleView)
+        val linearLayout = holder.card.findViewById<LinearLayout>(R.id.cardLinearLayout)
         val author = holder.card.findViewById<TextView>(R.id.cardAuthor)
         val title = holder.card.findViewById<TextView>(R.id.cardTitle)
         val image = holder.card.findViewById<ImageView>(R.id.cardImage)
+
+        linearLayout.visibility = View.INVISIBLE
+
+        author.text = article.author
+        title.text = article.title
 
         val tagsRecyclerView = holder.card.findViewById<RecyclerView>(R.id.cardTagsRecyclerView)
         tagsRecyclerView.run {
@@ -81,9 +96,31 @@ class ArticleCardAdapter :
             addItemDecoration(dividerDecorator)
         }
 
-        if (article.iconUrl != null) Glide.with(image.context).load(article.iconUrl).into(image)
-        author.text = article.author
-        title.text = article.title
+        if (article.iconUrl != null) Glide.with(image.context).load(article.iconUrl).listener(
+            object : RequestListener<Drawable> {
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    image.visibility = View.GONE
+                    linearLayout.setVisibleWithTransition(Explode(), 600, cardArticleView)
+                    return false
+                }
+
+                override fun onResourceReady(
+                    resource: Drawable?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    dataSource: DataSource?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    linearLayout.setVisibleWithTransition(Explode(), 600, cardArticleView)
+                    return false
+                }
+            }
+        ).into(image)
 
         holder.card.setOnClickListener { card ->
             logger.debug("On click ${article.id}")
@@ -93,4 +130,11 @@ class ArticleCardAdapter :
 
     // Return the size of your dataset (invoked by the layout manager)
     override fun getItemCount() = articleList.size
+
+    private fun View.setVisibleWithTransition(transition: Transition, durationMs: Long, parent: ViewGroup) {
+        transition.duration = durationMs
+        transition.addTarget(this)
+        TransitionManager.beginDelayedTransition(parent, transition)
+        this.visibility = View.VISIBLE
+    }
 }

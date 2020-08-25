@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardArticleView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_margin="8dp"
     card_view:cardCornerRadius="8dp"
     card_view:cardElevation="10dp">
 
     <LinearLayout
+        android:id="@+id/cardLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -25,11 +27,11 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginStart="8dp"
-            android:layout_marginEnd="4dp"
             android:layout_marginTop="8dp"
+            android:layout_marginEnd="4dp"
             android:layout_marginBottom="4dp"
             android:textSize="22sp"
-            tools:text="Три веселых гуся"/>
+            tools:text="Три веселых гуся" />
 
         <TextView
             android:id="@+id/cardAuthor"
@@ -37,25 +39,25 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginStart="8dp"
-            android:layout_marginEnd="4dp"
             android:layout_marginTop="4dp"
+            android:layout_marginEnd="4dp"
             android:layout_marginBottom="4dp"
             android:textSize="16sp"
-            tools:text="Русская народная"/>
+            tools:text="Русская народная" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/cardTagsRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginEnd="4dp"
             android:layout_marginTop="2dp"
+            android:layout_marginEnd="4dp"
             android:layout_marginBottom="8dp"
-            android:orientation="horizontal"
             android:clipToPadding="false"
+            android:orientation="horizontal"
             android:padding="2dp"
-            tools:listitem="@layout/card_tag"
-            tools:itemCount="1" />
+            tools:itemCount="1"
+            tools:listitem="@layout/card_tag" />
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>
