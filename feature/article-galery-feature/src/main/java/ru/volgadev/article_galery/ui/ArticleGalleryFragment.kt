@@ -6,6 +6,8 @@ import androidx.annotation.AnyThread
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import kotlinx.android.synthetic.main.main_fragment.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import ru.volgadev.article_galery.R
@@ -38,7 +40,7 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
         super.onViewCreated(view, savedInstanceState)
         logger.debug("On fragment created")
 
-        val gridlayoutManager = GridLayoutManager(context, 2)
+        val staggeredGridLayoutManager = StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL)
 
         val viewAdapter = ArticleCardAdapter().apply {
             setOnItemClickListener(object : ArticleCardAdapter.OnItemClickListener {
@@ -53,7 +55,7 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
             // in content do not change the layout size of the RecyclerView
             setHasFixedSize(true)
 
-            layoutManager = gridlayoutManager
+            layoutManager = staggeredGridLayoutManager
             adapter = viewAdapter
         }
 
