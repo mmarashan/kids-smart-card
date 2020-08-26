@@ -21,8 +21,9 @@ import java.util.*
 
 
 const val ITEM_ID_KEY = "ITEM_ID"
-private const val SCROLL_STEP_DURATION_MS = 1000
-private const val SCROLL_VELOCITY_PIX_PER_SEC = 70
+
+private const val ROWS_PER_SEC = 1
+private const val SCROLL_FPS = 60
 
 class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
 
@@ -36,7 +37,9 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
 
     private val mediaPlayer: MediaPlayer = MediaPlayer()
 
-    private val autoScrollTimer = Timer()
+    private var autoScrollTimer: Timer = Timer()
+    private var pixelDownPerStep = 0
+    private val scrollStepMs = 1000 / SCROLL_FPS
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -76,32 +79,14 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
             logger.debug("isAutoScroll=$isAutoScroll")
             toggleAutoScroll.isPressed = isAutoScroll
             if (isAutoScroll) {
-                articleTextNestedScrollView.scrollDown(
-                    SCROLL_VELOCITY_PIX_PER_SEC,
-                    SCROLL_STEP_DURATION_MS
+                pixelDownPerStep = articleText.lineHeight * ROWS_PER_SEC / SCROLL_FPS
+                articleTextNestedScrollView?.smoothScrollBy(
+                    0,
+                    pixelDownPerStep,
+                    scrollStepMs
                 )
             }
         })
-
-        articleTextNestedScrollView.setOnScrollChangeListener { _: NestedScrollView?,
-                                                                _: Int, scrollY: Int,
-                                                                _: Int, _: Int ->
-            if (articleText.height != 0) {
-                viewModel.onScrollProgress(1f * scrollY / articleText.height)
-            }
-        }
-
-        autoScrollTimer.schedule(object : TimerTask() {
-            override fun run() {
-                val isAutoScroll = viewModel.isAutoScroll.value ?: false
-                if (isAutoScroll) {
-                    articleTextNestedScrollView?.scrollDown(
-                        SCROLL_VELOCITY_PIX_PER_SEC,
-                        SCROLL_STEP_DURATION_MS
-                    )
-                }
-            }
-        }, 0, SCROLL_STEP_DURATION_MS * 1L)
 
         viewModel.article.observe(viewLifecycleOwner, Observer { article ->
             logger.debug("Set new ${article.id} article")
@@ -114,14 +99,57 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
                 playAudio("https://raw.githubusercontent.com/mmarashan/psdata/master/audio/1.mp3")
             }
         })
+
+        articleTextNestedScrollView.setOnScrollChangeListener { _: NestedScrollView?,
+                                                                _: Int, scrollY: Int,
+                                                                _: Int, _: Int ->
+            // @WARNING this callback can be called from background thread!!!
+            if (articleText!=null && articleText.height != 0) {
+                viewModel.onScrollProgress(1f * scrollY / articleText.height)
+            }
+        }
+    }
+
+    private fun createAutoScrollTimerWithTask(): Timer{
+        logger.debug("runTimerTask()")
+        val timer = Timer()
+        timer.schedule(object : TimerTask() {
+            override fun run() {
+                val isAutoScroll = viewModel.isAutoScroll.value ?: false
+                if (isAutoScroll) {
+                    articleTextNestedScrollView?.smoothScrollBy(
+                        0,
+                        pixelDownPerStep,
+                        scrollStepMs
+                    )
+                }
+            }
+        }, 0, scrollStepMs * 1L)
+        return timer
+    }
+
+    override fun onResume() {
+        super.onResume()
+        logger.debug("onResume()")
+        autoScrollTimer = createAutoScrollTimerWithTask()
+        mediaPlayer.start()
+    }
+
+    override fun onPause() {
+        autoScrollTimer.purge()
+        autoScrollTimer.cancel()
+        mediaPlayer.pause()
+        logger.debug("onPause()")
+        super.onPause()
     }
 
     override fun onDestroyView() {
         logger.debug("onDestroyView()")
         super.onDestroyView()
-        autoScrollTimer.cancel()
         mediaPlayer.stop()
         mediaPlayer.release()
+        autoScrollTimer.purge()
+        autoScrollTimer.cancel()
     }
 
     private suspend fun playAudio(path: String) = withContext(Dispatchers.Default) {
@@ -129,10 +157,5 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
             logger.debug("Play $path")
             mediaPlayer.playAudio(appContext, path)
         }
-    }
-
-    private fun NestedScrollView.scrollDown(velocityPixPerSec: Int, durationMs: Int) {
-        val dy = velocityPixPerSec * durationMs / 1000
-        smoothScrollBy(0, dy, durationMs)
     }
 }

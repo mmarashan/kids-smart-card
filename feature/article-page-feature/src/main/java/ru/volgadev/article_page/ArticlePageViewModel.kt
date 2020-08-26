@@ -49,8 +49,8 @@ class ArticlePageViewModel(private val articleRepository: ArticleRepository) : V
         _autoScroll.value = value
     }
 
-    @MainThread
+    @AnyThread
     fun onScrollProgress(progressPercent: Float) {
-        _progressPercent.value = progressPercent
+        _progressPercent.postValue(progressPercent)
     }
 }
