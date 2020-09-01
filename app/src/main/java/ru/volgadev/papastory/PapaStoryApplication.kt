@@ -18,7 +18,7 @@ import ru.volgadev.common.log.Logger
 
 class PapaStoryApplication : Application() {
 
-    private val logger = Logger.get("SampleApplication")
+    private val logger = Logger.get("PapaStoryApplication")
 
     init {
         Logger.setDelegates(AndroidLoggerDelegate())

@@ -19,7 +19,8 @@
             android:id="@+id/cardImage"
             android:layout_width="match_parent"
             android:layout_height="164dp"
-            android:scaleType="centerInside" />
+            android:scaleType="centerInside"
+            tools:src="@drawable/app_icon"/>
 
         <TextView
             android:id="@+id/cardTitle"

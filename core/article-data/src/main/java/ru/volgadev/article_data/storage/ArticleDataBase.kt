@@ -1,4 +1,4 @@
-package ru.volgadev.article_data.db
+package ru.volgadev.article_data.storage
 
 import android.content.Context
 import androidx.annotation.WorkerThread

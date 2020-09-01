@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.volgadev.article_data.api.ArticleBackendApi
-import ru.volgadev.article_data.db.ArticleDatabase
+import ru.volgadev.article_data.storage.ArticleDatabase
 import ru.volgadev.article_data.model.Article
 import ru.volgadev.common.log.Logger
 import java.net.ConnectException

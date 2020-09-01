@@ -1,8 +1,14 @@
 package ru.volgadev.article_page
 
+// import kotlinx.android.synthetic.main.layout_article_page.*
 import android.media.MediaPlayer
 import android.os.Bundle
+import android.transition.Explode
+import android.transition.Slide
+import android.transition.Transition
+import android.transition.TransitionManager
 import android.view.View
+import android.view.ViewGroup
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -104,24 +110,48 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
                                                                 _: Int, scrollY: Int,
                                                                 _: Int, _: Int ->
             // @WARNING this callback can be called from background thread!!!
-            if (articleText!=null && articleText.height != 0) {
+            if (articleText != null && articleText.height != 0) {
                 viewModel.onScrollProgress(1f * scrollY / articleText.height)
             }
         }
+
+        startButton.setOnClickListener { startBtn ->
+            logger.debug("on click startButton")
+            viewModel.onClickStart()
+        }
+
+        viewModel.isStarted.observe(viewLifecycleOwner, Observer { isStarted ->
+            if (isStarted) {
+                appBarLayout.setExpanded(false, true)
+                bottomControls.setVisibleWithTransition(View.VISIBLE, Explode(), 3000, appBarLayout)
+                // TODO: remove magic constants
+                startButton.setVisibleWithTransition(View.INVISIBLE, Slide(), 1500, appBarLayout)
+                articleText.postDelayed({
+                    viewModel.onToggleAutoScroll(true)
+                }, 1000L)
+            } else {
+                appBarLayout.setExpanded(true, true)
+                startButton.visibility = View.VISIBLE
+                bottomControls.visibility = View.GONE
+                viewModel.onToggleAutoScroll(false)
+            }
+        })
     }
 
-    private fun createAutoScrollTimerWithTask(): Timer{
+    private fun createAutoScrollTimerWithTask(): Timer {
         logger.debug("runTimerTask()")
         val timer = Timer()
         timer.schedule(object : TimerTask() {
             override fun run() {
                 val isAutoScroll = viewModel.isAutoScroll.value ?: false
                 if (isAutoScroll) {
-                    articleTextNestedScrollView?.smoothScrollBy(
-                        0,
-                        pixelDownPerStep,
-                        scrollStepMs
-                    )
+                    articleTextNestedScrollView?.post {
+                        articleTextNestedScrollView?.smoothScrollBy(
+                            0,
+                            pixelDownPerStep,
+                            scrollStepMs
+                        )
+                    }
                 }
             }
         }, 0, scrollStepMs * 1L)
@@ -157,5 +187,17 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
             logger.debug("Play $path")
             mediaPlayer.playAudio(appContext, path)
         }
+    }
+
+    private fun View.setVisibleWithTransition(
+        visibility: Int,
+        transition: Transition,
+        durationMs: Long,
+        parent: ViewGroup
+    ) {
+        transition.duration = durationMs
+        transition.addTarget(this)
+        TransitionManager.beginDelayedTransition(parent, transition)
+        this.visibility = visibility
     }
 }

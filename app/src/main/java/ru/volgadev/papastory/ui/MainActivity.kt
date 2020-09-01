@@ -97,6 +97,12 @@ class MainActivity : AppCompatActivity() {
         bottomNavigation.selectedItemId = GALERY_ITEM_ID
     }
 
+    override fun onResume() {
+        super.onResume()
+        logger.debug("onResume()")
+        hideNavBar()
+    }
+
     private fun showFragment(
         fragment: Fragment,
         arguments: Bundle? = null,
