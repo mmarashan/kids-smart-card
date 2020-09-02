@@ -7,6 +7,7 @@ import android.transition.Explode
 import android.transition.Slide
 import android.transition.Transition
 import android.transition.TransitionManager
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.NestedScrollView
@@ -126,6 +127,7 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
                 bottomControls.setVisibleWithTransition(View.VISIBLE, Explode(), 3000, appBarLayout)
                 // TODO: remove magic constants
                 startButton.setVisibleWithTransition(View.INVISIBLE, Slide(), 1500, appBarLayout)
+                articleTextNestedScrollView.setScrollable(true)
                 articleText.postDelayed({
                     viewModel.onToggleAutoScroll(true)
                 }, 1000L)
@@ -133,6 +135,7 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
                 appBarLayout.setExpanded(true, true)
                 startButton.visibility = View.VISIBLE
                 bottomControls.visibility = View.GONE
+                articleTextNestedScrollView.setScrollable(false)
                 viewModel.onToggleAutoScroll(false)
             }
         })
@@ -199,5 +202,9 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
         transition.addTarget(this)
         TransitionManager.beginDelayedTransition(parent, transition)
         this.visibility = visibility
+    }
+
+    private fun NestedScrollView.setScrollable(scrollable: Boolean) {
+        setOnTouchListener { _, _ -> !scrollable }
     }
 }
