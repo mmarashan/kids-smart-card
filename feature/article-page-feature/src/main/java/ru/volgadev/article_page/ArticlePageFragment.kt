@@ -3,11 +3,7 @@ package ru.volgadev.article_page
 // import kotlinx.android.synthetic.main.layout_article_page.*
 import android.media.MediaPlayer
 import android.os.Bundle
-import android.transition.Explode
-import android.transition.Slide
-import android.transition.Transition
-import android.transition.TransitionManager
-import android.view.MotionEvent
+import android.transition.*
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.NestedScrollView
@@ -16,6 +12,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.layout_article_page.*
+import kotlinx.android.synthetic.main.layout_article_page.view.*
 import kotlinx.android.synthetic.main.layout_bottom_controls.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -87,7 +84,7 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
             toggleAutoScroll.isPressed = isAutoScroll
             if (isAutoScroll) {
                 pixelDownPerStep = articleText.lineHeight * ROWS_PER_SEC / SCROLL_FPS
-                articleTextNestedScrollView?.smoothScrollBy(
+                articleNestedScrollView?.smoothScrollBy(
                     0,
                     pixelDownPerStep,
                     scrollStepMs
@@ -107,9 +104,9 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
             }
         })
 
-        articleTextNestedScrollView.setOnScrollChangeListener { _: NestedScrollView?,
-                                                                _: Int, scrollY: Int,
-                                                                _: Int, _: Int ->
+        articleNestedScrollView.setOnScrollChangeListener { _: NestedScrollView?,
+                                                            _: Int, scrollY: Int,
+                                                            _: Int, _: Int ->
             // @WARNING this callback can be called from background thread!!!
             if (articleText != null && articleText.height != 0) {
                 viewModel.onScrollProgress(1f * scrollY / articleText.height)
@@ -123,19 +120,18 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
 
         viewModel.isStarted.observe(viewLifecycleOwner, Observer { isStarted ->
             if (isStarted) {
-                appBarLayout.setExpanded(false, true)
-                bottomControls.setVisibleWithTransition(View.VISIBLE, Explode(), 3000, appBarLayout)
+                bottomControls.setVisibleWithTransition(View.VISIBLE, Explode(), 3000, articlePageLayout)
                 // TODO: remove magic constants
-                startButton.setVisibleWithTransition(View.INVISIBLE, Slide(), 1500, appBarLayout)
-                articleTextNestedScrollView.setScrollable(true)
+                // TODO: hide custom navbar
+                startButton.setVisibleWithTransition(View.INVISIBLE, Fade(), 3000, articlePageLayout)
+                articleNestedScrollView.setScrollable(true)
                 articleText.postDelayed({
                     viewModel.onToggleAutoScroll(true)
                 }, 1000L)
             } else {
-                appBarLayout.setExpanded(true, true)
                 startButton.visibility = View.VISIBLE
                 bottomControls.visibility = View.GONE
-                articleTextNestedScrollView.setScrollable(false)
+                articleNestedScrollView.setScrollable(false)
                 viewModel.onToggleAutoScroll(false)
             }
         })
@@ -148,8 +144,8 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
             override fun run() {
                 val isAutoScroll = viewModel.isAutoScroll.value ?: false
                 if (isAutoScroll) {
-                    articleTextNestedScrollView?.post {
-                        articleTextNestedScrollView?.smoothScrollBy(
+                    articleNestedScrollView?.post {
+                        articleNestedScrollView?.smoothScrollBy(
                             0,
                             pixelDownPerStep,
                             scrollStepMs

@@ -5,17 +5,17 @@
     android:id="@+id/bottomControls"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_gravity="center|bottom"
+    android:layout_gravity="end|bottom"
     android:layout_margin="8dp"
-    app:cardCornerRadius="20dp"
+    app:cardCornerRadius="24dp"
     app:cardElevation="6dp">
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/control_button_size"
+        android:layout_width="@dimen/control_button_size"
+        android:layout_height="wrap_content"
         android:layout_margin="8dp"
         android:divider="@drawable/empty_divider_24"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:showDividers="middle">
 
         <androidx.appcompat.widget.AppCompatToggleButton

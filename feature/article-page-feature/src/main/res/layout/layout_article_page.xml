@@ -1,112 +1,107 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/articlePageLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fitsSystemWindows="true">
-
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBarLayout"
-        android:layout_width="match_parent"
-        android:layout_height="360dp"
-        android:animateLayoutChanges="true"
-        android:background="@android:color/transparent"
-        android:fitsSystemWindows="true">
-
-        <com.google.android.material.appbar.CollapsingToolbarLayout
-            android:id="@+id/toolbarLayout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fitsSystemWindows="true"
-            app:contentScrim="@android:color/transparent"
-            app:expandedTitleMarginEnd="64dp"
-            app:expandedTitleMarginStart="48dp"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            app:statusBarScrim="@android:color/transparent">
-
-            <ImageView
-                android:id="@+id/articleImage"
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/detail_app_bar_height"
-                android:layout_marginTop="64dp"
-                android:scaleType="fitCenter" />
-
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/pageToolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="@color/colorPrimary"
-                app:layout_collapseMode="pin">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:layout_scrollFlags="scroll|snap">
-
-                    <ImageButton
-                        android:id="@+id/backButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center|start"
-                        android:layout_marginEnd="@dimen/margin_extra_small"
-                        android:background="@android:color/transparent"
-                        android:backgroundTint="@color/colorLightText"
-                        android:src="@drawable/ic_arrow_back" />
-
-                    <TextView
-                        android:id="@+id/titleText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginStart="@dimen/margin_extra_small"
-                        android:lineSpacingMultiplier="0.8"
-                        android:textAlignment="center"
-                        android:textColor="@color/colorLightText"
-                        android:textSize="20sp"
-                        tools:text="Иван-царевич и серый волк. Русская народная" />
-
-                </LinearLayout>
-            </androidx.appcompat.widget.Toolbar>
-
-        </com.google.android.material.appbar.CollapsingToolbarLayout>
-    </com.google.android.material.appbar.AppBarLayout>
+    android:layout_height="match_parent">
 
     <androidx.core.widget.NestedScrollView
-        android:id="@+id/articleTextNestedScrollView"
+        android:id="@+id/articleNestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <TextView
-            android:id="@+id/articleText"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="@dimen/margin_normal"
-            android:minHeight="@dimen/description_min_height"
-            android:textIsSelectable="false"
-            android:textSize="20sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:text="Жили у бабуси три веселых гуся" />
+            android:orientation="vertical">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/articleHeaderCardView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/margin_extra_small"
+                app:cardElevation="4dp"
+                app:cardCornerRadius="24dp">
+
+                <androidx.appcompat.widget.Toolbar
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/toolbar_size"
+                    android:background="@color/colorPrimary">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <ImageButton
+                            android:id="@+id/backButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center|start"
+                            android:layout_marginEnd="@dimen/margin_extra_small"
+                            android:background="@android:color/transparent"
+                            android:backgroundTint="@color/colorLightText"
+                            android:src="@drawable/ic_arrow_back" />
+
+                        <TextView
+                            android:id="@+id/titleText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginStart="@dimen/margin_extra_small"
+                            android:lineSpacingMultiplier="0.8"
+                            android:textAlignment="center"
+                            android:textColor="@color/colorLightText"
+                            android:textSize="20sp"
+                            tools:text="Иван-царевич и серый волк. Русская народная" />
+
+                    </LinearLayout>
+                </androidx.appcompat.widget.Toolbar>
+
+                <ImageView
+                    android:id="@+id/articleImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/detail_app_bar_height"
+                    android:scaleType="fitCenter"
+                    android:layout_marginTop="@dimen/toolbar_size"
+                    tools:src="@drawable/app_icon" />
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:id="@+id/articleText"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="@dimen/margin_normal"
+                android:layout_marginEnd="@dimen/margin_small"
+                android:layout_marginTop="@dimen/margin_small"
+                android:textIsSelectable="false"
+                android:textSize="@dimen/text_size"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:text="Жили у бабуси три веселых гуся" />
+
+        </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
-
-    <include layout="@layout/layout_bottom_controls" />
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/startButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
         android:text="@string/start"
         android:textColor="@color/colorLightText"
         android:textStyle="bold"
+        android:textSize="@dimen/text_size"
+        android:layout_margin="@dimen/margin_normal"
+        android:textAllCaps="false"
         app:backgroundTint="@color/colorPrimary"
         app:icon="@drawable/ic_stroke_down"
         app:iconTint="@color/colorLightText"
-        app:layout_anchor="@id/appBarLayout"
-        app:layout_anchorGravity="bottom|center"
+        android:layout_gravity="center|bottom"
         tools:text="Начать" />
+
+    <include layout="@layout/layout_bottom_controls" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
