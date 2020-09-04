@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
     private val logger = Logger.get("MainActivity")
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        logger.debug("On create")
+        logger.debug("onCreate($savedInstanceState)")
         setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
@@ -79,6 +79,7 @@ class MainActivity : AppCompatActivity() {
             override fun onNavigationItemSelected(item: MenuItem): Boolean {
                 when (item.itemId) {
                     HOME_ITEM_ID -> {
+                        logger.debug("HOME_ITEM_ID selected")
                         Toast.makeText(
                             applicationContext,
                             "TODO: On click home",
@@ -87,7 +88,10 @@ class MainActivity : AppCompatActivity() {
                         return true
                     }
                     GALERY_ITEM_ID -> {
-                        showFragment(galleryFragment)
+                        logger.debug("GALERY_ITEM_ID selected")
+                        if (savedInstanceState == null) {
+                            showFragment(galleryFragment)
+                        }
                         return true
                     }
                 }
