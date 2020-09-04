@@ -13,9 +13,7 @@ class FragmentProvider {
     companion object {
 
         private val FULLSCREEN_FRAGMENTS_CLASS_NAMES =
-            // TODO: решить проблему с backstack
-            // listOf(ArticlePageFragment::class.java.canonicalName)
-            listOf<String>()
+            listOf(ArticlePageFragment::class.java.canonicalName)
 
         private val articleGalleryFragment by lazy { ArticleGalleryFragment.newInstance() }
 

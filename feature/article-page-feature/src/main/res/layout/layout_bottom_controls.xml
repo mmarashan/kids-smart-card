@@ -7,14 +7,15 @@
     android:layout_height="wrap_content"
     android:layout_gravity="end|bottom"
     android:layout_margin="8dp"
-    app:cardCornerRadius="24dp"
+    app:cardCornerRadius="22dp"
+    app:cardBackgroundColor="@color/colorPrimary"
     app:cardElevation="6dp">
 
     <LinearLayout
         android:layout_width="@dimen/control_button_size"
         android:layout_height="wrap_content"
-        android:layout_margin="8dp"
         android:divider="@drawable/empty_divider_24"
+        android:layout_margin="8dp"
         android:orientation="vertical"
         android:showDividers="middle">
 
@@ -23,7 +24,7 @@
             android:layout_width="@dimen/control_button_size"
             android:layout_height="@dimen/control_button_size"
             android:background="@drawable/selector_music"
-            android:backgroundTint="@color/colorPrimary"
+            android:backgroundTint="@color/colorLightText"
             android:checked="false"
             android:textOff=""
             android:textOn="" />
@@ -33,10 +34,20 @@
             android:layout_width="@dimen/control_button_size"
             android:layout_height="@dimen/control_button_size"
             android:background="@drawable/selector_autoscroll"
-            android:backgroundTint="@color/colorPrimary"
+            android:backgroundTint="@color/colorLightText"
             android:checked="false"
             android:textOff=""
             android:textOn="" />
+
+        <ImageButton
+            android:id="@+id/backButtonIControl"
+            android:layout_width="@dimen/control_button_size"
+            android:layout_height="@dimen/control_button_size"
+            android:layout_marginEnd="@dimen/margin_extra_small"
+            android:background="@android:color/transparent"
+            android:backgroundTint="@color/colorLightText"
+            android:src="@drawable/ic_arrow_back" />
+
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>

@@ -47,15 +47,16 @@
 
                         <TextView
                             android:id="@+id/titleText"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
                             android:layout_gravity="center"
+                            android:gravity="center"
                             android:layout_marginStart="@dimen/margin_extra_small"
                             android:lineSpacingMultiplier="0.8"
                             android:textAlignment="center"
                             android:textColor="@color/colorLightText"
                             android:textSize="20sp"
-                            tools:text="Иван-царевич и серый волк. Русская народная" />
+                            tools:text="Иван-царевич и серый волк." />
 
                     </LinearLayout>
                 </androidx.appcompat.widget.Toolbar>
@@ -73,6 +74,7 @@
                 android:id="@+id/articleText"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:minHeight="@dimen/description_min_height"
                 android:layout_marginStart="@dimen/margin_normal"
                 android:layout_marginEnd="@dimen/margin_small"
                 android:layout_marginTop="@dimen/margin_small"

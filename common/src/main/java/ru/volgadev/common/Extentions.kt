@@ -11,8 +11,11 @@ import android.graphics.drawable.Drawable
 import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
+import android.transition.Transition
+import android.transition.TransitionManager
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
@@ -68,4 +71,18 @@ fun Activity.showNavBar() {
     val decorView: View = window.decorView
     val uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
     decorView.systemUiVisibility = uiOptions
+}
+
+fun View.setVisibleWithTransition(
+    visibility: Int,
+    transition: Transition,
+    durationMs: Long,
+    parent: ViewGroup,
+    delayMs: Long = 0L
+) {
+    transition.duration = durationMs
+    transition.startDelay = delayMs
+    transition.addTarget(this)
+    TransitionManager.beginDelayedTransition(parent, transition)
+    this.visibility = visibility
 }

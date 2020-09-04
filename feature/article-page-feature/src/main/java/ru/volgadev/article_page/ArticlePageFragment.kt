@@ -21,6 +21,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.mute
 import ru.volgadev.common.playAudio
+import ru.volgadev.common.setVisibleWithTransition
 import java.util.*
 
 
@@ -62,16 +63,17 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
             activity?.onBackPressed()
         }
 
+        backButtonIControl.setOnClickListener {
+            logger.debug("On click back")
+            activity?.onBackPressed()
+        }
+
         toggleButtonMute.setOnClickListener { btn ->
-            btn.postDelayed({
-                viewModel.onClickToggleMute()
-            }, 100)
+            viewModel.onClickToggleMute()
         }
 
         toggleAutoScroll.setOnClickListener { btn ->
-            btn.postDelayed({
-                viewModel.onToggleAutoScroll()
-            }, 100)
+            viewModel.onToggleAutoScroll()
         }
 
         viewModel.isMute.observe(viewLifecycleOwner, Observer { isMute ->
@@ -92,13 +94,21 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
             }
         })
 
+        articleHeaderCardView.visibility = View.INVISIBLE
+        articleText.visibility = View.INVISIBLE
+
         viewModel.article.observe(viewLifecycleOwner, Observer { article ->
             logger.debug("Set new ${article.id} article")
             val title = "${article.title}. ${article.author}"
             titleText.text = title
             articleText.text = article.text
-            if (article.iconUrl != null) Glide.with(articleImage.context).load(article.iconUrl)
-                .into(articleImage)
+            if (article.iconUrl != null) {
+                Glide.with(articleImage.context).load(article.iconUrl)
+                    .into(articleImage)
+            }
+            articleHeaderCardView.setVisibleWithTransition(View.VISIBLE, Explode(), 1000, articleNestedScrollView)
+            articleText.setVisibleWithTransition(View.VISIBLE, Fade(), 1000, articlePageLayout)
+
             viewLifecycleOwner.lifecycleScope.launch {
                 playAudio("https://raw.githubusercontent.com/mmarashan/psdata/master/audio/1.mp3")
             }
@@ -118,19 +128,20 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
             viewModel.onClickStart()
         }
 
+        startButton.visibility = View.GONE
         viewModel.isStarted.observe(viewLifecycleOwner, Observer { isStarted ->
             if (isStarted) {
                 bottomControls.setVisibleWithTransition(View.VISIBLE, Explode(), 3000, articlePageLayout)
-                // TODO: remove magic constants
-                // TODO: hide custom navbar
-                startButton.setVisibleWithTransition(View.INVISIBLE, Fade(), 3000, articlePageLayout)
+                startButton.setVisibleWithTransition(View.INVISIBLE, Explode(), 3000, articlePageLayout)
                 articleNestedScrollView.setScrollable(true)
                 articleText.postDelayed({
                     viewModel.onToggleAutoScroll(true)
                 }, 1000L)
             } else {
-                startButton.visibility = View.VISIBLE
+                //startButton.visibility = View.VISIBLE
                 bottomControls.visibility = View.GONE
+                startButton.setVisibleWithTransition(View.VISIBLE, Explode(), 3000, articlePageLayout)
+
                 articleNestedScrollView.setScrollable(false)
                 viewModel.onToggleAutoScroll(false)
             }
@@ -186,18 +197,6 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
             logger.debug("Play $path")
             mediaPlayer.playAudio(appContext, path)
         }
-    }
-
-    private fun View.setVisibleWithTransition(
-        visibility: Int,
-        transition: Transition,
-        durationMs: Long,
-        parent: ViewGroup
-    ) {
-        transition.duration = durationMs
-        transition.addTarget(this)
-        TransitionManager.beginDelayedTransition(parent, transition)
-        this.visibility = visibility
     }
 
     private fun NestedScrollView.setScrollable(scrollable: Boolean) {
