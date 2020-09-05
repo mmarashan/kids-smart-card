@@ -91,13 +91,13 @@ fun View.setVisibleWithTransition(
 }
 
 
-fun View.levitate(amplitudeY: Float, duration: Long) {
-        val interpolator: TimeInterpolator = DecelerateInterpolator()
-        this.animate().translationYBy(amplitudeY).setDuration(duration)
-            .setInterpolator(interpolator).setListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator?) {
-                    super.onAnimationEnd(animation)
-                    levitate(-amplitudeY, duration)
-                }
-            })
+fun View.runLevitateAnimation(amplitudeY: Float, duration: Long) {
+    val interpolator: TimeInterpolator = DecelerateInterpolator()
+    this.animate().translationYBy(amplitudeY).setDuration(duration)
+        .setInterpolator(interpolator).setListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator?) {
+                super.onAnimationEnd(animation)
+                runLevitateAnimation(-amplitudeY, duration)
+            }
+        })
 }

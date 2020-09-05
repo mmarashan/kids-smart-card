@@ -25,7 +25,7 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import ru.volgadev.article_data.model.Article
 import ru.volgadev.article_galery.R
-import ru.volgadev.common.levitate
+import ru.volgadev.common.runLevitateAnimation
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.setVisibleWithTransition
 
@@ -143,7 +143,7 @@ class ArticleCardAdapter :
             onItemClickListener?.onClick(article.id, card)
         }
 
-        image.levitate(4f, 700L)
+        image.runLevitateAnimation(4f, 700L)
     }
 
     // Return the size of your dataset (invoked by the layout manager)
