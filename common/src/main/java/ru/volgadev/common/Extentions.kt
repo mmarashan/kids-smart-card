@@ -1,5 +1,8 @@
 package ru.volgadev.common
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.TimeInterpolator
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageInfo
@@ -8,7 +11,6 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
 import android.transition.Transition
@@ -16,8 +18,9 @@ import android.transition.TransitionManager
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.app.ActivityCompat
+import android.view.animation.DecelerateInterpolator
 import androidx.core.content.ContextCompat
+
 
 fun Context.applicationDataDir(): String {
     val p: PackageInfo = this.packageManager.getPackageInfo(this.packageName, 0)
@@ -85,4 +88,16 @@ fun View.setVisibleWithTransition(
     transition.addTarget(this)
     TransitionManager.beginDelayedTransition(parent, transition)
     this.visibility = visibility
+}
+
+
+fun View.levitate(amplitudeY: Float, duration: Long) {
+        val interpolator: TimeInterpolator = DecelerateInterpolator()
+        this.animate().translationYBy(amplitudeY).setDuration(duration)
+            .setInterpolator(interpolator).setListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator?) {
+                    super.onAnimationEnd(animation)
+                    levitate(-amplitudeY, duration)
+                }
+            })
 }

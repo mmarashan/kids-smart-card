@@ -25,6 +25,7 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import ru.volgadev.article_data.model.Article
 import ru.volgadev.article_galery.R
+import ru.volgadev.common.levitate
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.setVisibleWithTransition
 
@@ -141,6 +142,8 @@ class ArticleCardAdapter :
             logger.debug("On click ${article.id}")
             onItemClickListener?.onClick(article.id, card)
         }
+
+        image.levitate(4f, 700L)
     }
 
     // Return the size of your dataset (invoked by the layout manager)

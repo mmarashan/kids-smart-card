@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import ru.volgadev.common.levitate
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.mute
 import ru.volgadev.common.playAudio
@@ -104,6 +105,7 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
             if (article.iconUrl != null) {
                 Glide.with(articleImage.context).load(article.iconUrl)
                     .into(articleImage)
+                articleImage.levitate(4f, 700L)
             }
             articleHeaderCardView.setVisibleWithTransition(View.VISIBLE, Slide(Gravity.END), 1000, articleNestedScrollView)
             articleText.setVisibleWithTransition(View.VISIBLE, Slide(Gravity.END), 1000, articlePageLayout)
@@ -131,7 +133,6 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
         viewModel.isStarted.observe(viewLifecycleOwner, Observer { isStarted ->
             if (isStarted) {
                 bottomControls.setVisibleWithTransition(View.VISIBLE, Explode(), 1000, articlePageLayout)
-                // startButton.setVisibleWithTransition(View.INVISIBLE, Slide(Gravity.BOTTOM), 1000, articlePageLayout)
                 startButton.visibility = View.INVISIBLE
                 articleNestedScrollView.setScrollable(true)
                 articleText.postDelayed({
@@ -139,6 +140,7 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
                 }, 1000L)
             } else {
                 startButton.visibility = View.VISIBLE
+                startButton.levitate(4f, 700L)
                 bottomControls.visibility = View.GONE
                 //startButton.setVisibleWithTransition(View.VISIBLE, Slide(Gravity.BOTTOM), 3000, articlePageLayout)
 

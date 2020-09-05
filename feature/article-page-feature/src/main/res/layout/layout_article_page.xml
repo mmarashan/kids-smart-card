@@ -99,7 +99,7 @@
         android:layout_margin="@dimen/margin_normal"
         android:textAllCaps="false"
         app:backgroundTint="@color/colorPrimary"
-        app:icon="@drawable/ic_stroke_down"
+        app:icon="@drawable/ic_papirus"
         app:iconTint="@color/colorLightText"
         android:layout_gravity="center|bottom"
         tools:text="Начать" />
