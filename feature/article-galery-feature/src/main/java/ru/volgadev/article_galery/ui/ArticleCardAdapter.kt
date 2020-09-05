@@ -1,7 +1,8 @@
 package ru.volgadev.article_galery.ui
 
 import android.graphics.drawable.Drawable
-import android.transition.*
+import android.transition.Slide
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,6 +24,7 @@ import com.bumptech.glide.request.target.Target
 import ru.volgadev.article_data.model.Article
 import ru.volgadev.article_galery.R
 import ru.volgadev.common.log.Logger
+import ru.volgadev.common.setVisibleWithTransition
 
 
 class ArticleCardAdapter :
@@ -106,7 +108,12 @@ class ArticleCardAdapter :
                     isFirstResource: Boolean
                 ): Boolean {
                     image.visibility = View.GONE
-                    linearLayout.setVisibleWithTransition(Explode(), 600, cardArticleView)
+                    linearLayout.setVisibleWithTransition(
+                        View.VISIBLE,
+                        Slide(Gravity.TOP),
+                        600,
+                        cardArticleView
+                    )
                     return false
                 }
 
@@ -117,7 +124,12 @@ class ArticleCardAdapter :
                     dataSource: DataSource?,
                     isFirstResource: Boolean
                 ): Boolean {
-                    linearLayout.setVisibleWithTransition(Explode(), 600, cardArticleView)
+                    linearLayout.setVisibleWithTransition(
+                        View.VISIBLE,
+                        Slide(Gravity.TOP),
+                        600,
+                        cardArticleView
+                    )
                     return false
                 }
             }
@@ -131,11 +143,4 @@ class ArticleCardAdapter :
 
     // Return the size of your dataset (invoked by the layout manager)
     override fun getItemCount() = articleList.size
-
-    private fun View.setVisibleWithTransition(transition: Transition, durationMs: Long, parent: ViewGroup) {
-        transition.duration = durationMs
-        transition.addTarget(this)
-        TransitionManager.beginDelayedTransition(parent, transition)
-        this.visibility = View.VISIBLE
-    }
 }

@@ -38,7 +38,7 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        logger.debug("On fragment created")
+        logger.debug("On fragment created; savedInstanceState=$savedInstanceState")
 
         val staggeredGridLayoutManager = StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL)
 

@@ -4,15 +4,14 @@ package ru.volgadev.article_page
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.transition.*
+import android.view.Gravity
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.layout_article_page.*
-import kotlinx.android.synthetic.main.layout_article_page.view.*
 import kotlinx.android.synthetic.main.layout_bottom_controls.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -61,11 +60,15 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
         backButton.setOnClickListener {
             logger.debug("On click back")
             activity?.onBackPressed()
+            // TODO: правильно скрывать элементы с elevation
+            // articleHeaderCardView.setVisibleWithTransition(View.INVISIBLE, Slide(Gravity.TOP), 100, articleNestedScrollView)
+            // articleHeaderCardView.visibility = View.INVISIBLE
         }
 
-        backButtonIControl.setOnClickListener {
+        backButtonInControl.setOnClickListener {
             logger.debug("On click back")
             activity?.onBackPressed()
+            articleHeaderCardView.setVisibleWithTransition(View.INVISIBLE, Slide(Gravity.TOP), 100, articleNestedScrollView)
         }
 
         toggleButtonMute.setOnClickListener { btn ->
@@ -106,8 +109,8 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
                 Glide.with(articleImage.context).load(article.iconUrl)
                     .into(articleImage)
             }
-            articleHeaderCardView.setVisibleWithTransition(View.VISIBLE, Explode(), 1000, articleNestedScrollView)
-            articleText.setVisibleWithTransition(View.VISIBLE, Fade(), 1000, articlePageLayout)
+            articleHeaderCardView.setVisibleWithTransition(View.VISIBLE, Slide(Gravity.END), 1000, articleNestedScrollView)
+            articleText.setVisibleWithTransition(View.VISIBLE, Slide(Gravity.END), 1000, articlePageLayout)
 
             viewLifecycleOwner.lifecycleScope.launch {
                 playAudio("https://raw.githubusercontent.com/mmarashan/psdata/master/audio/1.mp3")
@@ -131,16 +134,17 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
         startButton.visibility = View.GONE
         viewModel.isStarted.observe(viewLifecycleOwner, Observer { isStarted ->
             if (isStarted) {
-                bottomControls.setVisibleWithTransition(View.VISIBLE, Explode(), 3000, articlePageLayout)
-                startButton.setVisibleWithTransition(View.INVISIBLE, Explode(), 3000, articlePageLayout)
+                bottomControls.setVisibleWithTransition(View.VISIBLE, Explode(), 1000, articlePageLayout)
+                // startButton.setVisibleWithTransition(View.INVISIBLE, Slide(Gravity.BOTTOM), 1000, articlePageLayout)
+                startButton.visibility = View.INVISIBLE
                 articleNestedScrollView.setScrollable(true)
                 articleText.postDelayed({
                     viewModel.onToggleAutoScroll(true)
                 }, 1000L)
             } else {
-                //startButton.visibility = View.VISIBLE
+                startButton.visibility = View.VISIBLE
                 bottomControls.visibility = View.GONE
-                startButton.setVisibleWithTransition(View.VISIBLE, Explode(), 3000, articlePageLayout)
+                //startButton.setVisibleWithTransition(View.VISIBLE, Slide(Gravity.BOTTOM), 3000, articlePageLayout)
 
                 articleNestedScrollView.setScrollable(false)
                 viewModel.onToggleAutoScroll(false)

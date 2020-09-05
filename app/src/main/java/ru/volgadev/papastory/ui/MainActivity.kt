@@ -3,6 +3,8 @@ package ru.volgadev.papastory.ui
 import android.Manifest
 import android.app.AlertDialog
 import android.os.Bundle
+import android.transition.Slide
+import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
@@ -10,8 +12,6 @@ import androidx.annotation.MainThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.transition.Fade
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.android.synthetic.main.main_activity.*
 import ru.volgadev.article_galery.ui.ArticleGalleryFragment
@@ -23,9 +23,9 @@ import ru.volgadev.common.log.Logger
 import ru.volgadev.common.setVisibleWithTransition
 import ru.volgadev.papastory.R
 
-
 const val HOME_ITEM_ID = R.id.action_home
 const val GALERY_ITEM_ID = R.id.action_galery
+const val CONTENT_CONTAINER_ID = R.id.contentContainer
 
 private val NEEDED_PERMISSIONS = arrayOf(
     Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -60,12 +60,15 @@ class MainActivity : AppCompatActivity() {
 
         val galleryFragment: ArticleGalleryFragment =
             FragmentProvider.get(AppFragment.GALERY_FRAGMENT) as ArticleGalleryFragment
+        galleryFragment.enterTransition = Slide(Gravity.END)
+        galleryFragment.exitTransition = Slide(Gravity.START)
         galleryFragment.setOnItemClickListener(object : ArticleGalleryFragment.OnItemClickListener {
             override fun onClick(itemId: Long, clickedView: View) {
                 logger.debug("Choose $itemId item to show")
                 val itemPageFragment =
                     FragmentProvider.get(AppFragment.ARTICLE_PAGE_FRAGMENT) as ArticlePageFragment
-                itemPageFragment.enterTransition = Fade()
+                itemPageFragment.enterTransition = Slide(Gravity.START)
+                itemPageFragment.exitTransition = Slide(Gravity.END)
                 showFragment(
                     itemPageFragment,
                     Bundle().apply { putLong(ITEM_ID_KEY, itemId) },
@@ -125,7 +128,7 @@ class MainActivity : AppCompatActivity() {
         fragment.arguments = arguments
         val tagFragment = fragment.javaClass.canonicalName
         val transaction = supportFragmentManager.beginTransaction()
-            .replace(R.id.contentContainer, fragment, tagFragment)
+            .replace(CONTENT_CONTAINER_ID, fragment, tagFragment)
 
         if (addToBackStack) transaction.addToBackStack(null)
         transaction.commit()
@@ -142,14 +145,14 @@ class MainActivity : AppCompatActivity() {
     private fun showNavigationPanel() {
         bottomNavigation.setVisibleWithTransition(
             View.VISIBLE,
-            android.transition.Explode(), 500, mainActivityLayout
+            Slide(Gravity.BOTTOM), 600, mainActivityLayout
         )
     }
 
     private fun hideNavigationPanel() {
         bottomNavigation.setVisibleWithTransition(
             View.GONE,
-            android.transition.Explode(), 500, mainActivityLayout
+            Slide(Gravity.BOTTOM), 600, mainActivityLayout
         )
     }
 
