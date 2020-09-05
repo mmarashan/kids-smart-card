@@ -60,22 +60,18 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
         backButton.setOnClickListener {
             logger.debug("On click back")
             activity?.onBackPressed()
-            // TODO: правильно скрывать элементы с elevation
-            // articleHeaderCardView.setVisibleWithTransition(View.INVISIBLE, Slide(Gravity.TOP), 100, articleNestedScrollView)
-            // articleHeaderCardView.visibility = View.INVISIBLE
         }
 
         backButtonInControl.setOnClickListener {
             logger.debug("On click back")
             activity?.onBackPressed()
-            articleHeaderCardView.setVisibleWithTransition(View.INVISIBLE, Slide(Gravity.TOP), 100, articleNestedScrollView)
         }
 
-        toggleButtonMute.setOnClickListener { btn ->
+        toggleButtonMute.setOnClickListener { _ ->
             viewModel.onClickToggleMute()
         }
 
-        toggleAutoScroll.setOnClickListener { btn ->
+        toggleAutoScroll.setOnClickListener { _ ->
             viewModel.onToggleAutoScroll()
         }
 
@@ -126,7 +122,7 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
             }
         }
 
-        startButton.setOnClickListener { startBtn ->
+        startButton.setOnClickListener { _ ->
             logger.debug("on click startButton")
             viewModel.onClickStart()
         }

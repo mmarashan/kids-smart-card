@@ -44,7 +44,7 @@ class PapaStoryApplication : Application() {
         super.onCreate()
         logger.debug("on create")
 
-        val koin = startKoin {
+        startKoin {
             androidLogger(Level.DEBUG)
             androidContext(this@PapaStoryApplication)
             modules(sampleModule)

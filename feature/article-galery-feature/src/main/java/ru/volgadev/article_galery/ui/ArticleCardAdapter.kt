@@ -1,6 +1,8 @@
 package ru.volgadev.article_galery.ui
 
 import android.graphics.drawable.Drawable
+import android.transition.Explode
+import android.transition.Fade
 import android.transition.Slide
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -110,8 +112,8 @@ class ArticleCardAdapter :
                     image.visibility = View.GONE
                     linearLayout.setVisibleWithTransition(
                         View.VISIBLE,
-                        Slide(Gravity.TOP),
-                        600,
+                        Fade(),
+                        1000,
                         cardArticleView
                     )
                     return false
@@ -126,8 +128,8 @@ class ArticleCardAdapter :
                 ): Boolean {
                     linearLayout.setVisibleWithTransition(
                         View.VISIBLE,
-                        Slide(Gravity.TOP),
-                        600,
+                        Fade(),
+                        1000,
                         cardArticleView
                     )
                     return false

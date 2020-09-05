@@ -3,6 +3,7 @@ package ru.volgadev.papastory.ui
 import android.Manifest
 import android.app.AlertDialog
 import android.os.Bundle
+import android.transition.Fade
 import android.transition.Slide
 import android.view.Gravity
 import android.view.MenuItem
@@ -67,8 +68,7 @@ class MainActivity : AppCompatActivity() {
                 logger.debug("Choose $itemId item to show")
                 val itemPageFragment =
                     FragmentProvider.get(AppFragment.ARTICLE_PAGE_FRAGMENT) as ArticlePageFragment
-                itemPageFragment.enterTransition = Slide(Gravity.START)
-                itemPageFragment.exitTransition = Slide(Gravity.END)
+                itemPageFragment.exitTransition = Fade()
                 showFragment(
                     itemPageFragment,
                     Bundle().apply { putLong(ITEM_ID_KEY, itemId) },
@@ -129,7 +129,6 @@ class MainActivity : AppCompatActivity() {
         val tagFragment = fragment.javaClass.canonicalName
         val transaction = supportFragmentManager.beginTransaction()
             .replace(CONTENT_CONTAINER_ID, fragment, tagFragment)
-
         if (addToBackStack) transaction.addToBackStack(null)
         transaction.commit()
     }
