@@ -11,12 +11,10 @@ import ru.volgadev.article_galery.R
 class ArticleTagsAdapter :
     RecyclerView.Adapter<ArticleTagsAdapter.ViewHolder>() {
 
-    class ViewHolder(val card: CardView) : RecyclerView.ViewHolder(card)
-
     private val tags = ArrayList<String>()
 
     @AnyThread
-    fun setDataset(dataset: Collection<String>) {
+    fun setData(dataset: Collection<String>) {
         tags.clear()
         dataset.forEach { article ->
             tags.add(article)
@@ -34,10 +32,12 @@ class ArticleTagsAdapter :
         return ViewHolder(card)
     }
 
+    class ViewHolder(val card: CardView) : RecyclerView.ViewHolder(card) {
+        val tagTextView: TextView = card.findViewById<TextView>(R.id.tagTextView)
+    }
+
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val tag = tags[position]
-        val tagTextView = holder.card.findViewById<TextView>(R.id.tagTextView)
-        tagTextView.text = tag
+        holder.tagTextView.text = tags[position]
     }
 
     override fun getItemCount() = tags.size

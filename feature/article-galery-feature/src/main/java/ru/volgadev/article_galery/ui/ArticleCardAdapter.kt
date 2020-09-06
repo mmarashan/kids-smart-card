@@ -1,10 +1,7 @@
 package ru.volgadev.article_galery.ui
 
 import android.graphics.drawable.Drawable
-import android.transition.Explode
 import android.transition.Fade
-import android.transition.Slide
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,15 +22,13 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import ru.volgadev.article_data.model.Article
 import ru.volgadev.article_galery.R
-import ru.volgadev.common.runLevitateAnimation
 import ru.volgadev.common.log.Logger
+import ru.volgadev.common.runLevitateAnimation
 import ru.volgadev.common.setVisibleWithTransition
 
 
 class ArticleCardAdapter :
     RecyclerView.Adapter<ArticleCardAdapter.ViewHolder>() {
-
-    class ViewHolder(val card: CardView) : RecyclerView.ViewHolder(card)
 
     interface OnItemClickListener {
         fun onClick(itemId: Long, clickedView: View)
@@ -47,7 +42,7 @@ class ArticleCardAdapter :
     private val articleList = ArrayList<Article>()
 
     @AnyThread
-    fun setDataset(dataset: Collection<Article>) {
+    fun setData(dataset: Collection<Article>) {
         logger.debug("Set dataset with ${dataset.size} members")
         articleList.clear()
         dataset.forEach { article ->
@@ -63,7 +58,7 @@ class ArticleCardAdapter :
         val card = LayoutInflater.from(parent.context)
             .inflate(R.layout.card_article, parent, false) as CardView
 
-        return ViewHolder(card)
+        return ViewHolder(card, parent)
     }
 
     @AnyThread
@@ -71,72 +66,90 @@ class ArticleCardAdapter :
         onItemClickListener = listener
     }
 
-    // Replace the contents of a view (invoked by the layout manager)
+    class ViewHolder(val card: CardView, val parent: ViewGroup) : RecyclerView.ViewHolder(card) {
+
+        val cardArticleView: CardView = card.findViewById<CardView>(R.id.cardArticleView)
+        val linearLayout: LinearLayout = card.findViewById<LinearLayout>(R.id.cardLinearLayout)
+        val author: TextView = card.findViewById<TextView>(R.id.cardAuthor)
+        val title: TextView = card.findViewById<TextView>(R.id.cardTitle)
+        val image: ImageView = card.findViewById<ImageView>(R.id.cardImage)
+
+        val tagsRecyclerView: RecyclerView =
+            card.findViewById<RecyclerView>(R.id.cardTagsRecyclerView)
+        val tagsAdapter = ArticleTagsAdapter()
+
+        init {
+            tagsRecyclerView.run {
+                setHasFixedSize(false)
+                layoutManager =
+                    LinearLayoutManager(
+                        tagsRecyclerView.context,
+                        LinearLayoutManager.HORIZONTAL,
+                        false
+                    )
+                adapter = tagsAdapter
+                val dividerDrawable =
+                    ContextCompat.getDrawable(context, R.drawable.empty_divider_4)!!
+                val dividerDecorator =
+                    DividerItemDecoration(context, DividerItemDecoration.HORIZONTAL).apply {
+                        setDrawable(dividerDrawable)
+                    }
+                addItemDecoration(dividerDecorator)
+            }
+        }
+    }
+
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val article = articleList[position]
 
-        val cardArticleView = holder.card.findViewById<CardView>(R.id.cardArticleView)
-        val linearLayout = holder.card.findViewById<LinearLayout>(R.id.cardLinearLayout)
-        val author = holder.card.findViewById<TextView>(R.id.cardAuthor)
-        val title = holder.card.findViewById<TextView>(R.id.cardTitle)
-        val image = holder.card.findViewById<ImageView>(R.id.cardImage)
+        val cardArticleView = holder.cardArticleView
+        val linearLayout = holder.linearLayout
+        val image = holder.image
 
-        linearLayout.visibility = View.INVISIBLE
+        holder.author.text = article.author
+        holder.title.text = article.title
 
-        author.text = article.author
-        title.text = article.title
+        holder.tagsAdapter.setData(article.tags)
 
-        val tagsRecyclerView = holder.card.findViewById<RecyclerView>(R.id.cardTagsRecyclerView)
-        tagsRecyclerView.run {
-            setHasFixedSize(true)
-            layoutManager =
-                LinearLayoutManager(tagsRecyclerView.context, LinearLayoutManager.HORIZONTAL, false)
-            adapter = ArticleTagsAdapter().apply {
-                setDataset(article.tags)
-            }
-            val dividerDrawable = ContextCompat.getDrawable(context, R.drawable.empty_divider_4)!!
-            val dividerDecorator =
-                DividerItemDecoration(context, DividerItemDecoration.HORIZONTAL).apply {
-                    setDrawable(dividerDrawable)
+        image.visibility = View.INVISIBLE
+
+        if (article.iconUrl != null) {
+            Glide.with(image.context).load(article.iconUrl).listener(
+                object : RequestListener<Drawable> {
+                    override fun onLoadFailed(
+                        e: GlideException?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        image.visibility = View.GONE
+                        image.setVisibleWithTransition(
+                            View.VISIBLE,
+                            Fade(),
+                            1000,
+                            cardArticleView
+                        )
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: Drawable?,
+                        model: Any?,
+                        target: Target<Drawable>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        image.setVisibleWithTransition(
+                            View.VISIBLE,
+                            Fade(),
+                            1000,
+                            cardArticleView
+                        )
+                        return false
+                    }
                 }
-            addItemDecoration(dividerDecorator)
+            ).diskCacheStrategy(DiskCacheStrategy.RESOURCE).into(image)
         }
-
-        if (article.iconUrl != null) Glide.with(image.context).load(article.iconUrl).listener(
-            object : RequestListener<Drawable> {
-                override fun onLoadFailed(
-                    e: GlideException?,
-                    model: Any?,
-                    target: Target<Drawable>?,
-                    isFirstResource: Boolean
-                ): Boolean {
-                    image.visibility = View.GONE
-                    linearLayout.setVisibleWithTransition(
-                        View.VISIBLE,
-                        Fade(),
-                        1000,
-                        cardArticleView
-                    )
-                    return false
-                }
-
-                override fun onResourceReady(
-                    resource: Drawable?,
-                    model: Any?,
-                    target: Target<Drawable>?,
-                    dataSource: DataSource?,
-                    isFirstResource: Boolean
-                ): Boolean {
-                    linearLayout.setVisibleWithTransition(
-                        View.VISIBLE,
-                        Fade(),
-                        1000,
-                        cardArticleView
-                    )
-                    return false
-                }
-            }
-        ).diskCacheStrategy(DiskCacheStrategy.RESOURCE).into(image)
 
         holder.card.setOnClickListener { card ->
             logger.debug("On click ${article.id}")
