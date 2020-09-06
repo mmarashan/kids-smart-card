@@ -49,4 +49,5 @@ dependencies {
     implementation project(':feature:article-galery-feature')
     implementation project(':feature:article-page-feature')
     implementation project(':core:article-data')
+    implementation project(':core:music-data')
 }

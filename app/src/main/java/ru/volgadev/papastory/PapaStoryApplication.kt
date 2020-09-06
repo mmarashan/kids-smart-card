@@ -11,10 +11,14 @@ import ru.volgadev.article_data.api.ArticleBackendApi
 import ru.volgadev.article_data.api.ArticleBackendApiImpl
 import ru.volgadev.article_data.repository.ArticleRepository
 import ru.volgadev.article_data.repository.ArticleRepositoryImpl
-import ru.volgadev.article_galery.ui.ArticleGaleryViewModel
+import ru.volgadev.article_galery.ui.ArticleGalleryViewModel
 import ru.volgadev.article_page.ArticlePageViewModel
 import ru.volgadev.common.log.AndroidLoggerDelegate
 import ru.volgadev.common.log.Logger
+import ru.volgadev.music_data.api.MusicBackendApi
+import ru.volgadev.music_data.api.MusicBackendApiImpl
+import ru.volgadev.music_data.repository.MusicRepository
+import ru.volgadev.music_data.repository.MusicRepositoryImpl
 
 class PapaStoryApplication : Application() {
 
@@ -32,8 +36,15 @@ class PapaStoryApplication : Application() {
             )
         }
         single<ArticleBackendApi> { ArticleBackendApiImpl() }
+        single<MusicRepository> {
+            MusicRepositoryImpl.getInstance(
+                context = get(),
+                musicBackendApi = get()
+            )
+        }
+        single<MusicBackendApi> { MusicBackendApiImpl() }
         viewModel {
-            ArticleGaleryViewModel(get())
+            ArticleGalleryViewModel(get(), get())
         }
         viewModel {
             ArticlePageViewModel(get())

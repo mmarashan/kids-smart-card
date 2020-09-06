@@ -12,9 +12,10 @@ import java.util.concurrent.CountDownLatch
 class Downloader(private val context: Context, private val scope: CoroutineScope) {
 
     private val logger = Logger.get("Downloader")
+    private val workManager = WorkManager.getInstance(context)
 
     suspend fun download(url: String, filePath: String): LiveData<WorkInfo> =
-        withContext(Dispatchers.IO) {
+        withContext(scope.coroutineContext) {
 
             logger.debug("download() filePath=$filePath")
 
@@ -33,7 +34,6 @@ class Downloader(private val context: Context, private val scope: CoroutineScope
                     .setConstraints(constraints).build()
 
             logger.debug("Start download")
-            val workManager = WorkManager.getInstance(context)
             workManager.enqueue(oneTimeWorkRequest)
             return@withContext workManager
                 .getWorkInfoByIdLiveData(oneTimeWorkRequest.id)
