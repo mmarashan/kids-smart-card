@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import ru.volgadev.article_data.model.Article
 import ru.volgadev.article_galery.R
 import ru.volgadev.common.log.Logger
@@ -37,11 +38,10 @@ class ArticleCardAdapter :
     fun setData(dataset: Collection<Article>) {
         logger.debug("Set dataset with ${dataset.size} members")
         articleList.clear()
-        dataset.forEachIndexed { index, article ->
+        dataset.forEach { article ->
             articleList.add(article)
-            notifyItemInserted(index)
         }
-        // notifyDataSetChanged()
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(
@@ -61,6 +61,14 @@ class ArticleCardAdapter :
 
     inner class ViewHolder(val card: CardView, val parent: ViewGroup) :
         RecyclerView.ViewHolder(card) {
+
+        private val viewClickListener = View.OnClickListener { view ->
+            view?.let  {
+                val id = view.tag as Long
+                logger.debug("On click ${id}")
+                onItemClickListener?.onClick(id, view)
+            }
+        }
 
         private val cardArticleView: CardView = card.findViewById<CardView>(R.id.cardArticleView)
         private val author: TextView = card.findViewById<TextView>(R.id.cardAuthor)
@@ -94,7 +102,7 @@ class ArticleCardAdapter :
 
         fun bind(article: Article) {
             val holder = this
-            val cardArticleView = holder.cardArticleView
+            card.tag = article.id
             val image = holder.image
 
             holder.author.text = article.author
@@ -103,14 +111,13 @@ class ArticleCardAdapter :
             holder.tagsAdapter.setData(article.tags)
 
             article.iconUrl?.let { url ->
-                Glide.with(image.context).load(url).diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                Glide.with(image.context).load(url)
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                     .into(image)
             }
 
-            holder.card.setOnClickListener { card ->
-                logger.debug("On click ${article.id}")
-                onItemClickListener?.onClick(article.id, card)
-            }
+            holder.card.setOnClickListener(viewClickListener)
         }
     }
 

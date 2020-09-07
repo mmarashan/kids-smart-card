@@ -3,7 +3,8 @@ package ru.volgadev.article_page
 // import kotlinx.android.synthetic.main.layout_article_page.*
 import android.media.MediaPlayer
 import android.os.Bundle
-import android.transition.*
+import android.transition.Explode
+import android.transition.Slide
 import android.view.Gravity
 import android.view.View
 import androidx.core.widget.NestedScrollView
@@ -11,16 +12,17 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import kotlinx.android.synthetic.main.layout_article_page.*
 import kotlinx.android.synthetic.main.layout_bottom_controls.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import ru.volgadev.common.runLevitateAnimation
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.mute
 import ru.volgadev.common.playAudio
+import ru.volgadev.common.runLevitateAnimation
 import ru.volgadev.common.setVisibleWithTransition
 import java.util.*
 
@@ -104,10 +106,21 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
             articleText.text = article.text
             if (article.iconUrl != null) {
                 Glide.with(articleImage.context).load(article.iconUrl)
+                    .transition(DrawableTransitionOptions.withCrossFade())
                     .into(articleImage)
             }
-            articleHeaderCardView.setVisibleWithTransition(View.VISIBLE, Slide(Gravity.END), 1000, articleNestedScrollView)
-            articleText.setVisibleWithTransition(View.VISIBLE, Slide(Gravity.END), 1000, articlePageLayout)
+            articleHeaderCardView.setVisibleWithTransition(
+                View.VISIBLE,
+                Slide(Gravity.END),
+                1000,
+                articleNestedScrollView
+            )
+            articleText.setVisibleWithTransition(
+                View.VISIBLE,
+                Slide(Gravity.END),
+                1000,
+                articlePageLayout
+            )
 
             viewModel.tracks.observe(viewLifecycleOwner, Observer { tracks ->
                 logger.debug("On new ${tracks.size} tracks")
@@ -135,7 +148,12 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
         startButton.visibility = View.GONE
         viewModel.isStarted.observe(viewLifecycleOwner, Observer { isStarted ->
             if (isStarted) {
-                bottomControls.setVisibleWithTransition(View.VISIBLE, Explode(), 1000, articlePageLayout)
+                bottomControls.setVisibleWithTransition(
+                    View.VISIBLE,
+                    Explode(),
+                    1000,
+                    articlePageLayout
+                )
                 startButton.visibility = View.INVISIBLE
                 articleNestedScrollView.setScrollable(true)
                 articleText.postDelayed({
