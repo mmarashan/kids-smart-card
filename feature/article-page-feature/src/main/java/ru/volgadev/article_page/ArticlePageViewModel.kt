@@ -7,8 +7,12 @@ import kotlinx.coroutines.launch
 import ru.volgadev.article_data.model.Article
 import ru.volgadev.article_data.repository.ArticleRepository
 import ru.volgadev.common.log.Logger
+import ru.volgadev.music_data.repository.MusicRepository
 
-class ArticlePageViewModel(private val articleRepository: ArticleRepository) : ViewModel() {
+class ArticlePageViewModel(
+    private val articleRepository: ArticleRepository,
+    private val musicRepository: MusicRepository
+) : ViewModel() {
 
     private val logger = Logger.get("ArticlePageViewModel")
 
@@ -26,6 +30,8 @@ class ArticlePageViewModel(private val articleRepository: ArticleRepository) : V
 
     private val _isStarted = MutableLiveData<Boolean>().apply { value = false }
     val isStarted: LiveData<Boolean> = _isStarted.distinctUntilChanged()
+
+    val tracks = musicRepository.musicTracks().asLiveData()
 
     @AnyThread
     fun onChooseArticle(id: Long) {

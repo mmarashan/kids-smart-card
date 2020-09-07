@@ -29,7 +29,7 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
 
     private val viewModel: ArticleGalleryViewModel by viewModel()
 
-    private val mediaPlayer: MediaPlayer = MediaPlayer()
+    private var mediaPlayer: MediaPlayer? = null
 
     interface OnItemClickListener {
         fun onClick(itemId: Long, clickedView: View)
@@ -56,10 +56,6 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
         }
 
         contentRecyclerView.run {
-            // use this setting to improve performance if you know that changes
-            // in content do not change the layout size of the RecyclerView
-            setHasFixedSize(true)
-
             layoutManager = StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL)
             adapter = viewAdapter
         }
@@ -70,37 +66,42 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
         })
 
         viewModel.tracks.observe(viewLifecycleOwner, Observer { tracks ->
-            logger.debug("On new ${tracks.size} articles")
-            val trackUrl = tracks[0].url
+            logger.debug("On new ${tracks.size} tracks")
+            val trackUrl = tracks.random().url
             viewLifecycleOwner.lifecycleScope.launch {
                 playAudio(trackUrl)
             }
         })
+
+        mediaPlayer = MediaPlayer()
     }
 
     override fun onResume() {
         super.onResume()
         logger.debug("onResume()")
-        mediaPlayer.start()
+        mediaPlayer?.start()
     }
 
     override fun onPause() {
-        mediaPlayer.pause()
         logger.debug("onPause()")
+        mediaPlayer?.pause()
         super.onPause()
     }
 
     override fun onDestroyView() {
         logger.debug("onDestroyView()")
+        mediaPlayer?.let { player ->
+            player.stop()
+            player.release()
+        }
+        mediaPlayer = null
         super.onDestroyView()
-        mediaPlayer.stop()
-        mediaPlayer.release()
     }
 
     private suspend fun playAudio(path: String) = withContext(Dispatchers.Default) {
         context?.applicationContext?.let { appContext ->
             logger.debug("Play $path")
-            mediaPlayer.playAudio(appContext, path)
+            mediaPlayer?.playAudio(appContext, path)
         }
     }
 

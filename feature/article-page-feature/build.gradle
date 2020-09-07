@@ -46,4 +46,5 @@ dependencies {
 
     implementation project(':common')
     implementation project(':core:article-data')
+    implementation project(':core:music-data')
 }

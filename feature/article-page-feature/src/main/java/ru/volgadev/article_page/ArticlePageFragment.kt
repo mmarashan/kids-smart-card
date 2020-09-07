@@ -40,7 +40,7 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
 
     private val viewModel: ArticlePageViewModel by viewModel()
 
-    private val mediaPlayer: MediaPlayer = MediaPlayer()
+    private var mediaPlayer: MediaPlayer? = null
 
     private var autoScrollTimer: Timer = Timer()
     private var pixelDownPerStep = 0
@@ -78,7 +78,7 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
 
         viewModel.isMute.observe(viewLifecycleOwner, Observer { isMute ->
             toggleButtonMute.isPressed = isMute
-            mediaPlayer.mute(isMute)
+            mediaPlayer?.mute(isMute)
         })
 
         viewModel.isAutoScroll.observe(viewLifecycleOwner, Observer { isAutoScroll ->
@@ -105,14 +105,17 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
             if (article.iconUrl != null) {
                 Glide.with(articleImage.context).load(article.iconUrl)
                     .into(articleImage)
-                articleImage.runLevitateAnimation(4f, 700L)
             }
             articleHeaderCardView.setVisibleWithTransition(View.VISIBLE, Slide(Gravity.END), 1000, articleNestedScrollView)
             articleText.setVisibleWithTransition(View.VISIBLE, Slide(Gravity.END), 1000, articlePageLayout)
 
-            viewLifecycleOwner.lifecycleScope.launch {
-                playAudio("https://raw.githubusercontent.com/mmarashan/psdata/master/audio/1.mp3")
-            }
+            viewModel.tracks.observe(viewLifecycleOwner, Observer { tracks ->
+                logger.debug("On new ${tracks.size} tracks")
+                val trackUrl = tracks.random().url
+                viewLifecycleOwner.lifecycleScope.launch {
+                    playAudio(trackUrl)
+                }
+            })
         })
 
         articleNestedScrollView.setOnScrollChangeListener { _: NestedScrollView?,
@@ -148,6 +151,7 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
                 viewModel.onToggleAutoScroll(false)
             }
         })
+        mediaPlayer = MediaPlayer()
     }
 
     private fun createAutoScrollTimerWithTask(): Timer {
@@ -174,30 +178,33 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
         super.onResume()
         logger.debug("onResume()")
         autoScrollTimer = createAutoScrollTimerWithTask()
-        mediaPlayer.start()
+        mediaPlayer?.start()
     }
 
     override fun onPause() {
         autoScrollTimer.purge()
         autoScrollTimer.cancel()
-        mediaPlayer.pause()
+        mediaPlayer?.pause()
         logger.debug("onPause()")
         super.onPause()
     }
 
     override fun onDestroyView() {
         logger.debug("onDestroyView()")
-        super.onDestroyView()
-        mediaPlayer.stop()
-        mediaPlayer.release()
+        mediaPlayer?.let { player ->
+            player.stop()
+            player.release()
+        }
+        mediaPlayer = null
         autoScrollTimer.purge()
         autoScrollTimer.cancel()
+        super.onDestroyView()
     }
 
     private suspend fun playAudio(path: String) = withContext(Dispatchers.Default) {
         context?.applicationContext?.let { appContext ->
             logger.debug("Play $path")
-            mediaPlayer.playAudio(appContext, path)
+            mediaPlayer?.playAudio(appContext, path)
         }
     }
 

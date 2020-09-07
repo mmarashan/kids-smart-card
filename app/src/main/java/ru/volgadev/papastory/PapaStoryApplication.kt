@@ -47,7 +47,7 @@ class PapaStoryApplication : Application() {
             ArticleGalleryViewModel(get(), get())
         }
         viewModel {
-            ArticlePageViewModel(get())
+            ArticlePageViewModel(get(), get())
         }
     }
 
