@@ -16,15 +16,20 @@ import android.net.Uri
 import android.transition.Transition
 import android.transition.TransitionManager
 import android.util.Log
+import android.util.Patterns
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
+import android.webkit.URLUtil
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
+import java.net.MalformedURLException
 
 
 fun Context.applicationDataDir(): String {
     val p: PackageInfo = this.packageManager.getPackageInfo(this.packageName, 0)
-    return p.applicationInfo.dataDir+"/"
+    return p.applicationInfo.dataDir + "/"
 }
 
 fun Context.isPermissionGranted(permission: String): Boolean {
@@ -100,4 +105,22 @@ fun View.runLevitateAnimation(amplitudeY: Float, duration: Long) {
                 runLevitateAnimation(-amplitudeY, duration)
             }
         })
+}
+
+fun <T> LiveData<T>.observeOnce(observer: Observer<T>) {
+    observeForever(object : Observer<T> {
+        override fun onChanged(t: T?) {
+            observer.onChanged(t)
+            removeObserver(this)
+        }
+    })
+}
+
+fun String.isValidUrlString(): Boolean {
+    try {
+        return this.isNotEmpty() && URLUtil.isValidUrl(this) && Patterns.WEB_URL.matcher(this)
+            .matches()
+    } catch (e: MalformedURLException) {
+    }
+    return false
 }

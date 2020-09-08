@@ -19,6 +19,9 @@ interface MusicTrackDao {
 
     @Query("SELECT EXISTS(SELECT * FROM musictrack WHERE url = :url)")
     fun isExist(url : String) : Boolean
+
+    @Query("SELECT filePath FROM musictrack WHERE url = :url")
+    fun getPathByUrl(url : String) : String?
 }
 
 @Database(entities = [MusicTrack::class], version = 1)

@@ -1,20 +1,17 @@
 package ru.volgadev.downloader
 
 import android.content.Context
-import androidx.lifecycle.LiveData
 import androidx.work.*
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import ru.volgadev.common.log.Logger
-import java.util.concurrent.CountDownLatch
 
 class Downloader(private val context: Context, private val scope: CoroutineScope) {
 
     private val logger = Logger.get("Downloader")
     private val workManager = WorkManager.getInstance(context)
 
-    suspend fun download(url: String, filePath: String): LiveData<WorkInfo> =
+    suspend fun download(url: String, filePath: String): Boolean =
         withContext(scope.coroutineContext) {
 
             logger.debug("download() filePath=$filePath")
@@ -35,7 +32,8 @@ class Downloader(private val context: Context, private val scope: CoroutineScope
 
             logger.debug("Start download")
             workManager.enqueue(oneTimeWorkRequest)
-            return@withContext workManager
-                .getWorkInfoByIdLiveData(oneTimeWorkRequest.id)
+            val future = workManager.getWorkInfoById(oneTimeWorkRequest.id)
+            val workInfo = future.await()
+            return@withContext workInfo.state == WorkInfo.State.SUCCEEDED
         }
 }

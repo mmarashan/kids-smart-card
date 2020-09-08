@@ -6,11 +6,13 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
-import ru.volgadev.music_data.api.MusicBackendApi
-import ru.volgadev.music_data.storage.MusicTrackDatabase
-import ru.volgadev.music_data.model.MusicTrack
+import ru.volgadev.common.isValidUrlString
 import ru.volgadev.common.log.Logger
 import ru.volgadev.downloader.Downloader
+import ru.volgadev.music_data.api.MusicBackendApi
+import ru.volgadev.music_data.model.MusicTrack
+import ru.volgadev.music_data.storage.MusicTrackDatabase
+import java.io.File
 import java.net.ConnectException
 
 class MusicRepositoryImpl private constructor(
@@ -26,8 +28,8 @@ class MusicRepositoryImpl private constructor(
 
     private val downloader = Downloader(context, scope)
 
-    private val storage: MusicTrackDatabase by lazy {
-        MusicTrackDatabase.getInstance(context)
+    private val storageDao by lazy {
+        MusicTrackDatabase.getInstance(context).dao()
     }
 
     override fun musicTracks(): Flow<ArrayList<MusicTrack>> = audiosChannel.asFlow()
@@ -70,17 +72,50 @@ class MusicRepositoryImpl private constructor(
 
     @Throws(ConnectException::class)
     private suspend fun updateTracks() = withContext(Dispatchers.IO) {
-        val newTracks = musicBackendApi.getTracks()
-        // TODO: логика загрузки и кэширования
-        for (track in newTracks){
-
+        val fromBackendTracks = musicBackendApi.getTracks()
+        val tracks = mutableListOf<MusicTrack>()
+        val tracksToDownloading = mutableListOf<MusicTrack>()
+        val inStorageTracks =
+            storageDao.getAll().map { track -> track.url to track.filePath }.toMap()
+        for (track in fromBackendTracks) {
+            val urlStr = track.url
+            val pathInStorage = inStorageTracks[urlStr]
+            if (pathInStorage != null) {
+                track.filePath = pathInStorage
+            } else {
+                tracksToDownloading.add(track)
+            }
+            tracks.add(track)
         }
-        storage.dao().insertAll(*newTracks.toTypedArray())
-        audiosChannel.offer(ArrayList(newTracks))
+        audiosChannel.offer(ArrayList(fromBackendTracks))
+        loadTracks(tracksToDownloading)
+    }
+    // TODO: проверять наличие в файловой системе
+    private suspend fun loadTracks(newTracks: List<MusicTrack>) = withContext(Dispatchers.IO) {
+        for (track in newTracks) {
+            val urlStr = track.url
+
+            if (urlStr.isValidUrlString()) {
+                val filesDir = context.filesDir
+                val fileName: String =
+                    urlStr.substring(urlStr.lastIndexOf('/') + 1, urlStr.length)
+                val newFilePath = File(filesDir, fileName).absolutePath
+                logger.debug("Try to load $urlStr to $newFilePath")
+                val isSuccess = downloader.download(urlStr, newFilePath)
+                if (isSuccess) {
+                    logger.debug("Success load")
+                    val newTrack = MusicTrack(urlStr, newFilePath)
+                    storageDao.insertAll(newTrack)
+                }
+            } else {
+                logger.debug("Url not valid")
+            }
+        }
+
     }
 
     private suspend fun loadFromDB() = withContext(Dispatchers.Default) {
-        val tracks = storage.dao().getAll()
+        val tracks = storageDao.getAll()
         logger.debug("Load ${tracks.size} entities from Db")
         audiosChannel.offer(ArrayList(tracks))
     }

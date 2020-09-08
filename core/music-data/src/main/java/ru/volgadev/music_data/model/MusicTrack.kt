@@ -6,6 +6,6 @@ import androidx.room.PrimaryKey
 @Entity
 data class MusicTrack(
     @PrimaryKey
-    val url: String,
-    val filePath: String?
+    var url: String,
+    var filePath: String?
 )

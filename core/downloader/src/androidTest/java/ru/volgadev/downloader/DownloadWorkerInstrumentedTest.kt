@@ -19,7 +19,6 @@ import java.io.File
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-
 @RunWith(AndroidJUnit4::class)
 class DownloadWorkerInstrumentedTest {
 
@@ -46,93 +45,19 @@ class DownloadWorkerInstrumentedTest {
     }
 
     @Test
-    fun downloadWorkerTest() {
-        logger.debug("downloadWorkerTest()")
-        val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-
-        val constraints: Constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .setRequiresStorageNotLow(true)
-            .build()
-        val oneTimeWorkRequest =
-            OneTimeWorkRequest.Builder(DownloadWorker::class.java)
-                .setInputData(
-                    Data.Builder()
-                        .putString(FILE_PATH_KEY, IMAGE_FILE_PATH)
-                        .putString(
-                            URL_KEY,
-                            IMAGE_URL
-                        )
-                        .build()
-                )
-                .setConstraints(constraints).build()
-
-        logger.debug("Start download")
-        val workManager = WorkManager.getInstance(appContext)
-        workManager.enqueue(oneTimeWorkRequest)
-
-        val latch = CountDownLatch(1)
-
-        GlobalScope.launch(Dispatchers.Main) {
-            workManager
-                .getWorkInfoByIdLiveData(oneTimeWorkRequest.id)
-                .observeForever { workInfo: WorkInfo? ->
-                    if (workInfo != null) {
-                        if (workInfo.state == WorkInfo.State.SUCCEEDED) {
-                            latch.countDown()
-                            return@observeForever
-                        }
-                        if (workInfo.state == WorkInfo.State.FAILED) {
-                            assert(false, { "Test not passed" })
-                        }
-
-                        val progress = workInfo.progress
-                        val value = progress.getInt(PROGRESS_KEY, 0)
-                        logger.debug("Download progress: $value")
-                        if (value == 100) {
-                            latch.countDown()
-                        }
-                    }
-                }
-        }
-        latch.await(2, TimeUnit.SECONDS)
-
-        assert(File(IMAGE_FILE_PATH).exists())
-
-        logger.debug("downloadWorkerTest() end")
-    }
-
-    @Test
     fun downloadTest() {
         logger.debug("downloadTest()")
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
 
         val downloader = Downloader(appContext, GlobalScope)
         GlobalScope.launch(Dispatchers.Default) {
-            val liveData = downloader.download(IMAGE_URL, IMAGE_FILE_PATH)
-            val latch = CountDownLatch(1)
-            val observer = Observer { workInfo: WorkInfo? ->
-                if (workInfo != null) {
-                    if (workInfo.state == WorkInfo.State.SUCCEEDED) {
-                        latch.countDown()
-                    }
-                    if (workInfo.state == WorkInfo.State.FAILED) {
-                        latch.countDown()
-                    }
-
-                    val value = workInfo.progress.getInt(PROGRESS_KEY, 0)
-                    logger.debug("Download progress: $value")
-                }
-            }
-            launch(Dispatchers.Main) {liveData.observeForever(observer)}
-
-            latch.await(2, TimeUnit.SECONDS)
+            val isSuccess = downloader.download(IMAGE_URL, IMAGE_FILE_PATH)
+            assert(isSuccess)
             assert(File(IMAGE_FILE_PATH).exists())
 
             logger.debug("downloadTest() end")
 
         }
-
         logger.debug("downloadTest() end")
     }
 }

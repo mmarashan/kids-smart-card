@@ -48,7 +48,6 @@ class DownloadWorker(
             var total: Long = 0
             while (inputStream.read(buffer).also { len1 = it } > 0) {
                 total += len1.toLong()
-                logger.debug("Download total $total bytes")
                 val percentage = (1f * total * 100 / fileLength).toInt()
                 fos.write(buffer, 0, len1)
                 val progress = Data.Builder().putInt(PROGRESS_KEY, percentage).build()
