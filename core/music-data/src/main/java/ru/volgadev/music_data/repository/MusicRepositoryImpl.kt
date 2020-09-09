@@ -90,8 +90,8 @@ class MusicRepositoryImpl private constructor(
         audiosChannel.offer(ArrayList(fromBackendTracks))
         loadTracks(tracksToDownloading)
     }
-    // TODO: проверять наличие в файловой системе
     private suspend fun loadTracks(newTracks: List<MusicTrack>) = withContext(Dispatchers.IO) {
+        logger.debug("loadTracks(${newTracks.size} tracks)")
         for (track in newTracks) {
             val urlStr = track.url
 
@@ -106,6 +106,8 @@ class MusicRepositoryImpl private constructor(
                     logger.debug("Success load")
                     val newTrack = MusicTrack(urlStr, newFilePath)
                     storageDao.insertAll(newTrack)
+                } else {
+                    logger.warn("Unsuccess load")
                 }
             } else {
                 logger.debug("Url not valid")

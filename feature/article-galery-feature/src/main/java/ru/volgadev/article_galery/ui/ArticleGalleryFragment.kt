@@ -67,7 +67,14 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
 
         viewModel.tracks.observe(viewLifecycleOwner, Observer { tracks ->
             logger.debug("On new ${tracks.size} tracks")
-            val trackUrl = tracks.random().url
+            val downloadedTracks = tracks.filter { track -> track.filePath != null }
+            val trackUrl = if (downloadedTracks.isNotEmpty()) {
+                logger.debug("Play downloaded")
+                downloadedTracks.random().filePath!!
+            } else {
+                logger.debug("Play from streaming")
+                tracks.random().url
+            }
             viewLifecycleOwner.lifecycleScope.launch {
                 playAudio(trackUrl)
             }

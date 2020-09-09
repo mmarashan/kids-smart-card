@@ -57,10 +57,12 @@ fun MediaPlayer.playAudio(context: Context, path: String) {
     try {
         Log.d("MediaPlayer.playAudio", "Prepare. Set data source")
         setDataSource(context, Uri.parse(path))
-        prepare()
-        start()
+        prepareAsync()
+        setOnPreparedListener {
+            start()
+        }
     } catch (e: Exception) {
-        Log.e("MediaPlayer.playAudio", e.message.toString())
+        Log.e("MediaPlayer.playAudio", e.message?:e.toString())
     }
 }
 
