@@ -94,9 +94,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     GALERY_ITEM_ID -> {
                         logger.debug("GALERY_ITEM_ID selected")
-                        if (savedInstanceState == null) {
-                            showFragment(galleryFragment)
-                        }
+                        showFragment(galleryFragment)
                         return true
                     }
                 }
