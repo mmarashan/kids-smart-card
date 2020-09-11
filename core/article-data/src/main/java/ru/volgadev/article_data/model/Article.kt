@@ -1,6 +1,8 @@
 package ru.volgadev.article_data.model
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity
@@ -10,9 +12,25 @@ data class Article(
     val tags: List<String> = listOf(),
     val author: String,
     val title: String,
-    val text: String,
+    val pagesFile: String? = null, // TODO: remove nullable
     val iconUrl: String? = null,
     val averageTimeReadingMin: Int? = 0,
-    val hardLevel: Int? = 0,
     val timestamp: Long
 )
+
+@Entity(indices = [Index(value = ["article_id"])])
+data class ArticlePage(
+    @ColumnInfo(name = "article_id")
+    val articleId: Long,
+    val pageNum: Int,
+    val type: PageType,
+    val title: String? = null,
+    val text: String? = null,
+    val imageUrl: String? = null,
+    val soundUrl: String? = null,
+    val allowBackgroundSound: Boolean = true
+)
+
+enum class PageType {
+    TITLE_WITH_IMAGE, TEXT_WITH_IMAGE, ONLY_TEXT
+}

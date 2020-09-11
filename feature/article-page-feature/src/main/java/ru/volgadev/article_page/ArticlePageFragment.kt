@@ -99,13 +99,13 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
         articleHeaderCardView.visibility = View.INVISIBLE
         articleText.visibility = View.INVISIBLE
 
-        viewModel.article.observe(viewLifecycleOwner, Observer { article ->
-            logger.debug("Set new ${article.id} article")
-            val title = "${article.title}. ${article.author}"
+        viewModel.articlePage.observe(viewLifecycleOwner, Observer { articlePage ->
+            logger.debug("Set new ${articlePage.articleId} article page")
+            val title = "${articlePage.title}"
             titleText.text = title
-            articleText.text = article.text
-            if (article.iconUrl != null) {
-                Glide.with(articleImage.context).load(article.iconUrl)
+            articleText.text = articlePage.text
+            articlePage.imageUrl?.let { imageUrl ->
+                Glide.with(articleImage.context).load(imageUrl)
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .into(articleImage)
             }

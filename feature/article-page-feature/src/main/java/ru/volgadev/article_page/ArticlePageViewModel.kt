@@ -5,6 +5,7 @@ import androidx.annotation.MainThread
 import androidx.lifecycle.*
 import kotlinx.coroutines.launch
 import ru.volgadev.article_data.model.Article
+import ru.volgadev.article_data.model.ArticlePage
 import ru.volgadev.article_data.repository.ArticleRepository
 import ru.volgadev.common.log.Logger
 import ru.volgadev.music_data.repository.MusicRepository
@@ -16,8 +17,8 @@ class ArticlePageViewModel(
 
     private val logger = Logger.get("ArticlePageViewModel")
 
-    private val _article = MutableLiveData<Article>()
-    val article: LiveData<Article> = _article
+    private val _articlePage = MutableLiveData<ArticlePage>()
+    val articlePage: LiveData<ArticlePage> = _articlePage
 
     private val _mute = MutableLiveData<Boolean>().apply { value = false }
     val isMute: LiveData<Boolean> = _mute.distinctUntilChanged()
@@ -39,7 +40,9 @@ class ArticlePageViewModel(
             val article = articleRepository.getArticle(id)
             if (article != null) {
                 logger.debug("Use article ${article.id}")
-                _article.postValue(article)
+                val pages = articleRepository.getArticlePages(article)
+                val firstPage = pages[0]
+                _articlePage.postValue(firstPage)
             } else {
                 logger.error("Article $id not found")
             }

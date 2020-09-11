@@ -12,6 +12,7 @@ import kotlinx.coroutines.withContext
 import ru.volgadev.article_data.api.ArticleBackendApi
 import ru.volgadev.article_data.storage.ArticleDatabase
 import ru.volgadev.article_data.model.Article
+import ru.volgadev.article_data.model.ArticlePage
 import ru.volgadev.common.log.Logger
 import java.net.ConnectException
 
@@ -82,6 +83,13 @@ class ArticleRepositoryImpl private constructor(
         val articles = articlesDb.userDao().getAll()
         logger.debug("Load ${articles.size} entities from Db")
         articleChannel.offer(ArrayList(articles))
+    }
+
+    @WorkerThread
+    override suspend fun getArticlePages(article: Article): List<ArticlePage> = withContext(Dispatchers.IO){
+        logger.debug("getArticlePages(${article.id})")
+        val newArticles = articleBackendApi.getArticlePages(article)
+        return@withContext newArticles
     }
 
 }
