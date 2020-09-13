@@ -13,6 +13,9 @@ import ru.volgadev.article_data.api.ArticleBackendApi
 import ru.volgadev.article_data.storage.ArticleDatabase
 import ru.volgadev.article_data.model.Article
 import ru.volgadev.article_data.model.ArticlePage
+import ru.volgadev.common.DataResult
+import ru.volgadev.common.ErrorResult
+import ru.volgadev.common.SuccessResult
 import ru.volgadev.common.log.Logger
 import java.net.ConnectException
 
@@ -86,10 +89,15 @@ class ArticleRepositoryImpl private constructor(
     }
 
     @WorkerThread
-    override suspend fun getArticlePages(article: Article): List<ArticlePage> = withContext(Dispatchers.IO){
-        logger.debug("getArticlePages(${article.id})")
-        val newArticles = articleBackendApi.getArticlePages(article)
-        return@withContext newArticles
+    override suspend fun getArticlePages(article: Article): DataResult<List<ArticlePage>> = withContext(Dispatchers.IO) {
+        try {
+            logger.debug("getArticlePages(${article.id})")
+            val newArticles = articleBackendApi.getArticlePages(article)
+            logger.debug("${newArticles.size} pages")
+            return@withContext SuccessResult(newArticles)
+        } catch (e: Exception) {
+            return@withContext ErrorResult(e)
+        }
     }
 
 }

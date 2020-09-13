@@ -4,6 +4,7 @@ import androidx.annotation.WorkerThread
 import kotlinx.coroutines.flow.Flow
 import ru.volgadev.article_data.model.Article
 import ru.volgadev.article_data.model.ArticlePage
+import ru.volgadev.common.DataResult
 
 @WorkerThread
 interface ArticleRepository {
@@ -14,5 +15,5 @@ interface ArticleRepository {
 
     suspend fun getArticle(id: Long): Article?
 
-    suspend fun getArticlePages(article: Article): List<ArticlePage>
+    suspend fun getArticlePages(article: Article): DataResult<List<ArticlePage>>
 }

@@ -4,9 +4,10 @@ import androidx.annotation.AnyThread
 import androidx.annotation.MainThread
 import androidx.lifecycle.*
 import kotlinx.coroutines.launch
-import ru.volgadev.article_data.model.Article
 import ru.volgadev.article_data.model.ArticlePage
 import ru.volgadev.article_data.repository.ArticleRepository
+import ru.volgadev.common.ErrorResult
+import ru.volgadev.common.SuccessResult
 import ru.volgadev.common.log.Logger
 import ru.volgadev.music_data.repository.MusicRepository
 
@@ -40,9 +41,21 @@ class ArticlePageViewModel(
             val article = articleRepository.getArticle(id)
             if (article != null) {
                 logger.debug("Use article ${article.id}")
-                val pages = articleRepository.getArticlePages(article)
-                val firstPage = pages[0]
-                _articlePage.postValue(firstPage)
+                val pagesResult = articleRepository.getArticlePages(article)
+                when (pagesResult) {
+                    is SuccessResult<List<ArticlePage>> -> {
+                        val pages = pagesResult.data
+                        if (pages.isEmpty()) {
+                            val firstPage = pages[0]
+                            _articlePage.postValue(firstPage)
+                        } else {
+                            logger.warn("No pages in article $id")
+                        }
+                    }
+                    is ErrorResult -> {
+                        logger.error("Error when load pages ${pagesResult.exception.message}")
+                    }
+                }
             } else {
                 logger.error("Article $id not found")
             }

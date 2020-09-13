@@ -12,10 +12,11 @@ import ru.volgadev.common.BACKEND_URL
 import ru.volgadev.common.log.Logger
 import java.net.ConnectException
 
+
 @WorkerThread
 class ArticleBackendApiImpl : ArticleBackendApi {
 
-    var client = OkHttpClient()
+    private val client by lazy { OkHttpClient() }
     private val logger = Logger.get("ArticleBackendApiImpl")
 
     private companion object {

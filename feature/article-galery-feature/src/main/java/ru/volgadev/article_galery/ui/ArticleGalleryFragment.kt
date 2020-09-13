@@ -73,10 +73,16 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
                 downloadedTracks.random().filePath!!
             } else {
                 logger.debug("Play from streaming")
-                tracks.random().url
+                if (tracks.isNotEmpty()) {
+                    tracks.random().url
+                } else {
+                    null
+                }
             }
-            viewLifecycleOwner.lifecycleScope.launch {
-                playAudio(trackUrl)
+            trackUrl?.let { url ->
+                viewLifecycleOwner.lifecycleScope.launch {
+                    playAudio(url)
+                }
             }
         })
 
