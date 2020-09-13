@@ -24,14 +24,8 @@ class ArticlePageViewModel(
     private val _mute = MutableLiveData<Boolean>().apply { value = false }
     val isMute: LiveData<Boolean> = _mute.distinctUntilChanged()
 
-    private val _autoScroll = MutableLiveData<Boolean>().apply { value = false }
-    val isAutoScroll: LiveData<Boolean> = _autoScroll.distinctUntilChanged()
-
     private val _progressPercent = MutableLiveData<Float>()
     val progressPercent: LiveData<Float> = _progressPercent.distinctUntilChanged()
-
-    private val _isStarted = MutableLiveData<Boolean>().apply { value = false }
-    val isStarted: LiveData<Boolean> = _isStarted.distinctUntilChanged()
 
     val tracks = musicRepository.musicTracks().asLiveData()
 
@@ -45,7 +39,7 @@ class ArticlePageViewModel(
                 when (pagesResult) {
                     is SuccessResult<List<ArticlePage>> -> {
                         val pages = pagesResult.data
-                        if (pages.isEmpty()) {
+                        if (pages.isNotEmpty()) {
                             val firstPage = pages[0]
                             _articlePage.postValue(firstPage)
                         } else {
@@ -66,22 +60,5 @@ class ArticlePageViewModel(
     fun onClickToggleMute() {
         logger.debug("onClickMute()")
         _mute.value = !_mute.value!!
-    }
-
-    @MainThread
-    fun onToggleAutoScroll(value: Boolean = !_autoScroll.value!!) {
-        logger.debug("onClickAutoScroll(value=$value)")
-        _autoScroll.value = value
-    }
-
-    @AnyThread
-    fun onScrollProgress(progressPercent: Float) {
-        _progressPercent.postValue(progressPercent)
-    }
-
-    @MainThread
-    fun onClickStart() {
-        logger.debug("onClickStart()")
-        _isStarted.value = true
     }
 }
