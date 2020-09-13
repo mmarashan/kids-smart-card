@@ -2,10 +2,11 @@ package ru.volgadev.article_page
 
 import android.media.MediaPlayer
 import android.os.Bundle
-import android.transition.Explode
 import android.transition.Slide
 import android.view.Gravity
 import android.view.View
+import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -40,8 +41,8 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
         super.onViewCreated(view, savedInstanceState)
         logger.debug("On fragment created")
 
-        val musicOnDrawable = view.context.getDrawable(R.drawable.ic_music)!!
-        val musicOffDrawable = view.context.getDrawable(R.drawable.ic_music_off)!!
+        val musicOnDrawable = ContextCompat.getDrawable(view.context, R.drawable.ic_music)!!
+        val musicOffDrawable = ContextCompat.getDrawable(view.context, R.drawable.ic_music_off)!!
 
         val args = arguments
         if (args != null && args.containsKey(ITEM_ID_KEY)) {
@@ -60,13 +61,13 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
             viewModel.onClickToggleMute()
         }
 
-        toggleButtonMute.setVisibleWithTransition(
-            View.VISIBLE,
-            Explode(),
-            1000,
-            articlePageLayout
-        )
-        toggleButtonMute.runLevitateAnimation(4f, 700L)
+        prevButton.setOnClickListener { _ ->
+            viewModel.onClickPrev()
+        }
+
+        nextButton.setOnClickListener { _ ->
+            viewModel.onClickNext()
+        }
 
         viewModel.isMute.observe(viewLifecycleOwner, Observer { isMute ->
             toggleButtonMute.setImageDrawable(if (isMute) musicOnDrawable else musicOffDrawable)
@@ -76,7 +77,11 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
         articleCardView.visibility = View.INVISIBLE
         articleText.visibility = View.INVISIBLE
 
-        viewModel.articlePage.observe(viewLifecycleOwner, Observer { articlePage ->
+        val controls = listOf(toggleButtonMute, closeButton, prevButton, nextButton)
+        controls.forEach { btn -> btn.isVisible = false }
+
+        viewModel.state.observe(viewLifecycleOwner, Observer { readingState ->
+            val articlePage = readingState.page
             logger.debug("Set new ${articlePage.articleId} article page")
             val title = "${articlePage.title}"
             titleText.text = title
@@ -99,23 +104,36 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
                 articlePageLayout
             )
 
-            viewModel.tracks.observe(viewLifecycleOwner, Observer { tracks ->
-                logger.debug("On new ${tracks.size} tracks")
-                val downloadedTracks = tracks.filter { track -> track.filePath != null }
-                val trackUrl = if (downloadedTracks.isNotEmpty()) {
-                    logger.debug("Play downloaded")
-                    downloadedTracks.random().filePath!!
-                } else {
-                    logger.debug("Play from streaming")
-                    tracks.random().url
-                }
-                viewLifecycleOwner.lifecycleScope.launch {
-                    playAudio(trackUrl)
-                }
-                viewLifecycleOwner.lifecycleScope.launch {
-                    playAudio(trackUrl)
-                }
-            })
+            controls.forEach { btn ->
+                btn.isVisible = false
+                btn.setVisibleWithTransition(
+                    View.VISIBLE,
+                    Slide(Gravity.BOTTOM),
+                    1000,
+                    articlePageLayout
+                )
+
+                btn.runLevitateAnimation(4f, 700L)
+            }
+
+        })
+
+        viewModel.tracks.observe(viewLifecycleOwner, Observer { tracks ->
+            logger.debug("On new ${tracks.size} tracks")
+            val downloadedTracks = tracks.filter { track -> track.filePath != null }
+            val trackUrl = if (downloadedTracks.isNotEmpty()) {
+                logger.debug("Play downloaded")
+                downloadedTracks.random().filePath!!
+            } else {
+                logger.debug("Play from streaming")
+                tracks.random().url
+            }
+            viewLifecycleOwner.lifecycleScope.launch {
+                playAudio(trackUrl)
+            }
+            viewLifecycleOwner.lifecycleScope.launch {
+                playAudio(trackUrl)
+            }
         })
 
         mediaPlayer = MediaPlayer()

@@ -68,51 +68,47 @@
 
     </androidx.cardview.widget.CardView>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <ImageButton
         android:id="@+id/closeButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/round_button_size"
+        android:layout_height="@dimen/round_button_size"
         android:layout_margin="@dimen/margin_normal"
         android:elevation="6dp"
         android:src="@drawable/ic_close"
-        app:tint="@color/colorLightText"
-        app:backgroundTint="@color/colorPrimary"
+        android:background="@drawable/round_button_shape"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <ImageButton
         android:id="@+id/prevButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/round_button_size"
+        android:layout_height="@dimen/round_button_size"
         android:layout_margin="@dimen/margin_normal"
         android:elevation="6dp"
         android:src="@drawable/ic_arrow_prev"
-        app:tint="@color/colorLightText"
-        app:backgroundTint="@color/colorPrimary"
+        android:background="@drawable/round_button_shape"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/closeButton" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <ImageButton
         android:id="@+id/toggleButtonMute"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/round_button_size"
+        android:layout_height="@dimen/round_button_size"
         android:layout_margin="@dimen/margin_normal"
         android:elevation="6dp"
         android:src="@drawable/ic_music"
-        app:tint="@color/colorLightText"
-        app:backgroundTint="@color/colorPrimary"
+        android:background="@drawable/round_button_shape"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/prevButton" />
+        app:layout_constraintStart_toEndOf="@id/prevButton"/>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <ImageButton
         android:id="@+id/nextButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/round_button_size"
+        android:layout_height="@dimen/round_button_size"
         android:layout_margin="@dimen/margin_normal"
         android:elevation="6dp"
         android:src="@drawable/ic_arrow_next"
-        app:tint="@color/colorLightText"
-        app:backgroundTint="@color/colorPrimary"
+        android:background="@drawable/round_button_shape"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/toggleButtonMute" />
 

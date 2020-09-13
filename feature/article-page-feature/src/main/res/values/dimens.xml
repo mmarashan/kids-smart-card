@@ -10,4 +10,5 @@
     <dimen name="description_min_height">256dp</dimen>
     <dimen name="control_button_size">32dp</dimen>
     <dimen name="text_size">22sp</dimen>
+    <dimen name="round_button_size">64dp</dimen>
 </resources>
