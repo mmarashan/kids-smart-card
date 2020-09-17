@@ -6,9 +6,10 @@
     <dimen name="margin_normal">16dp</dimen>
     <dimen name="margin_small">8dp</dimen>
     <dimen name="margin_extra_small">4dp</dimen>
-    <dimen name="toolbar_size">48dp</dimen>
+    <dimen name="toolbar_size">64dp</dimen>
     <dimen name="description_min_height">256dp</dimen>
     <dimen name="control_button_size">32dp</dimen>
+    <dimen name="header_text_size">24sp</dimen>
     <dimen name="text_size">22sp</dimen>
     <dimen name="round_button_size">64dp</dimen>
 </resources>

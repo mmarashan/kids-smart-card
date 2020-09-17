@@ -6,43 +6,51 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/titleToolbar"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/toolbar_size"
-        android:background="@color/colorPrimary"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:id="@+id/titleText"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:layout_marginStart="@dimen/margin_extra_small"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:lineSpacingMultiplier="0.8"
-            android:textAlignment="center"
-            android:textColor="@color/colorLightText"
-            android:textSize="@dimen/text_size"
-            tools:text="Иван-царевич и серый волк." />
-
-    </androidx.appcompat.widget.Toolbar>
-
     <androidx.cardview.widget.CardView
         android:id="@+id/articleCardView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_margin="@dimen/margin_extra_small"
         app:cardCornerRadius="24dp"
+        app:cardBackgroundColor="@color/colorLightText"
         app:cardElevation="4dp"
         app:cardPreventCornerOverlap="true"
-        app:layout_constraintTop_toBottomOf="@id/titleToolbar">
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/titleToolbar"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/toolbar_size"
+                android:background="@color/colorPrimary">
+
+                <ImageButton
+                    android:id="@+id/closeButton"
+                    android:layout_width="48dp"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/ic_close"/>
+
+                <TextView
+                    android:id="@+id/titleText"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_marginStart="@dimen/margin_extra_small"
+                    android:gravity="center"
+                    android:lineSpacingMultiplier="0.8"
+                    android:textAlignment="center"
+                    android:textColor="@color/colorLightText"
+                    android:textSize="@dimen/header_text_size"
+                    android:textStyle="bold"
+                    tools:text="Иван-царевич и серый волк. В поросятах знает толк" />
+
+            </androidx.appcompat.widget.Toolbar>
 
             <ImageView
                 android:id="@+id/articleImage"
@@ -69,47 +77,37 @@
     </androidx.cardview.widget.CardView>
 
     <ImageButton
-        android:id="@+id/closeButton"
-        android:layout_width="@dimen/round_button_size"
-        android:layout_height="@dimen/round_button_size"
-        android:layout_margin="@dimen/margin_normal"
-        android:elevation="6dp"
-        android:src="@drawable/ic_close"
-        android:background="@drawable/round_button_shape"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <ImageButton
         android:id="@+id/prevButton"
         android:layout_width="@dimen/round_button_size"
         android:layout_height="@dimen/round_button_size"
         android:layout_margin="@dimen/margin_normal"
+        android:background="@drawable/round_button_shape"
         android:elevation="6dp"
         android:src="@drawable/ic_arrow_prev"
-        android:background="@drawable/round_button_shape"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/closeButton" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <ImageButton
         android:id="@+id/toggleButtonMute"
         android:layout_width="@dimen/round_button_size"
         android:layout_height="@dimen/round_button_size"
         android:layout_margin="@dimen/margin_normal"
+        android:background="@drawable/round_button_shape"
         android:elevation="6dp"
         android:src="@drawable/ic_music"
-        android:background="@drawable/round_button_shape"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/prevButton"/>
+        app:layout_constraintStart_toEndOf="@id/prevButton" />
 
     <ImageButton
         android:id="@+id/nextButton"
         android:layout_width="@dimen/round_button_size"
         android:layout_height="@dimen/round_button_size"
         android:layout_margin="@dimen/margin_normal"
+        android:background="@drawable/round_button_shape"
         android:elevation="6dp"
         android:src="@drawable/ic_arrow_next"
-        android:background="@drawable/round_button_shape"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@id/toggleButtonMute" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

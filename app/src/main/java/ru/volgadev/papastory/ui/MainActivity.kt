@@ -61,14 +61,20 @@ class MainActivity : AppCompatActivity() {
 
         val galleryFragment: ArticleGalleryFragment =
             FragmentProvider.get(AppFragment.GALERY_FRAGMENT) as ArticleGalleryFragment
-        galleryFragment.enterTransition = Slide(Gravity.END)
-        galleryFragment.exitTransition = Slide(Gravity.START)
+        galleryFragment.enterTransition = Slide(Gravity.END).apply {
+            duration = 1000
+        }
+        galleryFragment.exitTransition = Slide(Gravity.START).apply {
+            duration = 1000
+        }
         galleryFragment.setOnItemClickListener(object : ArticleGalleryFragment.OnItemClickListener {
             override fun onClick(itemId: Long, clickedView: View) {
                 logger.debug("Choose $itemId item to show")
                 val itemPageFragment =
                     FragmentProvider.get(AppFragment.ARTICLE_PAGE_FRAGMENT) as ArticlePageFragment
-                itemPageFragment.exitTransition = Fade()
+                itemPageFragment.exitTransition = Fade().apply {
+                    duration = 1000
+                }
                 showFragment(
                     itemPageFragment,
                     Bundle().apply { putLong(ITEM_ID_KEY, itemId) },

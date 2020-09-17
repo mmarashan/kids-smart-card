@@ -75,17 +75,20 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
         })
 
         articleCardView.visibility = View.INVISIBLE
-        articleText.visibility = View.INVISIBLE
 
-        val controls = listOf(toggleButtonMute, closeButton, prevButton, nextButton)
+        val controls = listOf(prevButton, nextButton)
         controls.forEach { btn -> btn.isVisible = false }
 
         viewModel.state.observe(viewLifecycleOwner, Observer { readingState ->
             val articlePage = readingState.page
             logger.debug("Set new ${articlePage.articleId} article page")
-            val title = "${articlePage.title}"
-            titleText.text = title
+
+            titleText.isVisible = titleText.text != null
+            titleText.text = articlePage.title
+
+            articleText.isVisible = articlePage.text != null
             articleText.text = articlePage.text
+
             articlePage.imageUrl?.let { imageUrl ->
                 Glide.with(articleImage.context).load(imageUrl)
                     .transition(DrawableTransitionOptions.withCrossFade())
@@ -94,28 +97,15 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
             articleCardView.setVisibleWithTransition(
                 View.VISIBLE,
                 Slide(Gravity.END),
-                1000,
-                articlePageLayout
-            )
-            articleText.setVisibleWithTransition(
-                View.VISIBLE,
-                Slide(Gravity.END),
-                1000,
-                articlePageLayout
+                1200,
+                articlePageLayout,
+                delayMs = 200
             )
 
             controls.forEach { btn ->
-                btn.isVisible = false
-                btn.setVisibleWithTransition(
-                    View.VISIBLE,
-                    Slide(Gravity.BOTTOM),
-                    1000,
-                    articlePageLayout
-                )
-
+                btn.isVisible = true
                 btn.runLevitateAnimation(4f, 700L)
             }
-
         })
 
         viewModel.tracks.observe(viewLifecycleOwner, Observer { tracks ->
