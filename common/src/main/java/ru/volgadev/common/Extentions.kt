@@ -24,6 +24,7 @@ import android.webkit.URLUtil
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import java.io.File
 import java.net.MalformedURLException
 
 
@@ -51,24 +52,6 @@ fun Drawable.toBitmap(): Bitmap {
     drawable.setBounds(0, 0, canvas.width, canvas.height)
     drawable.draw(canvas)
     return bitmap
-}
-
-fun MediaPlayer.playAudio(context: Context, path: String) {
-    try {
-        Log.d("MediaPlayer.playAudio", "Prepare. Set data source")
-        setDataSource(context, Uri.parse(path))
-        prepareAsync()
-        setOnPreparedListener {
-            start()
-        }
-    } catch (e: Exception) {
-        Log.e("MediaPlayer.playAudio", e.message?:e.toString())
-    }
-}
-
-fun MediaPlayer.mute(mute: Boolean) {
-    if (mute) setVolume(0f, 0f)
-    else setVolume(1f, 1f)
 }
 
 fun Activity.hideNavBar() {
@@ -125,4 +108,8 @@ fun String.isValidUrlString(): Boolean {
     } catch (e: MalformedURLException) {
     }
     return false
+}
+
+fun File.isExistsNonEmptyFile(): Boolean {
+    return isFile && exists() && length() > 0
 }

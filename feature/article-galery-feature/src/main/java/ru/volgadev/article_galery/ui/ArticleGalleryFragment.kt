@@ -1,26 +1,20 @@
 package ru.volgadev.article_galery.ui
 
-import android.media.MediaPlayer
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.annotation.AnyThread
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import kotlinx.android.synthetic.main.main_fragment.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import ru.volgadev.article_data.model.Article
 import ru.volgadev.article_data.model.ArticleType
 import ru.volgadev.article_galery.R
 import ru.volgadev.common.BackgroundMediaPlayer
 import ru.volgadev.common.log.Logger
-import ru.volgadev.common.playAudio
 
 
 class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
@@ -33,7 +27,8 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
 
     private val viewModel: ArticleGalleryViewModel by viewModel()
 
-    private var mediaPlayer: BackgroundMediaPlayer? = null
+    private val mediaPlayer = BackgroundMediaPlayer()
+    private val cardsMediaPlayer = BackgroundMediaPlayer()
 
     interface OnItemClickListener {
         fun onClick(article: Article, clickedView: View)
@@ -59,10 +54,14 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
                     clickedArticle?.let { article ->
                         logger.debug("On click article ${article.id}")
                         article.onClickSounds.firstOrNull()?.let { firstSoundUrl ->
-                            mediaPlayer?.playAudio(context!!, firstSoundUrl)
+                            try {
+                                cardsMediaPlayer.playAudio(context!!, Uri.parse(firstSoundUrl))
+                            } catch (e: Exception) {
+                                logger.error("Exception when playing: ${e.message}")
+                            }
                         }
                         if (article.type == ArticleType.NO_PAGES) {
-
+                            // TODO: magic, animation!
                         }
                         onItemClickListener?.onClick(article, clickedView)
                     }
@@ -95,29 +94,34 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
                 }
             }
             trackUrl?.let { url ->
-                mediaPlayer?.playAudio(context!!, url)
+                try {
+                    mediaPlayer.playAudio(context!!, Uri.parse(url))
+                } catch (e: Exception) {
+                    logger.error("Exception when playing: ${e.message}")
+                }
             }
         })
-
-        mediaPlayer = BackgroundMediaPlayer()
     }
 
     override fun onResume() {
         super.onResume()
         logger.debug("onResume()")
-        mediaPlayer?.start()
+        if (mediaPlayer.isPaused()) {
+            logger.debug("Start paused playing")
+            mediaPlayer.start()
+        }
     }
 
     override fun onPause() {
         logger.debug("onPause()")
-        mediaPlayer?.pause()
+        mediaPlayer.pause()
         super.onPause()
     }
 
     override fun onDestroyView() {
         logger.debug("onDestroyView()")
-        mediaPlayer?.stopAndRelease()
-        mediaPlayer = null
+        mediaPlayer.stopAndRelease()
+        cardsMediaPlayer.stopAndRelease()
         super.onDestroyView()
     }
 }

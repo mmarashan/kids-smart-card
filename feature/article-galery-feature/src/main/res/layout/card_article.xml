@@ -26,12 +26,13 @@
             android:id="@+id/cardTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="4dp"
             android:layout_marginBottom="4dp"
             android:textSize="22sp"
+            android:textAlignment="center"
             tools:text="Три веселых гуся" />
 
         <TextView

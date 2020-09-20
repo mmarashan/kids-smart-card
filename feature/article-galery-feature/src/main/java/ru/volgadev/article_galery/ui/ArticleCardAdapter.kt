@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.annotation.AnyThread
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -104,12 +105,21 @@ class ArticleCardAdapter :
             val holder = this
             card.tag = article.id
             val image = holder.image
-
-            holder.author.text = article.author
             holder.title.text = article.title
 
-            holder.tagsAdapter.setData(article.tags)
+            if (article.author.isNotEmpty()){
+                holder.author.isVisible = true
+                holder.author.text = article.author
+            } else {
+                holder.author.isVisible = false
+            }
 
+            if (article.tags.isNotEmpty()){
+                holder.tagsRecyclerView.isVisible = true
+                holder.tagsAdapter.setData(article.tags)
+            } else {
+                holder.tagsRecyclerView.isVisible = false
+            }
             article.iconUrl?.let { url ->
                 Glide.with(image.context).load(url)
                     .transition(DrawableTransitionOptions.withCrossFade())

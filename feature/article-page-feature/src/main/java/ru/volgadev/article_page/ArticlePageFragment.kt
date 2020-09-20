@@ -1,6 +1,5 @@
 package ru.volgadev.article_page
 
-import android.media.MediaPlayer
 import android.os.Bundle
 import android.transition.Slide
 import android.view.Gravity
@@ -9,19 +8,15 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import kotlinx.android.synthetic.main.layout_article_page.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import ru.volgadev.common.BackgroundMediaPlayer
 import ru.volgadev.common.log.Logger
-import ru.volgadev.common.mute
-import ru.volgadev.common.playAudio
 import ru.volgadev.common.runLevitateAnimation
 import ru.volgadev.common.setVisibleWithTransition
+import java.io.File
 
 const val ITEM_ID_KEY = "ITEM_ID"
 
@@ -35,7 +30,7 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
 
     private val viewModel: ArticlePageViewModel by viewModel()
 
-    private var mediaPlayer: MediaPlayer? = null
+    private var mediaPlayer: BackgroundMediaPlayer? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -71,7 +66,7 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
 
         viewModel.isMute.observe(viewLifecycleOwner, Observer { isMute ->
             toggleButtonMute.setImageDrawable(if (isMute) musicOnDrawable else musicOffDrawable)
-            mediaPlayer?.mute(isMute)
+            mediaPlayer?.setMute(isMute)
         })
 
         articleCardView.visibility = View.INVISIBLE
@@ -118,21 +113,21 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
                 logger.debug("Play from streaming")
                 tracks.random().url
             }
-            viewLifecycleOwner.lifecycleScope.launch {
-                playAudio(trackUrl)
-            }
-            viewLifecycleOwner.lifecycleScope.launch {
-                playAudio(trackUrl)
-            }
+            mediaPlayer?.playAudio(context!!, File(trackUrl))
         })
 
-        mediaPlayer = MediaPlayer()
+        mediaPlayer = BackgroundMediaPlayer()
     }
 
     override fun onResume() {
         super.onResume()
         logger.debug("onResume()")
-        mediaPlayer?.start()
+        mediaPlayer?.let { player ->
+            if (player.isPaused()) {
+                logger.debug("Start paused playing")
+                player.start()
+            }
+        }
     }
 
     override fun onPause() {
@@ -143,18 +138,8 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
 
     override fun onDestroyView() {
         logger.debug("onDestroyView()")
-        mediaPlayer?.let { player ->
-            player.stop()
-            player.release()
-        }
+        mediaPlayer?.stopAndRelease()
         mediaPlayer = null
         super.onDestroyView()
-    }
-
-    private suspend fun playAudio(path: String) = withContext(Dispatchers.Default) {
-        context?.applicationContext?.let { appContext ->
-            logger.debug("Play $path")
-            mediaPlayer?.playAudio(appContext, path)
-        }
     }
 }
