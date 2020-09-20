@@ -12,11 +12,17 @@ data class Article(
     val tags: List<String> = listOf(),
     val author: String,
     val title: String,
-    val pagesFile: String? = null, // TODO: remove nullable
+    val type: ArticleType,
+    val pagesFile: String? = null,
     val iconUrl: String? = null,
+    val onClickSounds: List<String> = listOf(),
     val averageTimeReadingMin: Int? = 0,
     val timestamp: Long
 )
+
+enum class ArticleType {
+    NO_PAGES
+}
 
 @Entity(indices = [Index(value = ["article_id"])])
 data class ArticlePage(

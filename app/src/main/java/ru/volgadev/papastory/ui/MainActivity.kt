@@ -15,6 +15,8 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.android.synthetic.main.main_activity.*
+import ru.volgadev.article_data.model.Article
+import ru.volgadev.article_data.model.ArticleType
 import ru.volgadev.article_galery.ui.ArticleGalleryFragment
 import ru.volgadev.article_page.ArticlePageFragment
 import ru.volgadev.article_page.ITEM_ID_KEY
@@ -68,19 +70,21 @@ class MainActivity : AppCompatActivity() {
             duration = 1000
         }
         galleryFragment.setOnItemClickListener(object : ArticleGalleryFragment.OnItemClickListener {
-            override fun onClick(itemId: Long, clickedView: View) {
-                logger.debug("Choose $itemId item to show")
+            override fun onClick(article: Article, clickedView: View) {
+                logger.debug("Choose ${article.title} to show")
                 val itemPageFragment =
                     FragmentProvider.get(AppFragment.ARTICLE_PAGE_FRAGMENT) as ArticlePageFragment
                 itemPageFragment.exitTransition = Fade().apply {
                     duration = 1000
                 }
-                showFragment(
-                    itemPageFragment,
-                    Bundle().apply { putLong(ITEM_ID_KEY, itemId) },
-                    true,
-                    clickedView
-                )
+                if (article.type != ArticleType.NO_PAGES) {
+                    showFragment(
+                        itemPageFragment,
+                        Bundle().apply { putLong(ITEM_ID_KEY, article.id) },
+                        true,
+                        clickedView
+                    )
+                }
             }
         })
 

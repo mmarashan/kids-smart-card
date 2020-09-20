@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.annotation.WorkerThread
 import androidx.room.*
 import ru.volgadev.article_data.model.Article
+import ru.volgadev.article_data.model.ArticleType
 import java.util.stream.Collectors
 
 @Dao
@@ -26,7 +27,7 @@ interface ArticleDao {
 }
 
 @Database(entities = [Article::class], version = 1)
-@TypeConverters(ListStringConverter::class)
+@TypeConverters(ListStringConverter::class, ArticleTypeConverter::class)
 abstract class ArticleDatabase : RoomDatabase() {
 
     abstract fun userDao(): ArticleDao
@@ -55,12 +56,25 @@ private class ListStringConverter {
     private val DELIMITER = ","
 
     @TypeConverter
-    fun fromHobbies(hobbies: List<String>): String {
+    fun from(hobbies: List<String>): String {
         return hobbies.stream().collect(Collectors.joining(DELIMITER))
     }
 
     @TypeConverter
-    fun toHobbies(data: String): List<String> {
+    fun to(data: String): List<String> {
         return data.split(DELIMITER)
+    }
+}
+
+private class ArticleTypeConverter {
+
+    @TypeConverter
+    fun from(type: ArticleType): String {
+        return type.name
+    }
+
+    @TypeConverter
+    fun to(data: String): ArticleType {
+        return ArticleType.valueOf(data)
     }
 }

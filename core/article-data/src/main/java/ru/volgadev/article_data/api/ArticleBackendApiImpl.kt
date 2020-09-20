@@ -7,6 +7,7 @@ import okhttp3.Response
 import org.json.JSONObject
 import ru.volgadev.article_data.model.Article
 import ru.volgadev.article_data.model.ArticlePage
+import ru.volgadev.article_data.model.ArticleType
 import ru.volgadev.article_data.model.PageType
 import ru.volgadev.common.BACKEND_URL
 import ru.volgadev.common.log.Logger
@@ -48,8 +49,16 @@ class ArticleBackendApiImpl : ArticleBackendApi {
                         tags.add(tagsJs[t] as String)
                     }
                 }
+                val onClickSounds = arrayListOf<String>()
+                val onClickSoundsJson = articleJson.optJSONArray("onClickSounds")
+                onClickSoundsJson?.let { onClickSoundsJs ->
+                    for (t in 0 until onClickSoundsJs.length()) {
+                        onClickSounds.add(onClickSoundsJs[t] as String)
+                    }
+                }
                 val author = articleJson.optString("author")
                 val title = articleJson.optString("title")
+                val type = articleJson.optString("type")
                 val pagesFile = articleJson.optString("pagesFile")
                 val iconUrl = articleJson.optString("iconUrl")
                 val averageTimeReadingMin = articleJson.optInt("averageTimeReadingMin")
@@ -60,8 +69,10 @@ class ArticleBackendApiImpl : ArticleBackendApi {
                         tags = tags,
                         author = author,
                         title = title,
+                        type = ArticleType.valueOf(type),
                         pagesFile = pagesFile,
                         iconUrl = iconUrl,
+                        onClickSounds = onClickSounds,
                         averageTimeReadingMin = averageTimeReadingMin,
                         timestamp = timestamp
                     )

@@ -4,6 +4,7 @@ import android.media.MediaPlayer
 import android.os.Bundle
 import android.view.View
 import androidx.annotation.AnyThread
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
@@ -14,7 +15,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import ru.volgadev.article_data.model.Article
+import ru.volgadev.article_data.model.ArticleType
 import ru.volgadev.article_galery.R
+import ru.volgadev.common.BackgroundMediaPlayer
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.playAudio
 
@@ -29,10 +33,10 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
 
     private val viewModel: ArticleGalleryViewModel by viewModel()
 
-    private var mediaPlayer: MediaPlayer? = null
+    private var mediaPlayer: BackgroundMediaPlayer? = null
 
     interface OnItemClickListener {
-        fun onClick(itemId: Long, clickedView: View)
+        fun onClick(article: Article, clickedView: View)
     }
 
     @Volatile
@@ -50,7 +54,18 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
         val viewAdapter = ArticleCardAdapter().apply {
             setOnItemClickListener(object : ArticleCardAdapter.OnItemClickListener {
                 override fun onClick(itemId: Long, clickedView: View) {
-                    onItemClickListener?.onClick(itemId, clickedView)
+                    val clickedArticle =
+                        viewModel.articles.value?.first { article -> article.id == itemId }
+                    clickedArticle?.let { article ->
+                        logger.debug("On click article ${article.id}")
+                        article.onClickSounds.firstOrNull()?.let { firstSoundUrl ->
+                            mediaPlayer?.playAudio(context!!, firstSoundUrl)
+                        }
+                        if (article.type == ArticleType.NO_PAGES) {
+
+                        }
+                        onItemClickListener?.onClick(article, clickedView)
+                    }
                 }
             })
         }
@@ -80,13 +95,11 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
                 }
             }
             trackUrl?.let { url ->
-                viewLifecycleOwner.lifecycleScope.launch {
-                    playAudio(url)
-                }
+                mediaPlayer?.playAudio(context!!, url)
             }
         })
 
-        mediaPlayer = MediaPlayer()
+        mediaPlayer = BackgroundMediaPlayer()
     }
 
     override fun onResume() {
@@ -103,19 +116,8 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
 
     override fun onDestroyView() {
         logger.debug("onDestroyView()")
-        mediaPlayer?.let { player ->
-            player.stop()
-            player.release()
-        }
+        mediaPlayer?.stopAndRelease()
         mediaPlayer = null
         super.onDestroyView()
     }
-
-    private suspend fun playAudio(path: String) = withContext(Dispatchers.Default) {
-        context?.applicationContext?.let { appContext ->
-            logger.debug("Play $path")
-            mediaPlayer?.playAudio(appContext, path)
-        }
-    }
-
 }
