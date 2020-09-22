@@ -8,4 +8,8 @@ import ru.volgadev.music_data.model.MusicTrack
 interface MusicRepository {
 
     fun musicTracks(): Flow<ArrayList<MusicTrack>>
+
+    fun articleAudios(): Flow<ArrayList<MusicTrack>>
+
+    suspend fun loadArticleAudio(url: String): MusicTrack?
 }

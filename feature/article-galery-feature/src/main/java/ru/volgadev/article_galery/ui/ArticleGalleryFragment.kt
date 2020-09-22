@@ -53,9 +53,16 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
                         viewModel.articles.value?.first { article -> article.id == itemId }
                     clickedArticle?.let { article ->
                         logger.debug("On click article ${article.id}")
+                        viewModel.onClickArticle(article)
                         article.onClickSounds.firstOrNull()?.let { firstSoundUrl ->
+                            val loadedAudio =
+                                viewModel.articleAudios.value?.firstOrNull { audio -> audio.url == firstSoundUrl }
                             try {
-                                cardsMediaPlayer.playAudio(context!!, Uri.parse(firstSoundUrl))
+                                val audioPath = loadedAudio?.url ?: firstSoundUrl
+                                cardsMediaPlayer.playAudio(
+                                    view.context,
+                                    Uri.parse(audioPath)
+                                )
                             } catch (e: Exception) {
                                 logger.error("Exception when playing: ${e.message}")
                             }

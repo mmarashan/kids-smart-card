@@ -7,5 +7,10 @@ import androidx.room.PrimaryKey
 data class MusicTrack(
     @PrimaryKey
     var url: String,
-    var filePath: String?
+    var filePath: String?,
+    var type: MusicTrackType = MusicTrackType.MUSIC
 )
+
+enum class MusicTrackType{
+    MUSIC, ARTICLE_AUDIO
+}
