@@ -26,6 +26,9 @@ interface MusicTrackDao {
 
     @Query("SELECT filePath FROM musictrack WHERE url = :url")
     fun getPathByUrl(url : String) : String?
+
+    @Query("SELECT * FROM musictrack WHERE url = :url")
+    fun getByUrl(url : String) : MusicTrack?
 }
 
 @Database(entities = [MusicTrack::class], version = 1)

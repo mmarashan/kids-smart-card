@@ -12,4 +12,6 @@ interface MusicRepository {
     fun articleAudios(): Flow<ArrayList<MusicTrack>>
 
     suspend fun loadArticleAudio(url: String): MusicTrack?
+
+    suspend fun getTrackFromStorage(url: String): MusicTrack?
 }

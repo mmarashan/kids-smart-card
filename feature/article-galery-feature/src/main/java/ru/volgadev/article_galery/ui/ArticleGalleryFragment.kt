@@ -54,19 +54,6 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
                     clickedArticle?.let { article ->
                         logger.debug("On click article ${article.id}")
                         viewModel.onClickArticle(article)
-                        article.onClickSounds.firstOrNull()?.let { firstSoundUrl ->
-                            val loadedAudio =
-                                viewModel.articleAudios.value?.firstOrNull { audio -> audio.url == firstSoundUrl }
-                            try {
-                                val audioPath = loadedAudio?.url ?: firstSoundUrl
-                                cardsMediaPlayer.playAudio(
-                                    view.context,
-                                    Uri.parse(audioPath)
-                                )
-                            } catch (e: Exception) {
-                                logger.error("Exception when playing: ${e.message}")
-                            }
-                        }
                         if (article.type == ArticleType.NO_PAGES) {
                             // TODO: magic, animation!
                         }
@@ -75,6 +62,15 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
                 }
             })
         }
+
+        viewModel.audioToPlay.observe(viewLifecycleOwner, Observer { track ->
+            val audioPath = track.filePath ?: track.url
+            logger.debug("Play $audioPath")
+            cardsMediaPlayer.playAudio(
+                view.context,
+                Uri.parse(audioPath)
+            )
+        })
 
         contentRecyclerView.run {
             layoutManager = StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL)

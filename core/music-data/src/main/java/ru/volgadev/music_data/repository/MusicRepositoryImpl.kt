@@ -57,29 +57,36 @@ class MusicRepositoryImpl private constructor(
         }
     }
 
-    private suspend fun loadMusicTrack(url: String, type: MusicTrackType): MusicTrack? = withContext(Dispatchers.IO) {
-        logger.debug("loadMusicTrack($url)")
-        if (url.isValidUrlString()) {
-            val filesDir = context.filesDir
-            val fileName: String =
-                url.substring(url.lastIndexOf('/') + 1, url.length)
-            val newFilePath = File(filesDir, fileName).absolutePath
-            logger.debug("Try to load $url to $newFilePath")
-            val isSuccess = downloader.download(url, newFilePath)
-            if (isSuccess) {
-                logger.debug("Success load")
-                val newTrack = MusicTrack(url, newFilePath, type)
-                storageDao.insertAll(newTrack)
-                return@withContext newTrack
+    override suspend fun getTrackFromStorage(url: String): MusicTrack? =
+        withContext(Dispatchers.Default) {
+            logger.debug("getTrackFromStorage()")
+            return@withContext storageDao.getByUrl(url)
+        }
+
+    private suspend fun loadMusicTrack(url: String, type: MusicTrackType): MusicTrack? =
+        withContext(Dispatchers.IO) {
+            logger.debug("loadMusicTrack($url)")
+            if (url.isValidUrlString()) {
+                val filesDir = context.filesDir
+                val fileName: String =
+                    url.substring(url.lastIndexOf('/') + 1, url.length)
+                val newFilePath = File(filesDir, fileName).absolutePath
+                logger.debug("Try to load $url to $newFilePath")
+                val isSuccess = downloader.download(url, newFilePath)
+                if (isSuccess) {
+                    logger.debug("Success load")
+                    val newTrack = MusicTrack(url, newFilePath, type)
+                    storageDao.insertAll(newTrack)
+                    return@withContext newTrack
+                } else {
+                    logger.warn("Fail load")
+                    return@withContext null
+                }
             } else {
-                logger.warn("Fail load")
+                logger.debug("Url not valid")
                 return@withContext null
             }
-        } else {
-            logger.debug("Url not valid")
-            return@withContext null
         }
-    }
 
     init {
         logger.debug("init")
