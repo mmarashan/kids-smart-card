@@ -11,11 +11,8 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import android.media.MediaPlayer
-import android.net.Uri
 import android.transition.Transition
 import android.transition.TransitionManager
-import android.util.Log
 import android.util.Patterns
 import android.view.View
 import android.view.ViewGroup
@@ -88,6 +85,24 @@ fun View.runLevitateAnimation(amplitudeY: Float, duration: Long) {
             override fun onAnimationEnd(animation: Animator?) {
                 super.onAnimationEnd(animation)
                 runLevitateAnimation(-amplitudeY, duration)
+            }
+        })
+}
+
+fun View.runScaleAnimation(amplitudeZ: Float, period: Long, count: Int) {
+    assert(count > 0)
+    assert(amplitudeZ > 0)
+    assert(amplitudeZ <= 1)
+    val interpolator: TimeInterpolator = DecelerateInterpolator()
+    this.animate().scaleX(amplitudeZ).scaleY(amplitudeZ).setDuration(period)
+        .setInterpolator(interpolator).setListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator?) {
+                super.onAnimationEnd(animation)
+                if (count > 1) {
+                    runScaleAnimation(1/amplitudeZ, period, count - 1)
+                } else {
+                    runScaleAnimation(1f, period, 0)
+                }
             }
         })
 }
