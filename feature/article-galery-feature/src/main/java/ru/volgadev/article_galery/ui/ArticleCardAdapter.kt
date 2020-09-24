@@ -128,6 +128,8 @@ class ArticleCardAdapter :
             }
 
             holder.card.setOnClickListener(viewClickListener)
+
+            logger.debug("Bind card elevation = ${card.elevation} ${card.cardElevation}")
         }
     }
 

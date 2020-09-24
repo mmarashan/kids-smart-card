@@ -15,7 +15,7 @@ import ru.volgadev.article_data.model.ArticleType
 import ru.volgadev.article_galery.R
 import ru.volgadev.common.BackgroundMediaPlayer
 import ru.volgadev.common.log.Logger
-import ru.volgadev.common.runScaleAnimation
+import ru.volgadev.common.scaleToFitAnimatedAndBack
 
 
 class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
@@ -56,7 +56,10 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
                         logger.debug("On click article ${article.id}")
                         viewModel.onClickArticle(article)
                         if (article.type == ArticleType.NO_PAGES) {
-                            clickedView.runScaleAnimation(0.95f, 400L, 3)
+                            clickedView.elevation = clickedView.elevation + 1
+                            clickedView.scaleToFitAnimatedAndBack(4000L) {
+                                clickedView.elevation = clickedView.elevation - 1
+                            }
                         }
                         onItemClickListener?.onClick(article, clickedView)
                     }

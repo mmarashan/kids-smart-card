@@ -16,7 +16,9 @@ import android.transition.TransitionManager
 import android.util.Patterns
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
 import android.view.animation.DecelerateInterpolator
+import android.view.animation.ScaleAnimation
 import android.webkit.URLUtil
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
@@ -89,22 +91,46 @@ fun View.runLevitateAnimation(amplitudeY: Float, duration: Long) {
         })
 }
 
-fun View.runScaleAnimation(amplitudeZ: Float, period: Long, count: Int) {
-    assert(count > 0)
-    assert(amplitudeZ > 0)
-    assert(amplitudeZ <= 1)
-    val interpolator: TimeInterpolator = DecelerateInterpolator()
-    this.animate().scaleX(amplitudeZ).scaleY(amplitudeZ).setDuration(period)
-        .setInterpolator(interpolator).setListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
-                super.onAnimationEnd(animation)
-                if (count > 1) {
-                    runScaleAnimation(1/amplitudeZ, period, count - 1)
-                } else {
-                    runScaleAnimation(1f, period, 0)
-                }
-            }
-        })
+fun View.scaleToFitAnimatedAndBack(time: Long, onEnd: () -> Unit = {}) {
+    val anim = scaleToFitAnimation(this)
+    anim.duration = time
+    anim.setAnimationListener(object : Animation.AnimationListener {
+        override fun onAnimationStart(animation: Animation?) {
+        }
+
+        override fun onAnimationEnd(animation: Animation?) {
+            onEnd.invoke()
+        }
+
+        override fun onAnimationRepeat(animation: Animation?) {
+        }
+    })
+    this.startAnimation(anim)
+}
+
+fun scaleToFitAnimation(view: View): ScaleAnimation {
+    val screenSize = getScreenSize(view.context)
+    val screenW = screenSize.first
+    val screenH = screenSize.second
+    val distanceFromTop = view.bottom - view.height / 2
+    val distanceFromLeft = view.right - view.width / 2
+    val dY_belowCenter = distanceFromTop - screenH / 2
+    val dX_belowCenter = distanceFromLeft - screenW / 2
+    val scaleX = screenW.toFloat() / view.width
+    val pivotY = 0.5f + dY_belowCenter.toFloat() / (screenH / 2)
+    val pivotX = 0.5f + dX_belowCenter.toFloat() / (screenW / 2)
+    val scaleAnimation = ScaleAnimation(
+        1f, scaleX,
+        1f, scaleX,
+        Animation.RELATIVE_TO_SELF, pivotX,
+        Animation.RELATIVE_TO_SELF, pivotY
+    )
+    return scaleAnimation
+}
+
+fun getScreenSize(context: Context): Pair<Int, Int> {
+    val displayMetrics = context.resources.displayMetrics
+    return Pair(displayMetrics.widthPixels, displayMetrics.heightPixels)
 }
 
 fun <T> LiveData<T>.observeOnce(observer: Observer<T>) {
