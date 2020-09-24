@@ -28,7 +28,7 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
 
     private val viewModel: ArticleGalleryViewModel by viewModel()
 
-    private val mediaPlayer = BackgroundMediaPlayer()
+    private val musicMediaPlayer = BackgroundMediaPlayer()
     private val cardsMediaPlayer = BackgroundMediaPlayer()
 
     interface OnItemClickListener {
@@ -67,6 +67,12 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
         viewModel.audioToPlay.observe(viewLifecycleOwner, Observer { track ->
             val audioPath = track.filePath ?: track.url
             logger.debug("Play $audioPath")
+            cardsMediaPlayer.setOnCompletionListener {
+                view.postDelayed({
+                    musicMediaPlayer.setVolume(1f, 1f)
+                }, 700L)
+            }
+            musicMediaPlayer.setVolume(0.4f, 0.4f)
             cardsMediaPlayer.playAudio(
                 view.context,
                 Uri.parse(audioPath)
@@ -99,7 +105,7 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
             }
             trackUrl?.let { url ->
                 try {
-                    mediaPlayer.playAudio(context!!, Uri.parse(url))
+                    musicMediaPlayer.playAudio(context!!, Uri.parse(url))
                 } catch (e: Exception) {
                     logger.error("Exception when playing: ${e.message}")
                 }
@@ -110,21 +116,21 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
     override fun onResume() {
         super.onResume()
         logger.debug("onResume()")
-        if (mediaPlayer.isPaused()) {
+        if (musicMediaPlayer.isPaused()) {
             logger.debug("Start paused playing")
-            mediaPlayer.start()
+            musicMediaPlayer.start()
         }
     }
 
     override fun onPause() {
         logger.debug("onPause()")
-        mediaPlayer.pause()
+        musicMediaPlayer.pause()
         super.onPause()
     }
 
     override fun onDestroyView() {
         logger.debug("onDestroyView()")
-        mediaPlayer.stopAndRelease()
+        musicMediaPlayer.stopAndRelease()
         cardsMediaPlayer.stopAndRelease()
         super.onDestroyView()
     }
