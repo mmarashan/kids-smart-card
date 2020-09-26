@@ -25,6 +25,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import java.io.File
 import java.net.MalformedURLException
+import kotlin.math.min
 
 
 fun Context.applicationDataDir(): String {
@@ -91,24 +92,43 @@ fun View.runLevitateAnimation(amplitudeY: Float, duration: Long) {
         })
 }
 
-fun View.scaleToFitAnimatedAndBack(time: Long, onEnd: () -> Unit = {}) {
-    val anim = scaleToFitAnimation(this)
-    anim.duration = time
-    anim.setAnimationListener(object : Animation.AnimationListener {
-        override fun onAnimationStart(animation: Animation?) {
-        }
+fun View.scaleToFitAnimatedAndBack(
+    timeUp: Long,
+    timeDelay: Long,
+    timeDown: Long,
+    onEnd: () -> Unit = {}
+) {
+    val animPair = scaleToFitParentAnimation(this)
+    val animScaleUp = animPair.first
+    val animScaleDown = animPair.second
+    val view = this
+    animScaleUp.duration = timeUp
+    animScaleUp.fillAfter = true
+    animScaleUp.setAnimationListener(object : Animation.AnimationListener {
+        override fun onAnimationStart(animation: Animation?) {}
 
         override fun onAnimationEnd(animation: Animation?) {
-            onEnd.invoke()
+            animScaleDown.setAnimationListener(object : Animation.AnimationListener {
+                override fun onAnimationStart(animation: Animation?) {}
+
+                override fun onAnimationEnd(animation: Animation?) {
+                    onEnd.invoke()
+                }
+
+                override fun onAnimationRepeat(animation: Animation?) {}
+            })
+            animScaleDown.duration = timeDown
+            view.postDelayed({
+                view.startAnimation(animScaleDown)
+            }, timeDelay)
         }
 
-        override fun onAnimationRepeat(animation: Animation?) {
-        }
+        override fun onAnimationRepeat(animation: Animation?) {}
     })
-    this.startAnimation(anim)
+    this.startAnimation(animScaleUp)
 }
 
-fun scaleToFitAnimation(view: View): ScaleAnimation {
+private fun scaleToFitParentAnimation(view: View): Pair<ScaleAnimation, ScaleAnimation> {
     val screenSize = getScreenSize(view.context)
     val screenW = screenSize.first
     val screenH = screenSize.second
@@ -117,15 +137,23 @@ fun scaleToFitAnimation(view: View): ScaleAnimation {
     val dY_belowCenter = distanceFromTop - screenH / 2
     val dX_belowCenter = distanceFromLeft - screenW / 2
     val scaleX = screenW.toFloat() / view.width
+    val scaleY = screenH.toFloat() / view.height
+    val scaleFactor = min(scaleX, scaleY)
     val pivotY = 0.5f + dY_belowCenter.toFloat() / (screenH / 2)
     val pivotX = 0.5f + dX_belowCenter.toFloat() / (screenW / 2)
-    val scaleAnimation = ScaleAnimation(
-        1f, scaleX,
-        1f, scaleX,
+    val scaleUpAnimation = ScaleAnimation(
+        1f, scaleFactor,
+        1f, scaleFactor,
         Animation.RELATIVE_TO_SELF, pivotX,
         Animation.RELATIVE_TO_SELF, pivotY
     )
-    return scaleAnimation
+    val scaleDownAnimation = ScaleAnimation(
+        scaleFactor, 1f,
+        scaleFactor, 1f,
+        Animation.RELATIVE_TO_SELF, pivotX,
+        Animation.RELATIVE_TO_SELF, pivotY
+    )
+    return Pair(scaleUpAnimation, scaleDownAnimation)
 }
 
 fun getScreenSize(context: Context): Pair<Int, Int> {

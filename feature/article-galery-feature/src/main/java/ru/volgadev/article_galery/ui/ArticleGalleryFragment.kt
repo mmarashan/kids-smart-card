@@ -55,10 +55,11 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
                     clickedArticle?.let { article ->
                         logger.debug("On click article ${article.id}")
                         viewModel.onClickArticle(article)
+                        val startElevation = clickedView.elevation
                         if (article.type == ArticleType.NO_PAGES) {
-                            clickedView.elevation = clickedView.elevation + 1
-                            clickedView.scaleToFitAnimatedAndBack(4000L) {
-                                clickedView.elevation = clickedView.elevation - 1
+                            contentRecyclerView.isClickable
+                            clickedView.scaleToFitAnimatedAndBack(1000L, 1000L, 1000L) {
+                                clickedView.elevation = startElevation
                             }
                         }
                         onItemClickListener?.onClick(article, clickedView)
