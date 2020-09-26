@@ -12,6 +12,7 @@ import android.widget.Toast
 import androidx.annotation.MainThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.android.synthetic.main.main_activity.*
@@ -90,7 +91,6 @@ class MainActivity : AppCompatActivity() {
 
         bottomNavigation.setOnNavigationItemSelectedListener(object :
             BottomNavigationView.OnNavigationItemSelectedListener {
-
             override fun onNavigationItemSelected(item: MenuItem): Boolean {
                 when (item.itemId) {
                     HOME_ITEM_ID -> {
@@ -116,7 +116,7 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager.addOnBackStackChangedListener {
             supportFragmentManager.findFragmentById(
                 R.id.contentContainer
-            )?.let { checkHideNavigationPanel(it) }
+            )?.let { provideNavigationPanelVisibitity(it) }
         }
     }
 
@@ -124,6 +124,15 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         logger.debug("onResume()")
         hideNavBar()
+        bottomNavigation.isVisible = false
+        bottomNavigation.postDelayed({
+            showNavigationPanel()
+        }, 500L)
+    }
+
+    override fun onPause(){
+        super.onPause()
+        logger.debug("onPause()")
     }
 
     private fun showFragment(
@@ -141,7 +150,7 @@ class MainActivity : AppCompatActivity() {
         transaction.commit()
     }
 
-    private fun checkHideNavigationPanel(fragment: Fragment){
+    private fun provideNavigationPanelVisibitity(fragment: Fragment){
         if (FragmentProvider.isFullscreen(fragment)) {
             hideNavigationPanel()
         } else {
@@ -150,16 +159,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showNavigationPanel() {
+        logger.debug("showNavigationPanel()")
         bottomNavigation.setVisibleWithTransition(
             View.VISIBLE,
-            Slide(Gravity.BOTTOM), 600, mainActivityLayout
+            Slide(Gravity.TOP), 600, mainActivityLayout
         )
     }
 
     private fun hideNavigationPanel() {
+        logger.debug("hideNavigationPanel()")
         bottomNavigation.setVisibleWithTransition(
             View.GONE,
-            Slide(Gravity.BOTTOM), 600, mainActivityLayout
+            Slide(Gravity.TOP), 600, mainActivityLayout
         )
     }
 
