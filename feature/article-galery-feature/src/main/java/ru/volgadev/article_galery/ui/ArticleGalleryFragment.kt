@@ -17,7 +17,6 @@ import ru.volgadev.common.BackgroundMediaPlayer
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.scaleToFitAnimatedAndBack
 
-
 class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
 
     private val logger = Logger.get("ArticleGalleryFragment")
@@ -28,8 +27,8 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
 
     private val viewModel: ArticleGalleryViewModel by viewModel()
 
-    private val musicMediaPlayer = BackgroundMediaPlayer()
-    private val cardsMediaPlayer = BackgroundMediaPlayer()
+    private val musicMediaPlayer by lazy { BackgroundMediaPlayer() }
+    private val cardsMediaPlayer by lazy { BackgroundMediaPlayer() }
 
     interface OnItemClickListener {
         fun onClick(article: Article, clickedView: View)
@@ -56,8 +55,8 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
                         logger.debug("On click article ${article.id}")
                         viewModel.onClickArticle(article)
                         val startElevation = clickedView.elevation
+                        clickedView.elevation = startElevation + 1
                         if (article.type == ArticleType.NO_PAGES) {
-                            contentRecyclerView.isClickable
                             clickedView.scaleToFitAnimatedAndBack(1000L, 1000L, 1000L) {
                                 clickedView.elevation = startElevation
                             }
@@ -130,12 +129,5 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
         logger.debug("onPause()")
         musicMediaPlayer.pause()
         super.onPause()
-    }
-
-    override fun onDestroyView() {
-        logger.debug("onDestroyView()")
-        musicMediaPlayer.stopAndRelease()
-        cardsMediaPlayer.stopAndRelease()
-        super.onDestroyView()
     }
 }

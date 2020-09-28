@@ -28,7 +28,7 @@ import ru.volgadev.common.setVisibleWithTransition
 import ru.volgadev.papastory.R
 
 const val HOME_ITEM_ID = R.id.action_home
-const val GALERY_ITEM_ID = R.id.action_galery
+const val GALLERY_ITEM_ID = R.id.action_galery
 const val CONTENT_CONTAINER_ID = R.id.contentContainer
 
 private val NEEDED_PERMISSIONS = arrayOf(
@@ -102,7 +102,7 @@ class MainActivity : AppCompatActivity() {
                         ).show()
                         return true
                     }
-                    GALERY_ITEM_ID -> {
+                    GALLERY_ITEM_ID -> {
                         logger.debug("GALERY_ITEM_ID selected")
                         showFragment(galleryFragment)
                         return true
@@ -111,7 +111,7 @@ class MainActivity : AppCompatActivity() {
                 return false
             }
         })
-        bottomNavigation.selectedItemId = GALERY_ITEM_ID
+        bottomNavigation.selectedItemId = GALLERY_ITEM_ID
 
         supportFragmentManager.addOnBackStackChangedListener {
             supportFragmentManager.findFragmentById(

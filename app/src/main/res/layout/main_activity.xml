@@ -10,14 +10,14 @@
         android:id="@+id/contentContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/bottomNavigation"
+        android:layout_above="@+id/bottomNavigation"
         android:animateLayoutChanges="true" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
         android:background="@color/navigationBarColor"
         app:itemBackground="@color/navigationBarColor"
         app:itemIconTint="@color/colorLightText"
