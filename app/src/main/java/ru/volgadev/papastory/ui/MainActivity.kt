@@ -162,7 +162,7 @@ class MainActivity : AppCompatActivity() {
         logger.debug("showNavigationPanel()")
         bottomNavigation.setVisibleWithTransition(
             View.VISIBLE,
-            Slide(Gravity.TOP), 600, mainActivityLayout
+            Slide(Gravity.BOTTOM), 600, mainActivityLayout
         )
     }
 
@@ -170,7 +170,7 @@ class MainActivity : AppCompatActivity() {
         logger.debug("hideNavigationPanel()")
         bottomNavigation.setVisibleWithTransition(
             View.GONE,
-            Slide(Gravity.TOP), 600, mainActivityLayout
+            Slide(Gravity.BOTTOM), 600, mainActivityLayout
         )
     }
 

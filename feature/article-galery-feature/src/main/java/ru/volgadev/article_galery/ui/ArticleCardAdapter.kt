@@ -107,6 +107,13 @@ class ArticleCardAdapter :
             val image = holder.image
             holder.title.text = article.title
 
+            if (article.title.isNotEmpty()){
+                holder.title.isVisible = true
+                holder.title.text = article.title
+            } else {
+                holder.title.isVisible = false
+            }
+
             if (article.author.isNotEmpty()){
                 holder.author.isVisible = true
                 holder.author.text = article.author
