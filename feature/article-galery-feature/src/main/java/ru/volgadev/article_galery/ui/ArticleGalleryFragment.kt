@@ -4,8 +4,10 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.annotation.AnyThread
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import kotlinx.android.synthetic.main.main_fragment.*
@@ -91,6 +93,27 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
             logger.debug("Set new ${articles.size} articles")
             viewAdapter.setData(articles)
         })
+
+        val categoryTagsAdapter = TagsAdapter(R.layout.category_tag)
+        categoryRecyclerView.run {
+            setHasFixedSize(false)
+            layoutManager =
+                LinearLayoutManager(
+                    context,
+                    LinearLayoutManager.HORIZONTAL,
+                    false
+                )
+            adapter = categoryTagsAdapter
+            val dividerDrawable =
+                ContextCompat.getDrawable(context, R.drawable.empty_divider_4)!!
+            val dividerDecorator =
+                DividerItemDecoration(context, DividerItemDecoration.HORIZONTAL).apply {
+                    setDrawable(dividerDrawable)
+                }
+            addItemDecoration(dividerDecorator)
+        }
+
+        categoryTagsAdapter.setData(listOf("Алфавит", "Цифры"))
 
         viewModel.tracks.observe(viewLifecycleOwner, Observer { tracks ->
             logger.debug("On new ${tracks.size} tracks")

@@ -8,8 +8,8 @@ import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import ru.volgadev.article_galery.R
 
-class ArticleTagsAdapter :
-    RecyclerView.Adapter<ArticleTagsAdapter.ViewHolder>() {
+class TagsAdapter(val itemLayout: Int) :
+    RecyclerView.Adapter<TagsAdapter.ViewHolder>() {
 
     private val tags = ArrayList<String>()
 
@@ -27,7 +27,7 @@ class ArticleTagsAdapter :
         viewType: Int
     ): ViewHolder {
         val card = LayoutInflater.from(parent.context)
-            .inflate(R.layout.card_tag, parent, false) as CardView
+            .inflate(itemLayout, parent, false) as CardView
 
         return ViewHolder(card)
     }

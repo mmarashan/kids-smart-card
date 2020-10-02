@@ -64,7 +64,7 @@ class ArticleCardAdapter :
         RecyclerView.ViewHolder(card) {
 
         private val viewClickListener = View.OnClickListener { view ->
-            view?.let  {
+            view?.let {
                 val id = view.tag as Long
                 logger.debug("On click ${id}")
                 onItemClickListener?.onClick(id, view)
@@ -78,7 +78,7 @@ class ArticleCardAdapter :
 
         private val tagsRecyclerView: RecyclerView =
             card.findViewById<RecyclerView>(R.id.cardTagsRecyclerView)
-        private val tagsAdapter = ArticleTagsAdapter()
+        private val tagsAdapter = TagsAdapter(R.layout.card_tag)
 
         init {
             tagsRecyclerView.run {
@@ -107,21 +107,21 @@ class ArticleCardAdapter :
             val image = holder.image
             holder.title.text = article.title
 
-            if (article.title.isNotEmpty()){
+            if (article.title.isNotEmpty()) {
                 holder.title.isVisible = true
                 holder.title.text = article.title
             } else {
                 holder.title.isVisible = false
             }
 
-            if (article.author.isNotEmpty()){
+            if (article.author.isNotEmpty()) {
                 holder.author.isVisible = true
                 holder.author.text = article.author
             } else {
                 holder.author.isVisible = false
             }
 
-            if (article.tags.isNotEmpty()){
+            if (article.tags.isNotEmpty()) {
                 holder.tagsRecyclerView.isVisible = true
                 holder.tagsAdapter.setData(article.tags)
             } else {
