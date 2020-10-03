@@ -4,6 +4,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import androidx.annotation.AnyThread
+import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -94,15 +95,21 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
             viewAdapter.setData(articles)
         })
 
-        val categoryTagsAdapter = TagsAdapter(R.layout.category_tag)
+        val categoryTagsAdapter = TagsAdapter(R.layout.category_tag).apply {
+            setOnItemClickListener(object : TagsAdapter.OnItemClickListener {
+                override fun onClick(item: String, clickedView: CardView) {
+                    logger.debug("on click $item")
+                    onChose(item)
+                }
+            })
+        }
         categoryRecyclerView.run {
-            setHasFixedSize(false)
-            layoutManager =
-                LinearLayoutManager(
-                    context,
-                    LinearLayoutManager.HORIZONTAL,
-                    false
-                )
+            setHasFixedSize(true)
+            layoutManager = LinearLayoutManager(
+                context,
+                LinearLayoutManager.HORIZONTAL,
+                false
+            )
             adapter = categoryTagsAdapter
             val dividerDrawable =
                 ContextCompat.getDrawable(context, R.drawable.empty_divider_4)!!
@@ -113,7 +120,7 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
             addItemDecoration(dividerDecorator)
         }
 
-        categoryTagsAdapter.setData(listOf("Алфавит", "Цифры"))
+        categoryTagsAdapter.setData(listOf("Алфавит", "Цифры", "Животные", "Музыка"))
 
         viewModel.tracks.observe(viewLifecycleOwner, Observer { tracks ->
             logger.debug("On new ${tracks.size} tracks")

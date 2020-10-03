@@ -55,7 +55,6 @@ class ArticleCardAdapter :
         return ViewHolder(card, parent)
     }
 
-    @AnyThread
     fun setOnItemClickListener(listener: OnItemClickListener) {
         onItemClickListener = listener
     }
