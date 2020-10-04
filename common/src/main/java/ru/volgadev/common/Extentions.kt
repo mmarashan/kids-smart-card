@@ -132,15 +132,13 @@ private fun scaleToFitParentAnimation(view: View): Pair<ScaleAnimation, ScaleAni
     val screenSize = getScreenSize(view.context)
     val screenW = screenSize.first
     val screenH = screenSize.second
-    val distanceFromTop = view.bottom - view.height / 2
-    val distanceFromLeft = view.right - view.width / 2
-    val dY_belowCenter = distanceFromTop - screenH / 2
-    val dX_belowCenter = distanceFromLeft - screenW / 2
+    val yBelowCenter = view.bottom - view.height / 2 - screenH / 2
+    val xBelowCenter = view.right - view.width / 2 - screenW / 2
     val scaleX = screenW.toFloat() / view.width
     val scaleY = screenH.toFloat() / view.height
     val scaleFactor = min(scaleX, scaleY)
-    val pivotY = 0.5f + dY_belowCenter.toFloat() / (screenH / 2)
-    val pivotX = 0.5f + dX_belowCenter.toFloat() / (screenW / 2)
+    val pivotY = 0.5f + yBelowCenter.toFloat() / (screenH / 2)
+    val pivotX = 0.5f + xBelowCenter.toFloat() / (screenW / 2)
     val scaleUpAnimation = ScaleAnimation(
         1f, scaleFactor,
         1f, scaleFactor,

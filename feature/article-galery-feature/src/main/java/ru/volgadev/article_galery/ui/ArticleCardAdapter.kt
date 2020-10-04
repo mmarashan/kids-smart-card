@@ -38,11 +38,21 @@ class ArticleCardAdapter :
     @AnyThread
     fun setData(dataset: Collection<Article>) {
         logger.debug("Set dataset with ${dataset.size} members")
-        articleList.clear()
-        dataset.forEach { article ->
-            articleList.add(article)
+
+        if (articleList.isNotEmpty()) {
+            val length = articleList.size
+            articleList.clear()
+            (0..length).iterator().forEach { index ->
+                notifyItemRemoved(index)
+            }
+            // notifyDataSetChanged()
         }
-        notifyDataSetChanged()
+        dataset.forEachIndexed { index, article ->
+            articleList.add(article)
+            notifyItemChanged(index)
+        }
+        // notifyItemRangeInserted(0, articleList.size)
+        // notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(
@@ -65,7 +75,7 @@ class ArticleCardAdapter :
         private val viewClickListener = View.OnClickListener { view ->
             view?.let {
                 val id = view.tag as Long
-                logger.debug("On click ${id}")
+                logger.debug("On click $id")
                 onItemClickListener?.onClick(id, view)
             }
         }

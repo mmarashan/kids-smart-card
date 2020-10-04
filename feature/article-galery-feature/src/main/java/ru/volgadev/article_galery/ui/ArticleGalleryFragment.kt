@@ -3,6 +3,7 @@ package ru.volgadev.article_galery.ui
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.view.animation.OvershootInterpolator
 import androidx.annotation.AnyThread
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
@@ -11,6 +12,8 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import jp.wasabeef.recyclerview.animators.LandingAnimator
+import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
 import kotlinx.android.synthetic.main.main_fragment.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import ru.volgadev.article_data.model.Article
@@ -49,7 +52,7 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
         super.onViewCreated(view, savedInstanceState)
         logger.debug("On fragment created; savedInstanceState=$savedInstanceState")
 
-        val viewAdapter = ArticleCardAdapter().apply {
+        val articlesAdapter = ArticleCardAdapter().apply {
             setOnItemClickListener(object : ArticleCardAdapter.OnItemClickListener {
                 override fun onClick(itemId: Long, clickedView: View) {
                     val clickedArticle =
@@ -60,7 +63,10 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
                         val startElevation = clickedView.elevation
                         clickedView.elevation = startElevation + 1
                         if (article.type == ArticleType.NO_PAGES) {
-                            clickedView.scaleToFitAnimatedAndBack(1000L, 1000L, 1000L) {
+                            clickedView.scaleToFitAnimatedAndBack(
+                                1000L,
+                                1000L,
+                                1000L) {
                                 clickedView.elevation = startElevation
                             }
                         }
@@ -87,12 +93,18 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
 
         contentRecyclerView.run {
             layoutManager = StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL)
-            adapter = viewAdapter
+            adapter = articlesAdapter
+            itemAnimator = LandingAnimator(OvershootInterpolator(1f)).apply {
+                addDuration = 700
+                removeDuration = 100
+                moveDuration = 700
+                changeDuration = 100
+            }
         }
 
         viewModel.currentArticles.observe(viewLifecycleOwner, Observer { articles ->
             logger.debug("Set new ${articles.size} articles")
-            viewAdapter.setData(articles)
+            articlesAdapter.setData(articles)
         })
 
         val categoryTagsAdapter = TagsAdapter(R.layout.category_tag).apply {
@@ -100,7 +112,6 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
                 override fun onClick(item: String, clickedView: CardView) {
                     logger.debug("on click $item")
                     viewModel.onClickCategory(item)
-                    onChose(item)
                 }
             })
         }
@@ -125,6 +136,7 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
                     setDrawable(dividerDrawable)
                 }
             addItemDecoration(dividerDecorator)
+            itemAnimator = null
         }
 
         viewModel.categories.observe(viewLifecycleOwner, Observer { categories ->
