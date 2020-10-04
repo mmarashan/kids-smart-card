@@ -53,7 +53,7 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
             setOnItemClickListener(object : ArticleCardAdapter.OnItemClickListener {
                 override fun onClick(itemId: Long, clickedView: View) {
                     val clickedArticle =
-                        viewModel.articles.value?.first { article -> article.id == itemId }
+                        viewModel.currentArticles.value?.first { article -> article.id == itemId }
                     clickedArticle?.let { article ->
                         logger.debug("On click article ${article.id}")
                         viewModel.onClickArticle(article)
@@ -90,7 +90,7 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
             adapter = viewAdapter
         }
 
-        viewModel.articles.observe(viewLifecycleOwner, Observer { articles ->
+        viewModel.currentArticles.observe(viewLifecycleOwner, Observer { articles ->
             logger.debug("Set new ${articles.size} articles")
             viewAdapter.setData(articles)
         })
@@ -99,10 +99,17 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
             setOnItemClickListener(object : TagsAdapter.OnItemClickListener {
                 override fun onClick(item: String, clickedView: CardView) {
                     logger.debug("on click $item")
+                    viewModel.onClickCategory(item)
                     onChose(item)
                 }
             })
         }
+
+        viewModel.currentCategory.observe(viewLifecycleOwner, Observer { category ->
+            logger.debug("Set category $category")
+            categoryTagsAdapter.onChose(category)
+        })
+
         categoryRecyclerView.run {
             setHasFixedSize(true)
             layoutManager = LinearLayoutManager(
@@ -120,7 +127,9 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
             addItemDecoration(dividerDecorator)
         }
 
-        categoryTagsAdapter.setData(listOf("Алфавит", "Цифры", "Животные", "Музыка"))
+        viewModel.categories.observe(viewLifecycleOwner, Observer { categories ->
+            categoryTagsAdapter.setData(categories)
+        })
 
         viewModel.tracks.observe(viewLifecycleOwner, Observer { tracks ->
             logger.debug("On new ${tracks.size} tracks")

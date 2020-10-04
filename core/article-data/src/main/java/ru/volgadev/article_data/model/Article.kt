@@ -12,6 +12,7 @@ data class Article(
     val tags: List<String> = listOf(),
     val author: String,
     val title: String,
+    val category: String,
     val type: ArticleType,
     val pagesFile: String? = null,
     val iconUrl: String? = null,

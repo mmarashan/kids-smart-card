@@ -59,6 +59,7 @@ class ArticleBackendApiImpl : ArticleBackendApi {
                 val author = articleJson.optString("author")
                 val title = articleJson.optString("title")
                 val type = articleJson.optString("type")
+                val category = articleJson.optString("category")
                 val pagesFile = articleJson.optString("pagesFile")
                 val iconUrl = articleJson.optString("iconUrl")
                 val averageTimeReadingMin = articleJson.optInt("averageTimeReadingMin")
@@ -69,6 +70,7 @@ class ArticleBackendApiImpl : ArticleBackendApi {
                         tags = tags,
                         author = author,
                         title = title,
+                        category = category,
                         type = ArticleType.valueOf(type),
                         pagesFile = pagesFile,
                         iconUrl = iconUrl,
