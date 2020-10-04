@@ -1,4 +1,4 @@
 <resources>
-    <string name="home">Профиль</string>
-    <string name="gallery">Галерея</string>
+    <string name="home">Кабинет</string>
+    <string name="gallery">Карточки</string>
 </resources>

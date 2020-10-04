@@ -1,4 +1,4 @@
 <resources>
-    <string name="home">Home</string>
-    <string name="gallery">Gallery</string>
+    <string name="home">Cabinet</string>
+    <string name="gallery">Cards</string>
 </resources>
