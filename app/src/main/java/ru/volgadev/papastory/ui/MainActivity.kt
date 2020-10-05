@@ -94,16 +94,12 @@ class MainActivity : AppCompatActivity() {
             override fun onNavigationItemSelected(item: MenuItem): Boolean {
                 when (item.itemId) {
                     HOME_ITEM_ID -> {
-                        logger.debug("HOME_ITEM_ID selected")
-                        Toast.makeText(
-                            applicationContext,
-                            "TODO: On click home",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        logger.debug("CABINET_FRAGMENT selected")
+                        showFragment(FragmentProvider.get(AppFragment.CABINET_FRAGMENT))
                         return true
                     }
                     GALLERY_ITEM_ID -> {
-                        logger.debug("GALERY_ITEM_ID selected")
+                        logger.debug("galleryFragment selected")
                         showFragment(galleryFragment)
                         return true
                     }

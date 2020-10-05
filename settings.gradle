@@ -6,6 +6,7 @@ include ':app',
         ':feature',
         ':feature:article-galery-feature',
         ':feature:article-page-feature',
+        ':feature:cabinet-feature',
         ':core:article-data',
         ':core:music-data',
         ':core:downloader'

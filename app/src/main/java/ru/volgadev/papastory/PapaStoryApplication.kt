@@ -13,6 +13,7 @@ import ru.volgadev.article_data.repository.ArticleRepository
 import ru.volgadev.article_data.repository.ArticleRepositoryImpl
 import ru.volgadev.article_galery.ui.ArticleGalleryViewModel
 import ru.volgadev.article_page.ArticlePageViewModel
+import ru.volgadev.cabinet_feature.CabinetViewModel
 import ru.volgadev.common.log.AndroidLoggerDelegate
 import ru.volgadev.common.log.Logger
 import ru.volgadev.music_data.api.MusicBackendApi
@@ -48,6 +49,9 @@ class PapaStoryApplication : Application() {
         }
         viewModel {
             ArticlePageViewModel(get(), get())
+        }
+        viewModel {
+            CabinetViewModel(get())
         }
     }
 

@@ -41,3 +41,12 @@ data class ArticlePage(
 enum class PageType {
     TITLE_WITH_IMAGE, TEXT_WITH_IMAGE, ONLY_TEXT
 }
+
+@Entity
+data class ArticleCategory(
+    @PrimaryKey
+    val name: String,
+    val description: String,
+    val iconUrl: String? = null,
+    val priceDollar: Int
+)

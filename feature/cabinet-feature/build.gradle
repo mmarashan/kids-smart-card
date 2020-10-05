@@ -1,4 +1,4 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
@@ -6,13 +6,16 @@ android {
     compileSdkVersion versions.compileSdkVersion
 
     defaultConfig {
-        applicationId "ru.volgadev.papastory"
         minSdkVersion versions.minSdkVersion
         targetSdkVersion versions.targetSdkVersion
-        versionCode 3
-        versionName "0.3"
+        versionCode 1
+        versionName "1.0"
+    }
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
     }
 
     compileOptions {
@@ -23,13 +26,6 @@ android {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-    }
 }
 
 dependencies {
@@ -37,18 +33,19 @@ dependencies {
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
     implementation "androidx.core:core-ktx:${versions.corektx}"
     implementation "androidx.constraintlayout:constraintlayout:${versions.constraintlayout}"
+    implementation "com.google.android.material:material:${versions.material}"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:${versions.androidxlifecycleruntime}"
 
     implementation "org.koin:koin-android:${versions.koin}"
     implementation "org.koin:koin-androidx-viewmodel:${versions.koin}"
     implementation "androidx.lifecycle:lifecycle-extensions:${versions.androidxlifecycle}"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${versions.androidxlifecycle}"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:${versions.androidxlifecycle}"
-    implementation "com.google.android.material:material:${versions.material}"
+    implementation "androidx.cardview:cardview:${versions.cardview}"
+    implementation "com.github.bumptech.glide:glide:${versions.glide}"
+    implementation "jp.wasabeef:recyclerview-animators:${versions.recyclerviewanimators}"
 
     implementation project(':common')
-    implementation project(':feature:article-galery-feature')
-    implementation project(':feature:article-page-feature')
-    implementation project(':feature:cabinet-feature')
     implementation project(':core:article-data')
     implementation project(':core:music-data')
 }
