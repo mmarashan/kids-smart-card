@@ -2,6 +2,8 @@ package ru.volgadev.article_galery.ui
 
 import androidx.annotation.MainThread
 import androidx.lifecycle.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import ru.volgadev.article_data.model.Article
 import ru.volgadev.article_data.repository.ArticleRepository
@@ -18,8 +20,6 @@ class ArticleGalleryViewModel(
 
     private val logger = Logger.get("ArticleGalleryViewModel")
 
-    private val articlesLiveData = articleRepository.articles().asLiveData()
-
     private val _category = MutableLiveData<String>()
     val currentCategory: LiveData<String> = _category
 
@@ -30,38 +30,30 @@ class ArticleGalleryViewModel(
 
     val audioToPlay = LiveEvent<MusicTrack>()
 
-    private val _categories = MutableLiveData<Set<String>>()
-    val categories: LiveData<Set<String>> = _categories
+    val categories = articleRepository.categories().asLiveData()
 
     private var cachedArticles = ArrayList<Article>()
 
-    // TODO: cache current category, show articles by category
-    private val articlesObserver = Observer<ArrayList<Article>> { articles ->
-        val categories = articles.map { article -> article.category }.toSet()
-        cachedArticles = articles
-        _categories.value = categories
-        if (categories.isNotEmpty()) {
-            val category = categories.first()
-            onClickCategory(category)
-        } else {
-            logger.warn("Empty categories set!")
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            articleRepository.articles().collect { articlesList ->
+                cachedArticles = articlesList
+            }
         }
     }
 
-    init {
-        articlesLiveData.observeForever(articlesObserver)
-    }
-
     @MainThread
-    fun onClickCategory(category: String) {
-        logger.debug("onClickCategory $category")
+    fun onClickCategory(categoryName: String) {
+        logger.debug("onClickCategory $categoryName")
         val categories = categories.value
-        if (categories != null && categories.contains(category)) {
-            _category.value = category
-            val categoryArticles = cachedArticles.filter { article -> article.category == category }
+        val categoryExists = categories?.any { category -> category.name == categoryName } ?: false
+        if (categoryExists) {
+            _category.value = categoryName
+            val categoryArticles =
+                cachedArticles.filter { article -> article.category == categoryName }
             _articles.value = categoryArticles
         } else {
-            throw IllegalStateException("Categories undefined or not exists category $category")
+            throw IllegalStateException("Categories undefined or not exists category $categoryName")
         }
     }
 
@@ -86,7 +78,6 @@ class ArticleGalleryViewModel(
 
     override fun onCleared() {
         logger.debug("onCleared()")
-        articlesLiveData.removeObserver(articlesObserver)
         super.onCleared()
     }
 }

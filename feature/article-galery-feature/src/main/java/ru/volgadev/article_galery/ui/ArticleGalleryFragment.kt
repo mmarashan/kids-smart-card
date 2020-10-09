@@ -140,7 +140,11 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
         }
 
         viewModel.categories.observe(viewLifecycleOwner, Observer { categories ->
-            categoryTagsAdapter.setData(categories)
+            val categoryNames = categories.map { category -> category.name }
+            categoryTagsAdapter.setData(categoryNames)
+            categoryNames.firstOrNull()?.let { firstCategory ->
+                viewModel.onClickCategory(firstCategory)
+            }
         })
 
         viewModel.tracks.observe(viewLifecycleOwner, Observer { tracks ->

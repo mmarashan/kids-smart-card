@@ -64,38 +64,49 @@ class MainActivity : AppCompatActivity() {
 
         val galleryFragment: ArticleGalleryFragment =
             FragmentProvider.get(AppFragment.GALERY_FRAGMENT) as ArticleGalleryFragment
-        galleryFragment.enterTransition = Slide(Gravity.END).apply {
-            duration = 1000
-        }
-        galleryFragment.exitTransition = Slide(Gravity.START).apply {
-            duration = 1000
-        }
-        galleryFragment.setOnItemClickListener(object : ArticleGalleryFragment.OnItemClickListener {
-            override fun onClick(article: Article, clickedView: View) {
-                logger.debug("Choose ${article.title} to show")
-                val itemPageFragment =
-                    FragmentProvider.get(AppFragment.ARTICLE_PAGE_FRAGMENT) as ArticlePageFragment
-                itemPageFragment.exitTransition = Fade().apply {
-                    duration = 1000
-                }
-                if (article.type != ArticleType.NO_PAGES) {
-                    showFragment(
-                        itemPageFragment,
-                        Bundle().apply { putLong(ITEM_ID_KEY, article.id) },
-                        true,
-                        clickedView
-                    )
-                }
+        galleryFragment.run {
+            enterTransition = Slide(Gravity.END).apply {
+                duration = 1000
             }
-        })
+            exitTransition = Slide(Gravity.START).apply {
+                duration = 1000
+            }
+            setOnItemClickListener(object : ArticleGalleryFragment.OnItemClickListener {
+                override fun onClick(article: Article, clickedView: View) {
+                    logger.debug("Choose ${article.title} to show")
+                    val itemPageFragment =
+                        FragmentProvider.get(AppFragment.ARTICLE_PAGE_FRAGMENT) as ArticlePageFragment
+                    itemPageFragment.exitTransition = Fade().apply {
+                        duration = 1000
+                    }
+                    if (article.type != ArticleType.NO_PAGES) {
+                        showFragment(
+                            itemPageFragment,
+                            Bundle().apply { putLong(ITEM_ID_KEY, article.id) },
+                            true,
+                            clickedView
+                        )
+                    }
+                }
+            })
+        }
+
+        val cabinetFragment = FragmentProvider.get(AppFragment.CABINET_FRAGMENT).apply {
+            enterTransition = Slide(Gravity.START).apply {
+                duration = 1000
+            }
+            exitTransition = Slide(Gravity.END).apply {
+                duration = 1000
+            }
+        }
 
         bottomNavigation.setOnNavigationItemSelectedListener(object :
             BottomNavigationView.OnNavigationItemSelectedListener {
             override fun onNavigationItemSelected(item: MenuItem): Boolean {
                 when (item.itemId) {
                     HOME_ITEM_ID -> {
-                        logger.debug("CABINET_FRAGMENT selected")
-                        showFragment(FragmentProvider.get(AppFragment.CABINET_FRAGMENT))
+                        logger.debug("cabinetFragment selected")
+                        showFragment(cabinetFragment)
                         return true
                     }
                     GALLERY_ITEM_ID -> {
