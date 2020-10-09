@@ -45,8 +45,10 @@ enum class PageType {
 @Entity
 data class ArticleCategory(
     @PrimaryKey
+    val id: String,
     val name: String,
     val description: String,
     val iconUrl: String? = null,
-    val priceDollar: Int
+    val priceDollar: Int? = null,
+    val fileUrl: String
 )

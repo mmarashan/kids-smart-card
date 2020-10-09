@@ -12,26 +12,35 @@ import kotlinx.coroutines.withContext
 import ru.volgadev.article_data.api.ArticleBackendApi
 import ru.volgadev.article_data.storage.ArticleDatabase
 import ru.volgadev.article_data.model.Article
+import ru.volgadev.article_data.model.ArticleCategory
 import ru.volgadev.article_data.model.ArticlePage
+import ru.volgadev.article_data.storage.ArticleCategoriesDatabase
 import ru.volgadev.common.DataResult
 import ru.volgadev.common.ErrorResult
 import ru.volgadev.common.SuccessResult
 import ru.volgadev.common.log.Logger
 import java.net.ConnectException
 
-class ArticleRepositoryImpl private constructor(
+class ArticleRepositoryImpl(
     private val context: Context,
     private val articleBackendApi: ArticleBackendApi
 ) : ArticleRepository {
 
     private val logger = Logger.get("ArticleRepositoryImpl")
     private val articleChannel = ConflatedBroadcastChannel<ArrayList<Article>>()
+    private val categoriesChannel = ConflatedBroadcastChannel<ArrayList<ArticleCategory>>()
 
     private val articlesDb: ArticleDatabase by lazy {
         ArticleDatabase.getInstance(context)
     }
 
+    private val categoriesDb: ArticleCategoriesDatabase by lazy {
+        ArticleCategoriesDatabase.getInstance(context)
+    }
+
+
     override fun articles(): Flow<ArrayList<Article>> = articleChannel.asFlow()
+    override fun categories(): Flow<ArrayList<ArticleCategory>> = categoriesChannel.asFlow()
 
     override suspend fun getArticle(id: Long): Article? = withContext(Dispatchers.Default) {
         logger.debug("Get article with id $id")
@@ -46,28 +55,12 @@ class ArticleRepositoryImpl private constructor(
         }
     }
 
-    companion object {
-
-        // For Singleton instantiation
-        @Volatile
-        private var instance: ArticleRepositoryImpl? = null
-
-        fun getInstance(
-            context: Context, articleBackendApi: ArticleBackendApi
-        ) =
-            instance ?: synchronized(this) {
-                instance ?: ArticleRepositoryImpl(
-                    context,
-                    articleBackendApi
-                ).also { instance = it }
-            }
-    }
-
     @WorkerThread
     override suspend fun updateArticles() {
         try {
             logger.debug("Try to update data")
             updateArticlesFromApi()
+            updateCategoriesFromApi()
         } catch (e: ConnectException) {
             logger.error("Exception when update article $e")
             logger.debug("Load data from DB")
@@ -78,12 +71,19 @@ class ArticleRepositoryImpl private constructor(
     @Throws(ConnectException::class)
     private suspend fun updateArticlesFromApi() = withContext(Dispatchers.IO) {
         val newArticles = articleBackendApi.getUpdates(System.currentTimeMillis())
-        articlesDb.userDao().insertAll(*newArticles.toTypedArray())
+        articlesDb.dao().insertAll(*newArticles.toTypedArray())
         articleChannel.offer(ArrayList(newArticles))
     }
 
+    @Throws(ConnectException::class)
+    private suspend fun updateCategoriesFromApi() = withContext(Dispatchers.IO) {
+        val categories = articleBackendApi.getCategories()
+        categoriesDb.dao().insertAll(*categories.toTypedArray())
+        categoriesChannel.offer(ArrayList(categories))
+    }
+
     private suspend fun loadFromDB() = withContext(Dispatchers.Default) {
-        val articles = articlesDb.userDao().getAll()
+        val articles = articlesDb.dao().getAll()
         logger.debug("Load ${articles.size} entities from Db")
         articleChannel.offer(ArrayList(articles))
     }

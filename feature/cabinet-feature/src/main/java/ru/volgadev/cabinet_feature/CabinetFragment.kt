@@ -7,7 +7,6 @@ import androidx.annotation.AnyThread
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import jp.wasabeef.recyclerview.animators.LandingAnimator
 import kotlinx.android.synthetic.main.cabinet_fragment.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -44,7 +43,7 @@ class CabinetFragment : Fragment(R.layout.cabinet_fragment) {
         super.onViewCreated(view, savedInstanceState)
         logger.debug("On fragment created; savedInstanceState=$savedInstanceState")
 
-        val categorysAdapter = CategoryCardAdapter().apply {
+        val categoriesAdapter = CategoryCardAdapter().apply {
             setOnItemClickListener(object : CategoryCardAdapter.OnItemClickListener {
                 override fun onClick(categoryName: String, clickedView: View) {
                     val clickedCategory =
@@ -60,8 +59,12 @@ class CabinetFragment : Fragment(R.layout.cabinet_fragment) {
 
 
         contentRecyclerView.run {
-            layoutManager = StaggeredGridLayoutManager(1, LinearLayoutManager.VERTICAL)
-            adapter = categorysAdapter
+            layoutManager = LinearLayoutManager(
+                this.context,
+                LinearLayoutManager.VERTICAL,
+                false
+            )
+            adapter = categoriesAdapter
             itemAnimator = LandingAnimator(OvershootInterpolator(1f)).apply {
                 addDuration = 700
                 removeDuration = 100
@@ -71,8 +74,8 @@ class CabinetFragment : Fragment(R.layout.cabinet_fragment) {
         }
 
         viewModel.categories.observe(viewLifecycleOwner, Observer { categorys ->
-            logger.debug("Set new ${categorys.size} categorys")
-            categorysAdapter.setData(categorys)
+            logger.debug("Set new ${categorys.size} categories")
+            categoriesAdapter.setData(categorys)
         })
     }
 

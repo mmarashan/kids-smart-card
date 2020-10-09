@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="100dp"
     android:layout_margin="8dp"
+    android:minHeight="100dp"
     card_view:cardCornerRadius="50dp"
     card_view:cardElevation="10dp">
 
@@ -27,7 +28,7 @@
 
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="0.8"
             android:layout_gravity="center_vertical"
             android:orientation="vertical">
@@ -50,10 +51,11 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
                 android:layout_marginBottom="4dp"
-                android:textSize="20sp"
-                tools:text="English alphabet" />
+                android:textSize="18sp"
+                android:lineSpacingExtra="-0.02dp"
+                android:lines="2"
+                tools:text="English alphabet with pretty animals" />
 
         </LinearLayout>
 
@@ -66,7 +68,7 @@
             android:layout_marginEnd="24dp"
             android:layout_weight="0.2"
             android:gravity="end"
-            android:textSize="22sp"
+            android:textSize="20sp"
             android:lines="1"
             tools:text="1$" />
     </LinearLayout>

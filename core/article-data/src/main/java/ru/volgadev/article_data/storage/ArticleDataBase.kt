@@ -30,13 +30,13 @@ interface ArticleDao {
 @TypeConverters(ListStringConverter::class, ArticleTypeConverter::class)
 abstract class ArticleDatabase : RoomDatabase() {
 
-    abstract fun userDao(): ArticleDao
+    abstract fun dao(): ArticleDao
 
     companion object {
         @Volatile
         private var INSTANCE: ArticleDatabase? = null
 
-        private const val ARTICLE_DATABASE_NAME = "article-database.db"
+        private const val DATABASE_NAME = "article-database.db"
 
         fun getInstance(context: Context): ArticleDatabase =
             INSTANCE ?: synchronized(this) {
@@ -46,7 +46,7 @@ abstract class ArticleDatabase : RoomDatabase() {
         private fun buildDatabase(context: Context) =
             Room.databaseBuilder(
                 context.applicationContext,
-                ArticleDatabase::class.java, ARTICLE_DATABASE_NAME
+                ArticleDatabase::class.java, DATABASE_NAME
             ).build()
     }
 }

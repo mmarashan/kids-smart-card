@@ -31,7 +31,7 @@ class PapaStoryApplication : Application() {
 
     private val sampleModule = module {
         single<ArticleRepository> {
-            ArticleRepositoryImpl.getInstance(
+            ArticleRepositoryImpl(
                 context = get(),
                 articleBackendApi = get()
             )

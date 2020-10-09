@@ -5,10 +5,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONObject
-import ru.volgadev.article_data.model.Article
-import ru.volgadev.article_data.model.ArticlePage
-import ru.volgadev.article_data.model.ArticleType
-import ru.volgadev.article_data.model.PageType
+import ru.volgadev.article_data.model.*
 import ru.volgadev.common.BACKEND_URL
 import ru.volgadev.common.log.Logger
 import java.net.ConnectException
@@ -23,6 +20,7 @@ class ArticleBackendApiImpl : ArticleBackendApi {
     private companion object {
         const val ARTICLES_BACKEND_URL = "$BACKEND_URL/articles.json"
         const val ARTICLE_PAGES_BACKEND_URL = "$BACKEND_URL/articles"
+        const val CATEGORIES_BACKEND_URL = "$BACKEND_URL/category.json"
     }
 
     @Throws(ConnectException::class)
@@ -36,7 +34,6 @@ class ArticleBackendApiImpl : ArticleBackendApi {
         try {
             val response: Response = client.newCall(request).execute()
             val stringResponse = response.body!!.string()
-            logger.debug("stringResponse $stringResponse")
             val json = JSONObject(stringResponse)
             val articlesArray = json.getJSONArray("articles")
             for (i in 0 until articlesArray.length()) {
@@ -99,7 +96,6 @@ class ArticleBackendApiImpl : ArticleBackendApi {
         try {
             val response: Response = client.newCall(request).execute()
             val stringResponse = response.body!!.string()
-            logger.debug("stringResponse $stringResponse")
             val json = JSONObject(stringResponse)
             val articlesArray = json.getJSONArray("pages")
             for (i in 0 until articlesArray.length()) {
@@ -126,6 +122,45 @@ class ArticleBackendApiImpl : ArticleBackendApi {
         } catch (e: Exception) {
             logger.error("Error when get new article pages $e")
             throw ConnectException("Error when get new article pages $e")
+        }
+        return result
+    }
+
+    @Throws(ConnectException::class)
+    override fun getCategories(): List<ArticleCategory> {
+        val request: Request = Request.Builder().apply {
+            url(CATEGORIES_BACKEND_URL)
+        }.build()
+
+        val result = arrayListOf<ArticleCategory>()
+
+        try {
+            val response: Response = client.newCall(request).execute()
+            val stringResponse = response.body!!.string()
+            val json = JSONObject(stringResponse)
+            val categoriesArray = json.getJSONArray("categories")
+            for (i in 0 until categoriesArray.length()) {
+                val categoriesJson = categoriesArray[i] as JSONObject
+                val id = categoriesJson.optString("id")
+                val name = categoriesJson.optString("name")
+                val description = categoriesJson.optString("description")
+                val iconUrl = categoriesJson.optString("iconUrl")
+                val fileUrl = categoriesJson.optString("fileUrl")
+                val priceDollar = categoriesJson.optInt("priceDollar")
+                result.add(
+                    ArticleCategory(
+                        id = id,
+                        name = name,
+                        description = description,
+                        iconUrl = iconUrl,
+                        priceDollar = priceDollar,
+                        fileUrl = fileUrl
+                    )
+                )
+            }
+        } catch (e: Exception) {
+            logger.error("Error when get new categories $e")
+            throw ConnectException("Error when get new categories $e")
         }
         return result
     }

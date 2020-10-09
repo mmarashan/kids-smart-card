@@ -4,6 +4,7 @@ import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import ru.volgadev.article_data.model.Article
 import ru.volgadev.article_data.model.ArticleCategory
 import ru.volgadev.article_data.repository.ArticleRepository
@@ -15,30 +16,11 @@ class CabinetViewModel(
 
     private val logger = Logger.get("CabinetViewModel")
 
-    private val _categories = MutableLiveData<List<ArticleCategory>>()
-    val categories: LiveData<List<ArticleCategory>> = _categories
-
-    init {
-        _categories.postValue(
-            listOf(
-                ArticleCategory(
-                    "Alphabet",
-                    "English alphabet",
-                    "https://www.google.ru/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png",
-                    2
-                )
-            )
-        )
-    }
+    val categories: LiveData<List<ArticleCategory>> = articleRepository.categories().asLiveData()
 
     @MainThread
     fun onClickCategory(category: String) {
         logger.debug("onClickCategory $category")
-    }
-
-    @MainThread
-    fun onClickCategory(article: Article) {
-        logger.debug("onClickArticle ${article.title}")
     }
 
     override fun onCleared() {

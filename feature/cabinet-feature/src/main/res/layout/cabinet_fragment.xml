@@ -5,7 +5,17 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/gradient_background"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/categories"
+        android:textSize="32sp"
+        android:gravity="center"
+        android:layout_marginBottom="4dp"
+        android:textColor="@color/colorLightText"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/contentRecyclerView"
@@ -15,6 +25,6 @@
         android:scrollbars="none"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:itemCount="2"
-        tools:listitem="@layout/card_catrgory" />
+        tools:listitem="@layout/card_category" />
 
 </LinearLayout>

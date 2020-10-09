@@ -50,7 +50,7 @@ class CategoryCardAdapter :
         viewType: Int
     ): ViewHolder {
         val card = LayoutInflater.from(parent.context)
-            .inflate(R.layout.card_catrgory, parent, false) as CardView
+            .inflate(R.layout.card_category, parent, false) as CardView
 
         return ViewHolder(card, parent)
     }
