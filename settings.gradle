@@ -9,4 +9,5 @@ include ':app',
         ':feature:cabinet-feature',
         ':core:article-data',
         ':core:music-data',
-        ':core:downloader'
+        ':core:downloader',
+        ':core:pay-lib'
