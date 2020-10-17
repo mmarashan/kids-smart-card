@@ -7,70 +7,64 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.annotation.MainThread
 import com.google.android.gms.common.api.ApiException
-import com.google.android.gms.wallet.AutoResolveHelper
-import com.google.android.gms.wallet.PaymentData
-import com.google.android.gms.wallet.PaymentsClient
-import com.google.android.gms.wallet.WalletConstants
-import com.volgadev.pay_lib.R
+import com.google.android.gms.wallet.*
 import kotlinx.android.synthetic.main.activity_checkout.*
 import org.json.JSONException
 import org.json.JSONObject
 
-/**
- * Checkout implementation for the app
- */
 class PaymentActivity : Activity() {
 
-    private lateinit var paymentsClient: PaymentsClient
+    private fun createPaymentsClient(isTest: Boolean = true): PaymentsClient {
+        val paymentEnvironment: Int =
+            if (isTest) WalletConstants.ENVIRONMENT_TEST else WalletConstants.ENVIRONMENT_PRODUCTION
 
-    private val supportedNetworks: List<Int> = listOf(
-        WalletConstants.CARD_NETWORK_OTHER,
-        WalletConstants.CARD_NETWORK_VISA,
-        WalletConstants.CARD_NETWORK_MASTERCARD
-    )
-    private val supportedMethods: List<String> = listOf(
-        "PAN_ONLY",
-        "CRYPTOGRAM_3DS"
-    )
+        val walletOptions = Wallet.WalletOptions.Builder()
+            .setEnvironment(paymentEnvironment)
+            .build()
 
-    val gateway: String = "example"
-    val gatewayMerchantId: String = "exampleGatewayMerchantId"
-    val tokenizationParameters = mapOf(
-        "gateway" to gateway,
-        "gatewayMerchantId" to gatewayMerchantId
-    )
-
-    private val paymentRequestsBuilder =
-        PaymentRequestsBuilder(tokenizationParameters, supportedNetworks, supportedMethods)
-
-    /**
-     * Custom parameters required by the processor/gateway.
-     * In many cases, your processor / gateway will only require a gatewayMerchantId.
-     * Please refer to your processor's documentation for more information. The number of parameters
-     * required and their names vary depending on the processor.
-     *
-     * @value #PAYMENT_GATEWAY_TOKENIZATION_PARAMETERS
-     */
-    val countryCode: String = "US"
-    val currencyCode: String = "USD"
+        return Wallet.getPaymentsClient(applicationContext, walletOptions)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_checkout)
 
         val paymentRequest = intent.getParcelableExtra<PaymentRequest>(PAYMENT_REQUEST_EXTRA)
+        val merchantParameters = intent.getParcelableExtra<MerchantData>(MERCHANT_DATA_EXTRA)
+        val isTest = intent.getBooleanExtra(IS_TEST_EXTRA, true)
+        if (paymentRequest == null || merchantParameters == null) {
+            throw IllegalStateException("You should open pay activity via PaymentActivity.openPaymentActivity(...)")
+        }
 
-        paymentsClient = applicationContext.createPaymentsClient(true)
-        possiblyShowGooglePayButton()
+        val requestsManager = PayRequestsManager(merchantParameters)
+        val paymentsClient = createPaymentsClient(isTest)
 
-        googlePayButton.setOnClickListener { requestPayment() }
+        drawPurchase(paymentRequest)
+        possiblyShowGooglePayButton(paymentsClient, requestsManager)
+
+        googlePayButton.setOnClickListener {
+            requestPayment(
+                paymentsClient,
+                requestsManager,
+                paymentRequest
+            )
+        }
     }
 
-    private fun possiblyShowGooglePayButton() {
+    @MainThread
+    private fun drawPurchase(paymentRequest: PaymentRequest){
+        Log.v(TAG, "drawPurchase($paymentRequest)")
+        detailTitle.text = paymentRequest.title
+        detailDescription.text = paymentRequest.description
+    }
 
-        val request =
-            paymentRequestsBuilder.isReadyToPayRequest(supportedNetworks, supportedMethods)
+    private fun possiblyShowGooglePayButton(
+        paymentsClient: PaymentsClient,
+        payRequestsManager: PayRequestsManager
+    ) {
+        val request = payRequestsManager.isReadyToPayRequest()
 
         val task = paymentsClient.isReadyToPay(request)
         task.addOnCompleteListener { completedTask ->
@@ -93,21 +87,21 @@ class PaymentActivity : Activity() {
         }
     }
 
-    private fun requestPayment() {
-
+    private fun requestPayment(
+        paymentsClient: PaymentsClient,
+        payRequestsManager: PayRequestsManager,
+        paymentRequest: PaymentRequest
+    ) {
         // Disables the button to prevent multiple clicks.
         googlePayButton.isClickable = false
 
-        // The price provided to the API should include taxes and shipping.
-        // This price is not displayed to the user.
-        val garmentPrice = 100.0 // selectedGarment.getDouble("price")
-        val priceCents =
-            Math.round(garmentPrice * CENTS.toLong())
-
-        val paymentDataRequest =
-            paymentRequestsBuilder.paymentDataRequest(priceCents, countryCode, currencyCode)
+        val paymentDataRequest = payRequestsManager.paymentDataRequest(
+            paymentRequest.price,
+            paymentRequest.countryCode,
+            paymentRequest.currencyCode
+        )
         AutoResolveHelper.resolveTask(
-            paymentsClient.loadPaymentData(paymentDataRequest), this, LOAD_PAYMENT_DATA_REQUEST_CODE
+            paymentsClient.loadPaymentData(paymentDataRequest), this, PAYMENT_REQUEST_CODE
         )
     }
 
@@ -123,7 +117,7 @@ class PaymentActivity : Activity() {
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             // Value passed in AutoResolveHelper
-            LOAD_PAYMENT_DATA_REQUEST_CODE -> {
+            PAYMENT_REQUEST_CODE -> {
                 when (resultCode) {
                     RESULT_OK ->
                         data?.let { intent ->
@@ -221,12 +215,21 @@ class PaymentActivity : Activity() {
     companion object {
 
         private val TAG = PaymentActivity.javaClass.name
-        private const val LOAD_PAYMENT_DATA_REQUEST_CODE = 991
+        private const val PAYMENT_REQUEST_CODE = 991
+        private const val MERCHANT_DATA_EXTRA = "MERCHANT_PARAMETERS_EXTRA"
         private const val PAYMENT_REQUEST_EXTRA = "PAYMENT_REQUEST_EXTRA"
+        private const val IS_TEST_EXTRA = "IS_TEST_EXTRA"
 
-        fun openPaymentActivity(context: Context, paymentRequest: PaymentRequest) {
+        fun openPaymentActivity(
+            context: Context,
+            merchantData: MerchantData,
+            paymentRequest: PaymentRequest,
+            isTest: Boolean = true
+        ) {
             val intent = Intent(context, PaymentActivity::class.java).apply {
                 putExtra(PAYMENT_REQUEST_EXTRA, paymentRequest)
+                putExtra(MERCHANT_DATA_EXTRA, merchantData)
+                putExtra(IS_TEST_EXTRA, isTest)
             }
             context.startActivity(intent)
         }

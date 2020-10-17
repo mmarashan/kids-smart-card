@@ -1,21 +1,17 @@
 package ru.volgadev.pay_lib
 
-import com.google.android.gms.wallet.IsReadyToPayRequest
-import com.google.android.gms.wallet.PaymentDataRequest
+import android.content.Context
+import com.google.android.gms.wallet.*
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import java.math.BigDecimal
 import java.math.RoundingMode
 
-val CENTS = BigDecimal(100)
-
-class PaymentRequestsBuilder(
-    val tokenizationParameters: Map<String, String>,
-    val supportedNetworks: List<Int>,
-    val supportedMethods: List<String>
+// TODO: true naming!
+class PayRequestsManager(
+    private val merchantData: MerchantData
 ) {
-
     /**
      * Create a Google Pay API base request object with properties used in all requests.
      *
@@ -29,6 +25,11 @@ class PaymentRequestsBuilder(
         }
     }
 
+    private val allowedAuthMethods = listOf(
+        "PAN_ONLY",
+        "CRYPTOGRAM_3DS"
+    )
+
     /**
      * Gateway Integration: Identify your gateway and your app's gateway merchant identifier.
      *
@@ -41,7 +42,14 @@ class PaymentRequestsBuilder(
      */
     private val gatewayTokenizationSpecificationJsonObject = JSONObject().apply {
         put("type", "PAYMENT_GATEWAY")
-        put("parameters", JSONObject(tokenizationParameters))
+        put(
+            "parameters", JSONObject(
+                mapOf(
+                    "gateway" to merchantData.gateway,
+                    "gatewayMerchantId" to merchantData.gatewayMerchantId
+                )
+            )
+        )
     }
 
 
@@ -54,17 +62,16 @@ class PaymentRequestsBuilder(
      * @return A CARD PaymentMethod object describing accepted cards.
      * @see [PaymentMethod](https://developers.google.com/pay/api/android/reference/object.PaymentMethod)
      */
-    // Optionally, you can add billing address/phone number associated with a CARD payment method.
     private fun baseCardPaymentMethodJsonObject(): JSONObject {
 
-        val allowedCardAuthMethods = JSONArray(supportedMethods)
-        val allowedCardNetworks = JSONArray(supportedNetworks)
+        val allowedAuthMethodsJsonArray = JSONArray(allowedAuthMethods)
+        val allowedCardNetworksJsonArray = JSONArray(merchantData.allowedCardNetworks)
 
         return JSONObject().apply {
 
             val parameters = JSONObject().apply {
-                put("allowedAuthMethods", allowedCardAuthMethods)
-                put("allowedCardNetworks", allowedCardNetworks)
+                put("allowedAuthMethods", allowedAuthMethodsJsonArray)
+                put("allowedCardNetworks", allowedCardNetworksJsonArray)
                 put("billingAddressRequired", true)
                 put("billingAddressParameters", JSONObject().apply {
                     put("format", "FULL")
@@ -99,10 +106,7 @@ class PaymentRequestsBuilder(
      * @return API version and payment methods supported by the app.
      * @see [IsReadyToPayRequest](https://developers.google.com/pay/api/android/reference/object.IsReadyToPayRequest)
      */
-    fun isReadyToPayRequest(
-        supportedNetworks: List<Int>,
-        supportedMethods: List<String>
-    ): IsReadyToPayRequest {
+    fun isReadyToPayRequest(): IsReadyToPayRequest {
         val request = baseRequestJsonObject()
         val json = request.apply {
             put(
@@ -125,7 +129,7 @@ class PaymentRequestsBuilder(
         currencyCode: String
     ): PaymentDataRequest {
         val request = baseRequestJsonObject()
-        val merchantInfo: JSONObject = JSONObject().put("merchantName", "Example Merchant")
+        val merchantInfo: JSONObject = JSONObject().put("merchantName", merchantData.merchantName)
 
         val transactionInfo = JSONObject().apply {
             put("totalPrice", price.centsToString())
@@ -150,11 +154,11 @@ class PaymentRequestsBuilder(
 }
 
 /**
- * Converts cents to a string format accepted by [PaymentRequestsBuilder.paymentDataRequest].
+ * Converts cents to a string format accepted by [PayRequestsManager.paymentDataRequest].
  *
  * @param cents value of the price.
  */
 fun Long.centsToString() = BigDecimal(this)
-    .divide(CENTS)
+    .divide(BigDecimal(100))
     .setScale(2, RoundingMode.HALF_EVEN)
     .toString()

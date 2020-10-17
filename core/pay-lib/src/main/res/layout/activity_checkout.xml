@@ -38,14 +38,6 @@
             android:textColor="#777777" />
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:text="Description"
-            android:textColor="#333333"
-            android:textStyle="bold" />
-
-        <TextView
             android:id="@+id/detailDescription"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -50,7 +50,7 @@ class CabinetFragment : Fragment(R.layout.cabinet_fragment) {
                         viewModel.categories.value?.first { category -> category.name == categoryName }
                     clickedCategory?.let { category ->
                         logger.debug("On click category $category")
-                        viewModel.onClickCategory(category.name)
+                        viewModel.onClickCategory(context!!, category.name)
                         onItemClickListener?.onClick(category, clickedView)
                     }
                 }
