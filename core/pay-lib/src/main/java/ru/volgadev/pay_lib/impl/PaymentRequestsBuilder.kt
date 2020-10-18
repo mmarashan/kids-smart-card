@@ -6,8 +6,6 @@ import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import ru.volgadev.pay_lib.MerchantData
-import java.math.BigDecimal
-import java.math.RoundingMode
 
 internal class PayRequestsManager(
     private val merchantData: MerchantData
@@ -152,13 +150,3 @@ internal class PayRequestsManager(
         return PaymentDataRequest.fromJson(json.toString())
     }
 }
-
-/**
- * Converts cents to a string format accepted by [PayRequestsManager.paymentDataRequest].
- *
- * @param cents value of the price.
- */
-fun Long.centsToString() = BigDecimal(this)
-    .divide(BigDecimal(100))
-    .setScale(2, RoundingMode.HALF_EVEN)
-    .toString()

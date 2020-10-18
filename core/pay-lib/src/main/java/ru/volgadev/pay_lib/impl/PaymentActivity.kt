@@ -19,17 +19,6 @@ import ru.volgadev.pay_lib.R
 
 internal class PaymentActivity : Activity() {
 
-    private fun createPaymentsClient(isTest: Boolean = true): PaymentsClient {
-        val paymentEnvironment: Int =
-            if (isTest) WalletConstants.ENVIRONMENT_TEST else WalletConstants.ENVIRONMENT_PRODUCTION
-
-        val walletOptions = Wallet.WalletOptions.Builder()
-            .setEnvironment(paymentEnvironment)
-            .build()
-
-        return Wallet.getPaymentsClient(applicationContext, walletOptions)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_checkout)
@@ -42,7 +31,7 @@ internal class PaymentActivity : Activity() {
         }
 
         val requestsManager = PayRequestsManager(merchantParameters)
-        val paymentsClient = createPaymentsClient(isTest)
+        val paymentsClient = applicationContext.createPaymentsClient(isTest)
 
         drawPurchase(paymentRequest)
         possiblyShowGooglePayButton(paymentsClient, requestsManager)
@@ -61,6 +50,8 @@ internal class PaymentActivity : Activity() {
         Log.v(TAG, "drawPurchase($paymentRequest)")
         detailTitle.text = paymentRequest.title
         detailDescription.text = paymentRequest.description
+        val priceText = "${paymentRequest.price.centsToString()} ${paymentRequest.currencyCode}"
+        detailPrice.text = priceText
     }
 
     private fun possiblyShowGooglePayButton(
@@ -107,15 +98,6 @@ internal class PaymentActivity : Activity() {
         )
     }
 
-    /**
-     * Handle a resolved activity from the Google Pay payment sheet.
-     *
-     * @param requestCode Request code originally supplied to AutoResolveHelper in requestPayment().
-     * @param resultCode Result code returned by the Google Pay API.
-     * @param data Intent from the Google Pay API containing payment or error data.
-     * @see [Getting a result
-     * from an Activity](https://developer.android.com/training/basics/intents/result)
-     */
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             // Value passed in AutoResolveHelper

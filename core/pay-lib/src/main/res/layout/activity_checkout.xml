@@ -2,6 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="#fff"
     android:fillViewport="true">
 
@@ -52,7 +53,8 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/buy_button_height"
             android:layout_marginBottom="20dp"
-            android:visibility="gone" />
+            android:visibility="gone"
+            tools:visibility="visible"/>
 
     </LinearLayout>
 

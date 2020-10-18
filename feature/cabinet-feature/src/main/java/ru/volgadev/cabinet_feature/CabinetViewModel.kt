@@ -20,7 +20,6 @@ class CabinetViewModel(
 
     val categories: LiveData<List<ArticleCategory>> = articleRepository.categories().asLiveData()
 
-    // TODO: remove context from viewmodel!
     @MainThread
     fun onClickCategory(category: ArticleCategory) {
         logger.debug("onClickCategory ${category.name}")
