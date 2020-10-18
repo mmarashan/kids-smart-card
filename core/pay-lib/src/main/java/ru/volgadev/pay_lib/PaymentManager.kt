@@ -3,8 +3,15 @@ package ru.volgadev.pay_lib
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
-interface PayApi {
-    fun pay(itemId: String, price: Int)
+interface PaymentManager {
+
+    fun requestPayment(
+        merchantData: MerchantData,
+        paymentRequest: PaymentRequest,
+        isTest: Boolean = true
+    )
+
+    fun isPayed(): Boolean
 }
 
 /**

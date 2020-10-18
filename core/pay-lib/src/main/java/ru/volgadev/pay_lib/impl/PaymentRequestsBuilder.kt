@@ -1,15 +1,15 @@
-package ru.volgadev.pay_lib
+package ru.volgadev.pay_lib.impl
 
-import android.content.Context
-import com.google.android.gms.wallet.*
+import com.google.android.gms.wallet.IsReadyToPayRequest
+import com.google.android.gms.wallet.PaymentDataRequest
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
+import ru.volgadev.pay_lib.MerchantData
 import java.math.BigDecimal
 import java.math.RoundingMode
 
-// TODO: true naming!
-class PayRequestsManager(
+internal class PayRequestsManager(
     private val merchantData: MerchantData
 ) {
     /**

@@ -20,6 +20,8 @@ import ru.volgadev.music_data.api.MusicBackendApi
 import ru.volgadev.music_data.api.MusicBackendApiImpl
 import ru.volgadev.music_data.repository.MusicRepository
 import ru.volgadev.music_data.repository.MusicRepositoryImpl
+import ru.volgadev.pay_lib.PaymentManager
+import ru.volgadev.pay_lib.PaymentManagerFactory
 
 class PapaStoryApplication : Application() {
 
@@ -51,7 +53,13 @@ class PapaStoryApplication : Application() {
             ArticlePageViewModel(get(), get())
         }
         viewModel {
-            CabinetViewModel(get())
+            CabinetViewModel(get(), get())
+        }
+    }
+
+    private val paymentModule = module {
+        single<PaymentManager> {
+            PaymentManagerFactory.createPaymentManager(get())
         }
     }
 
@@ -62,7 +70,7 @@ class PapaStoryApplication : Application() {
         startKoin {
             androidLogger(Level.DEBUG)
             androidContext(this@PapaStoryApplication)
-            modules(sampleModule)
+            modules(listOf(sampleModule, paymentModule))
         }.koin
 
     }

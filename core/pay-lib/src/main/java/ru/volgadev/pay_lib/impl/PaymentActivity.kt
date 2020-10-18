@@ -1,4 +1,4 @@
-package ru.volgadev.pay_lib
+package ru.volgadev.pay_lib.impl
 
 import android.app.Activity
 import android.content.Context
@@ -13,8 +13,11 @@ import com.google.android.gms.wallet.*
 import kotlinx.android.synthetic.main.activity_checkout.*
 import org.json.JSONException
 import org.json.JSONObject
+import ru.volgadev.pay_lib.MerchantData
+import ru.volgadev.pay_lib.PaymentRequest
+import ru.volgadev.pay_lib.R
 
-class PaymentActivity : Activity() {
+internal class PaymentActivity : Activity() {
 
     private fun createPaymentsClient(isTest: Boolean = true): PaymentsClient {
         val paymentEnvironment: Int =
@@ -54,7 +57,7 @@ class PaymentActivity : Activity() {
     }
 
     @MainThread
-    private fun drawPurchase(paymentRequest: PaymentRequest){
+    private fun drawPurchase(paymentRequest: PaymentRequest) {
         Log.v(TAG, "drawPurchase($paymentRequest)")
         detailTitle.text = paymentRequest.title
         detailDescription.text = paymentRequest.description
@@ -81,7 +84,6 @@ class PaymentActivity : Activity() {
                     }
                 }
             } catch (exception: ApiException) {
-                // Process error
                 Log.w("isReadyToPay failed", exception)
             }
         }
@@ -92,7 +94,7 @@ class PaymentActivity : Activity() {
         payRequestsManager: PayRequestsManager,
         paymentRequest: PaymentRequest
     ) {
-        // Disables the button to prevent multiple clicks.
+        /* prevent multiple clicks */
         googlePayButton.isClickable = false
 
         val paymentDataRequest = payRequestsManager.paymentDataRequest(

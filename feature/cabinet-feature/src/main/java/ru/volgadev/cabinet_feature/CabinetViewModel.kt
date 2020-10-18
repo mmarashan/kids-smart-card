@@ -1,21 +1,19 @@
 package ru.volgadev.cabinet_feature
 
-import android.content.Context
 import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
-import ru.volgadev.article_data.model.Article
 import ru.volgadev.article_data.model.ArticleCategory
 import ru.volgadev.article_data.repository.ArticleRepository
 import ru.volgadev.common.log.Logger
 import ru.volgadev.pay_lib.MerchantData
-import ru.volgadev.pay_lib.PaymentActivity
+import ru.volgadev.pay_lib.PaymentManager
 import ru.volgadev.pay_lib.PaymentRequest
 
 class CabinetViewModel(
-    private val articleRepository: ArticleRepository
+    private val articleRepository: ArticleRepository,
+    private val paymentManager: PaymentManager
 ) : ViewModel() {
 
     private val logger = Logger.get("CabinetViewModel")
@@ -24,11 +22,15 @@ class CabinetViewModel(
 
     // TODO: remove context from viewmodel!
     @MainThread
-    fun onClickCategory(context: Context, category: String) {
-        logger.debug("onClickCategory $category")
+    fun onClickCategory(category: ArticleCategory) {
+        logger.debug("onClickCategory ${category.name}")
+
         val merchantData = MerchantData("example", "example", "example")
-        val paymentRequest = PaymentRequest(category, category, 100, "USD", "RU")
-        PaymentActivity.openPaymentActivity(context, merchantData, paymentRequest, true)
+        val paymentRequest = PaymentRequest(
+            category.name, category.description, 100,
+            "USD", "RU"
+        )
+        paymentManager.requestPayment(merchantData, paymentRequest, true)
     }
 
     override fun onCleared() {
