@@ -1,9 +1,7 @@
-package ru.volgadev.pay_lib.impl
+package ru.volgadev.pay_lib
 
 import android.content.Context
-import ru.volgadev.pay_lib.MerchantData
-import ru.volgadev.pay_lib.PaymentManager
-import ru.volgadev.pay_lib.PaymentRequest
+import ru.volgadev.pay_lib.impl.PurchaseActivity
 
 internal class PaymentManagerImpl(val context: Context) : PaymentManager {
 
@@ -12,7 +10,7 @@ internal class PaymentManagerImpl(val context: Context) : PaymentManager {
         paymentRequest: PaymentRequest,
         isTest: Boolean
     ) {
-        PaymentActivity.openPaymentActivity(context, merchantData, paymentRequest, isTest)
+        PurchaseActivity.openPaymentActivity(context, merchantData, paymentRequest, isTest)
     }
 
     override fun isPayed(): Boolean {
