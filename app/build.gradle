@@ -6,7 +6,7 @@ android {
     compileSdkVersion versions.compileSdkVersion
 
     defaultConfig {
-        applicationId "ru.volgadev.papastory"
+        applicationId "ru.volgadev.appsample"
         minSdkVersion versions.minSdkVersion
         targetSdkVersion versions.targetSdkVersion
         versionCode 3
