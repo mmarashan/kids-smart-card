@@ -35,6 +35,7 @@ dependencies {
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
     implementation "androidx.core:core-ktx:${versions.corektx}"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:${versions.androidxlifecycle}"
+    implementation "androidx.lifecycle:lifecycle-extensions:${versions.androidxlifecycle}"
 
     implementation "com.anjlab.android.iab.v3:library:${versions.anjlabandroidiappbilling}"
 }
