@@ -8,7 +8,7 @@ object PaymentManagerFactory {
 
     @AnyThread
     @JvmStatic
-    fun createPaymentManager(context: Context): PaymentManager {
-        return PaymentManagerImpl(context)
+    fun createPaymentManager(context: Context, licenseKey: String): PaymentManager {
+        return PaymentManagerImpl(context, licenseKey)
     }
 }

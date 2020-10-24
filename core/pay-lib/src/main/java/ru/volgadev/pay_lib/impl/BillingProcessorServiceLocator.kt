@@ -2,7 +2,6 @@ package ru.volgadev.pay_lib.impl
 
 import com.anjlab.android.iab.v3.BillingProcessor
 
-
 object BillingProcessorServiceLocator {
     private var billingProcessor: BillingProcessor? = null
 

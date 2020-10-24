@@ -7,9 +7,10 @@ import androidx.lifecycle.asLiveData
 import ru.volgadev.article_data.model.ArticleCategory
 import ru.volgadev.article_data.repository.ArticleRepository
 import ru.volgadev.common.log.Logger
-import ru.volgadev.pay_lib.MerchantData
 import ru.volgadev.pay_lib.PaymentManager
 import ru.volgadev.pay_lib.PaymentRequest
+import ru.volgadev.pay_lib.PaymentType
+import ru.volgadev.pay_lib.impl.DefaultPaymentActivity
 
 class CabinetViewModel(
     private val articleRepository: ArticleRepository,
@@ -24,12 +25,10 @@ class CabinetViewModel(
     fun onClickCategory(category: ArticleCategory) {
         logger.debug("onClickCategory ${category.name}")
 
-        val merchantData = MerchantData("example", "example", "example")
         val paymentRequest = PaymentRequest(
-            category.name, category.description, 100,
-            "USD", "RU"
+            "test_set", PaymentType.PURCHASE
         )
-        paymentManager.requestPayment(merchantData, paymentRequest, true)
+        paymentManager.requestPayment(paymentRequest, DefaultPaymentActivity::class.java)
     }
 
     override fun onCleared() {
