@@ -12,7 +12,8 @@ interface PaymentManager {
 
     fun requestPayment(
         paymentRequest: PaymentRequest,
-        activityClass: Class<out BillingProcessorActivity>
+        activityClass: Class<out BillingProcessorActivity>,
+        resultListener: PaymentResultListener
     )
 
     fun consumePurchase(itemId: String): Boolean
@@ -22,6 +23,14 @@ interface PaymentManager {
     fun ownedSubscriptionsFlow(): Flow<ArrayList<SkuDetails>>
 
     fun dispose()
+}
+
+interface PaymentResultListener {
+    fun onResult(result: RequestPaymentResult) = Unit
+}
+
+enum class RequestPaymentResult {
+    SUCCESS_PAYMENT, USER_CANCELED, NOT_ALLOWED_PAYMENT_TYPE, ALREADY_PAYED, PAYMENT_ERROR
 }
 
 enum class PaymentType {

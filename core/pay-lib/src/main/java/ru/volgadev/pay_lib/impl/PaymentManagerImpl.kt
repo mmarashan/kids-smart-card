@@ -10,8 +10,7 @@ import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import ru.volgadev.common.log.Logger
-import ru.volgadev.pay_lib.PaymentManager
-import ru.volgadev.pay_lib.PaymentRequest
+import ru.volgadev.pay_lib.*
 
 
 internal class PaymentManagerImpl(
@@ -27,7 +26,8 @@ internal class PaymentManagerImpl(
     private val billingHandler = object : IBillingHandler {
 
         override fun onProductPurchased(productId: String, details: TransactionDetails?) {
-            logger.debug("onProductPurchased()")
+            logger.debug("onProductPurchased($productId)")
+            resultListener?.onResult(RequestPaymentResult.SUCCESS_PAYMENT)
             updateOwnedItems()
         }
 
@@ -41,21 +41,31 @@ internal class PaymentManagerImpl(
             if (errorCode == Constants.BILLING_RESPONSE_RESULT_USER_CANCELED) {
                 logger.warn("User canceled the payment dialog")
                 updateOwnedItems()
+                resultListener?.onResult(RequestPaymentResult.USER_CANCELED)
             }
+            resultListener?.onResult(RequestPaymentResult.PAYMENT_ERROR)
         }
 
         override fun onBillingInitialized() {
             logger.debug("onBillingInitialized()")
-            billingProcessor.loadOwnedPurchasesFromGoogle()
+            loadOwnedItems()
         }
     }
 
-    private val billingProcessor: BillingProcessor by lazy {
-        BillingProcessor(
-            context,
-            googlePlayLicenseKey,
-            billingHandler
-        )
+    private val billingProcessor = BillingProcessor(
+        context,
+        googlePlayLicenseKey,
+        billingHandler
+    )
+
+    private var resultListener: PaymentResultListener? = null
+
+    private fun loadOwnedItems() {
+        logger.debug("loadOwnedItems()")
+        val loadResult = billingProcessor.loadOwnedPurchasesFromGoogle()
+        if (loadResult) {
+            updateOwnedItems()
+        }
     }
 
     private fun updateOwnedItems() {
@@ -63,13 +73,17 @@ internal class PaymentManagerImpl(
         val ownedProductIds = billingProcessor.listOwnedProducts() as ArrayList<String>
         val ownedSubscriptionIds = billingProcessor.listOwnedSubscriptions() as ArrayList<String>
 
-        val ownedProducts = billingProcessor.getPurchaseListingDetails(ownedProductIds) as ArrayList<SkuDetails>
-        val ownedSubscription = billingProcessor.getSubscriptionListingDetails(ownedSubscriptionIds) as ArrayList<SkuDetails>
+        val ownedProducts =
+            billingProcessor.getPurchaseListingDetails(ownedProductIds) as ArrayList<SkuDetails>?
+                ?: ArrayList()
+        val ownedSubscriptions =
+            billingProcessor.getSubscriptionListingDetails(ownedSubscriptionIds) as ArrayList<SkuDetails>?
+                ?: ArrayList()
 
         logger.debug("ownedProducts = ${ownedProducts.joinToString(",")}")
-        logger.debug("ownedSubscription = ${ownedSubscription.joinToString(",")}")
+        logger.debug("ownedSubscription = ${ownedSubscriptions.joinToString(",")}")
         ownedProductsChannel.offer(ownedProducts)
-        ownedSubscriptionChannel.offer(ownedSubscription)
+        ownedSubscriptionChannel.offer(ownedSubscriptions)
     }
 
     override fun init(): Boolean {
@@ -86,10 +100,20 @@ internal class PaymentManagerImpl(
 
     override fun requestPayment(
         paymentRequest: PaymentRequest,
-        activityClass: Class<out BillingProcessorActivity>
+        activityClass: Class<out BillingProcessorActivity>,
+        resultListener: PaymentResultListener
     ) {
-//        val isOneTimePurchaseSupported = billingProcessor.isOneTimePurchaseSupported
-//        val isSubsUpdateSupported = billingProcessor.isSubscriptionUpdateSupported
+        this.resultListener = resultListener
+        val isOneTimePurchaseSupported = billingProcessor.isOneTimePurchaseSupported
+        val isSubsUpdateSupported = billingProcessor.isSubscriptionUpdateSupported
+
+        if ((isOneTimePurchaseSupported && paymentRequest.type == PaymentType.PURCHASE)
+            || isSubsUpdateSupported && paymentRequest.type == PaymentType.SUBSCRIPTION
+        ) {
+            logger.error("Payment not supported type = ${paymentRequest.type} ")
+            resultListener.onResult(RequestPaymentResult.NOT_ALLOWED_PAYMENT_TYPE)
+            return
+        }
 
         BillingProcessorServiceLocator.register(billingProcessor)
         BillingProcessorActivity.startActivity(context, paymentRequest, activityClass)
@@ -104,7 +128,8 @@ internal class PaymentManagerImpl(
 
     override fun ownedProductsFlow(): Flow<ArrayList<SkuDetails>> = ownedProductsChannel.asFlow()
 
-    override fun ownedSubscriptionsFlow(): Flow<ArrayList<SkuDetails>> = ownedSubscriptionChannel.asFlow()
+    override fun ownedSubscriptionsFlow(): Flow<ArrayList<SkuDetails>> =
+        ownedSubscriptionChannel.asFlow()
 
     override fun dispose() {
         logger.debug("dispose()")

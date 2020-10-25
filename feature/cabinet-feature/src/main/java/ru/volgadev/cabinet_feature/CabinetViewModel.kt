@@ -9,6 +9,7 @@ import ru.volgadev.article_data.repository.ArticleRepository
 import ru.volgadev.common.log.Logger
 import ru.volgadev.pay_lib.PaymentManager
 import ru.volgadev.pay_lib.PaymentRequest
+import ru.volgadev.pay_lib.PaymentResultListener
 import ru.volgadev.pay_lib.PaymentType
 import ru.volgadev.pay_lib.impl.DefaultPaymentActivity
 
@@ -32,7 +33,9 @@ class CabinetViewModel(
             description = category.description,
             imageUrl = category.iconUrl
         )
-        paymentManager.requestPayment(paymentRequest, DefaultPaymentActivity::class.java)
+        paymentManager.requestPayment(paymentRequest, DefaultPaymentActivity::class.java, object : PaymentResultListener {
+
+        })
     }
 
     override fun onCleared() {
