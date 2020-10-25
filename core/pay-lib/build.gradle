@@ -38,6 +38,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-extensions:${versions.androidxlifecycle}"
 
     implementation "com.anjlab.android.iab.v3:library:${versions.anjlabandroidiappbilling}"
+    implementation "io.coil-kt:coil:${versions.coil}"
 
     implementation project(':common')
 }

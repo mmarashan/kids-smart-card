@@ -29,5 +29,8 @@ enum class PaymentType {
 @Parcelize
 data class PaymentRequest(
     val itemId: String,
-    val type: PaymentType
+    val type: PaymentType,
+    val name: String?,
+    val description: String?,
+    val imageUrl: String?
 ) : Parcelable

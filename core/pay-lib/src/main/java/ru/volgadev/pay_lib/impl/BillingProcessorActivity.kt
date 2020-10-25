@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.PersistableBundle
 import androidx.appcompat.app.AppCompatActivity
 import com.anjlab.android.iab.v3.BillingProcessor
+import com.anjlab.android.iab.v3.SkuDetails
 import ru.volgadev.pay_lib.PaymentRequest
 import ru.volgadev.pay_lib.PaymentType
 
@@ -13,13 +14,16 @@ open class BillingProcessorActivity : AppCompatActivity() {
 
     private val billingProcessor: BillingProcessor by lazy { BillingProcessorServiceLocator.get() }
 
-    private lateinit var paymentRequest: PaymentRequest
+    lateinit var paymentRequest: PaymentRequest
+    lateinit var skuDetails: SkuDetails
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        paymentRequest = intent.getParcelableExtra<PaymentRequest>(PAYMENT_REQUEST_EXTRA)
+        paymentRequest = intent.getParcelableExtra(PAYMENT_REQUEST_EXTRA)
             ?: throw IllegalStateException("You should open pay activity via PaymentActivity.openPaymentActivity(...)")
+
+        skuDetails = billingProcessor.getSubscriptionListingDetails(paymentRequest.itemId)
+            ?: throw IllegalStateException("You should open pay activity with actual itemId")
     }
 
     fun onClickPay() {

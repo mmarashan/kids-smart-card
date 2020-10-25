@@ -11,6 +11,16 @@ class DefaultPaymentActivity : BillingProcessorActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.defalt_billing_activity)
 
+        itemName.text = paymentRequest.name ?: skuDetails.title
+        itemDescription.text = paymentRequest.description ?: skuDetails.description
+
+        skuDetails.priceText?.let { priceText ->
+            itemPrice.text = priceText
+        }
+        paymentRequest.imageUrl?.let { imageUrl ->
+            itemImage
+        }
+
         btnPay.setOnClickListener {
             onClickPay()
         }
