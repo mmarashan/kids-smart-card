@@ -3,7 +3,6 @@ package ru.volgadev.pay_lib.impl
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.PersistableBundle
 import androidx.appcompat.app.AppCompatActivity
 import com.anjlab.android.iab.v3.BillingProcessor
 import com.anjlab.android.iab.v3.SkuDetails
@@ -22,8 +21,11 @@ open class BillingProcessorActivity : AppCompatActivity() {
         paymentRequest = intent.getParcelableExtra(PAYMENT_REQUEST_EXTRA)
             ?: throw IllegalStateException("You should open pay activity via PaymentActivity.openPaymentActivity(...)")
 
-        skuDetails = billingProcessor.getSubscriptionListingDetails(paymentRequest.itemId)
-            ?: throw IllegalStateException("You should open pay activity with actual itemId")
+        skuDetails = if (paymentRequest.type == PaymentType.PURCHASE) {
+            billingProcessor.getPurchaseListingDetails(paymentRequest.itemId)
+        } else {
+            billingProcessor.getSubscriptionListingDetails(paymentRequest.itemId)
+        } ?: throw IllegalStateException("You should open pay activity with actual itemId")
     }
 
     fun onClickPay() {

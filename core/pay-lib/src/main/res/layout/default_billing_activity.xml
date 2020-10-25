@@ -20,17 +20,17 @@
 
         <ImageView
             android:id="@+id/itemImage"
-            android:layout_width="256dp"
-            android:layout_height="256dp"
+            android:layout_width="128dp"
+            android:layout_height="128dp"
             tools:src="@tools:sample/backgrounds/scenic" />
 
         <TextView
             android:id="@+id/itemName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="16dp"
             android:layout_marginBottom="4dp"
-            android:textSize="28sp"
+            android:textSize="24sp"
             android:textStyle="bold"
             tools:text="Super item" />
 
@@ -40,7 +40,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
-            android:textSize="24sp"
+            android:textSize="18sp"
             tools:text="Very good item for your life" />
 
         <TextView
@@ -49,7 +49,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
-            android:textSize="24sp"
+            android:textSize="18sp"
             tools:text="1$" />
 
         <androidx.appcompat.widget.AppCompatButton
@@ -61,9 +61,10 @@
             android:background="@drawable/background_round_corners_8"
             android:gravity="center"
             android:padding="4dp"
+            android:textAllCaps="false"
             android:text="@string/pay"
             android:textColor="@android:color/background_light"
-            android:textSize="32sp"
+            android:textSize="24sp"
             android:textStyle="bold" />
 
     </LinearLayout>

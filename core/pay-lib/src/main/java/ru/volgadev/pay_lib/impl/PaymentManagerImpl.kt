@@ -21,29 +21,26 @@ internal class PaymentManagerImpl(
 
     private val logger = Logger.get("PaymentManagerImpl")
 
-    private val itemsChannel = ConflatedBroadcastChannel<SkuDetails>()
+    private val ownedProductsChannel = ConflatedBroadcastChannel<ArrayList<SkuDetails>>()
+    private val ownedSubscriptionChannel = ConflatedBroadcastChannel<ArrayList<SkuDetails>>()
 
     private val billingHandler = object : IBillingHandler {
 
         override fun onProductPurchased(productId: String, details: TransactionDetails?) {
             logger.debug("onProductPurchased()")
+            updateOwnedItems()
         }
 
         override fun onPurchaseHistoryRestored() {
             logger.debug("onPurchaseHistoryRestored()")
-            val ownedProductIds = billingProcessor.listOwnedProducts()
-            val ownedProducts = ArrayList<SkuDetails>()
-            ownedProductIds.forEach { id ->
-                billingProcessor.getSubscriptionListingDetails(id)?.let { details ->
-                    ownedProducts.add(details)
-                }
-            }
+            updateOwnedItems()
         }
 
         override fun onBillingError(errorCode: Int, error: Throwable?) {
-            logger.debug("onBillingError()")
+            logger.warn("onBillingError()")
             if (errorCode == Constants.BILLING_RESPONSE_RESULT_USER_CANCELED) {
-                // the user canceled the buy dialog
+                logger.warn("User canceled the payment dialog")
+                updateOwnedItems()
             }
         }
 
@@ -59,6 +56,20 @@ internal class PaymentManagerImpl(
             googlePlayLicenseKey,
             billingHandler
         )
+    }
+
+    private fun updateOwnedItems() {
+        logger.debug("Update owned items")
+        val ownedProductIds = billingProcessor.listOwnedProducts() as ArrayList<String>
+        val ownedSubscriptionIds = billingProcessor.listOwnedSubscriptions() as ArrayList<String>
+
+        val ownedProducts = billingProcessor.getPurchaseListingDetails(ownedProductIds) as ArrayList<SkuDetails>
+        val ownedSubscription = billingProcessor.getSubscriptionListingDetails(ownedSubscriptionIds) as ArrayList<SkuDetails>
+
+        logger.debug("ownedProducts = ${ownedProducts.joinToString(",")}")
+        logger.debug("ownedSubscription = ${ownedSubscription.joinToString(",")}")
+        ownedProductsChannel.offer(ownedProducts)
+        ownedSubscriptionChannel.offer(ownedSubscription)
     }
 
     override fun init(): Boolean {
@@ -91,7 +102,9 @@ internal class PaymentManagerImpl(
         return consumptionResult
     }
 
-    override fun purchaseItemsFlow(): Flow<SkuDetails> = itemsChannel.asFlow()
+    override fun ownedProductsFlow(): Flow<ArrayList<SkuDetails>> = ownedProductsChannel.asFlow()
+
+    override fun ownedSubscriptionsFlow(): Flow<ArrayList<SkuDetails>> = ownedSubscriptionChannel.asFlow()
 
     override fun dispose() {
         logger.debug("dispose()")

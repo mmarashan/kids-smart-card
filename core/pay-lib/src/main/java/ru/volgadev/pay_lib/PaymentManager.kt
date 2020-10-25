@@ -17,7 +17,9 @@ interface PaymentManager {
 
     fun consumePurchase(itemId: String): Boolean
 
-    fun purchaseItemsFlow(): Flow<SkuDetails>
+    fun ownedProductsFlow(): Flow<ArrayList<SkuDetails>>
+
+    fun ownedSubscriptionsFlow(): Flow<ArrayList<SkuDetails>>
 
     fun dispose()
 }

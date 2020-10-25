@@ -26,7 +26,11 @@ class CabinetViewModel(
         logger.debug("onClickCategory ${category.name}")
 
         val paymentRequest = PaymentRequest(
-            "test_set", PaymentType.PURCHASE
+            itemId = "test_set",
+            type = PaymentType.PURCHASE,
+            name = category.name,
+            description = category.description,
+            imageUrl = category.iconUrl
         )
         paymentManager.requestPayment(paymentRequest, DefaultPaymentActivity::class.java)
     }
