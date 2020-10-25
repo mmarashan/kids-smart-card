@@ -6,7 +6,6 @@
     <application>
         <activity
             android:name="ru.volgadev.pay_lib.impl.DefaultPaymentActivity"
-            android:label="@string/app_name"
             android:screenOrientation="portrait" />
     </application>
 </manifest>

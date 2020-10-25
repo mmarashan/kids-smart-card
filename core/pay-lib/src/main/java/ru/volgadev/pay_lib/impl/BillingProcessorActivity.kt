@@ -20,7 +20,6 @@ open class BillingProcessorActivity : AppCompatActivity() {
 
         paymentRequest = intent.getParcelableExtra<PaymentRequest>(PAYMENT_REQUEST_EXTRA)
             ?: throw IllegalStateException("You should open pay activity via PaymentActivity.openPaymentActivity(...)")
-
     }
 
     fun onClickPay() {
