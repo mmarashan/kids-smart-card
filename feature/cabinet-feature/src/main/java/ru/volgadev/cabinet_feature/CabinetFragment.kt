@@ -27,18 +27,6 @@ class CabinetFragment : Fragment(R.layout.cabinet_fragment) {
     private val musicMediaPlayer by lazy { BackgroundMediaPlayer() }
     private val cardsMediaPlayer by lazy { BackgroundMediaPlayer() }
 
-    interface OnItemClickListener {
-        fun onClick(category: ArticleCategory, clickedView: View)
-    }
-
-    @Volatile
-    private var onItemClickListener: OnItemClickListener? = null
-
-    @AnyThread
-    fun setOnItemClickListener(listener: OnItemClickListener) {
-        onItemClickListener = listener
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         logger.debug("On fragment created; savedInstanceState=$savedInstanceState")
@@ -51,7 +39,6 @@ class CabinetFragment : Fragment(R.layout.cabinet_fragment) {
                     clickedCategory?.let { category ->
                         logger.debug("On click category $category")
                         viewModel.onClickCategory(category)
-                        onItemClickListener?.onClick(category, clickedView)
                     }
                 }
             })

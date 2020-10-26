@@ -1,9 +1,7 @@
 package ru.volgadev.cabinet_feature
 
 import androidx.annotation.MainThread
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
+import androidx.lifecycle.*
 import ru.volgadev.article_data.model.ArticleCategory
 import ru.volgadev.article_data.repository.ArticleRepository
 import ru.volgadev.common.log.Logger
@@ -20,7 +18,14 @@ class CabinetViewModel(
 
     private val logger = Logger.get("CabinetViewModel")
 
+    val marketCategories: LiveData<List<MarketCategory>> = MutableLiveData<List<MarketCategory>>()
+
     val categories: LiveData<List<ArticleCategory>> = articleRepository.categories().asLiveData()
+
+    val payedCategoriesItemIds: LiveData<List<String>> =
+        paymentManager.ownedProductsFlow().asLiveData().map { detailsList ->
+            return@map detailsList.map { skuDetails -> skuDetails.productId }
+        }.distinctUntilChanged()
 
     @MainThread
     fun onClickCategory(category: ArticleCategory) {
@@ -33,9 +38,12 @@ class CabinetViewModel(
             description = category.description,
             imageUrl = category.iconUrl
         )
-        paymentManager.requestPayment(paymentRequest, DefaultPaymentActivity::class.java, object : PaymentResultListener {
+        paymentManager.requestPayment(paymentRequest,
+            DefaultPaymentActivity::class.java,
+            object : PaymentResultListener {
 
-        })
+            }
+        )
     }
 
     override fun onCleared() {

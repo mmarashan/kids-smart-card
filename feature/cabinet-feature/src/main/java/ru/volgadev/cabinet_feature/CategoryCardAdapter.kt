@@ -72,7 +72,7 @@ class CategoryCardAdapter :
 
         private val cardArticleCategoryView: CardView =
             card.findViewById(R.id.categoryCardView)
-        private val price: TextView = card.findViewById(R.id.categoryPrice)
+        private val starStatus: ImageView = card.findViewById(R.id.categoryStatus)
         private val title: TextView = card.findViewById(R.id.categoryTitle)
         private val image: ImageView = card.findViewById(R.id.categoryImage)
         private val description: TextView = card.findViewById(R.id.categoryDescription)
@@ -82,8 +82,6 @@ class CategoryCardAdapter :
             card.tag = category.name
             val image = holder.image
             holder.title.text = category.name
-            val priceStr = category.priceDollar.toString() + "$"
-            holder.price.text = priceStr
             holder.description.text = category.description
 
             category.iconUrl?.let { url ->

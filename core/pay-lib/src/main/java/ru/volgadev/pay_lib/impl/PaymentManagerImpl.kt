@@ -115,6 +115,16 @@ internal class PaymentManagerImpl(
             return
         }
 
+        if (paymentRequest.type == PaymentType.PURCHASE) {
+            val transactionDetails =
+                billingProcessor.getPurchaseTransactionDetails(paymentRequest.itemId)
+            if (transactionDetails != null) {
+                logger.warn("Payment already payed ${paymentRequest.type} ")
+                resultListener.onResult(RequestPaymentResult.ALREADY_PAYED)
+                return
+            }
+        }
+
         BillingProcessorServiceLocator.register(billingProcessor)
         BillingProcessorActivity.startActivity(context, paymentRequest, activityClass)
     }

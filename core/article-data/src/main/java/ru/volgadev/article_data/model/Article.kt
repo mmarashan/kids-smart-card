@@ -49,6 +49,6 @@ data class ArticleCategory(
     val name: String,
     val description: String,
     val iconUrl: String? = null,
-    val priceDollar: Int? = null,
-    val fileUrl: String
+    val fileUrl: String,
+    val marketItemId: String? = null
 )

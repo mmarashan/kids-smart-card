@@ -146,14 +146,14 @@ class ArticleBackendApiImpl : ArticleBackendApi {
                 val description = categoriesJson.optString("description")
                 val iconUrl = categoriesJson.optString("iconUrl")
                 val fileUrl = categoriesJson.optString("fileUrl")
-                val priceDollar = categoriesJson.optInt("priceDollar")
+                val marketItemId = categoriesJson.optString("priceDollar", null)
                 result.add(
                     ArticleCategory(
                         id = id,
                         name = name,
                         description = description,
                         iconUrl = iconUrl,
-                        priceDollar = priceDollar,
+                        marketItemId = marketItemId,
                         fileUrl = fileUrl
                     )
                 )
