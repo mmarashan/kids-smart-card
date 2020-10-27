@@ -1,3 +1,4 @@
+include ':feature:pincode-bubble'
 rootProject.name = "appsample"
 
 include ':app',
@@ -7,6 +8,7 @@ include ':app',
         ':feature:article-galery-feature',
         ':feature:article-page-feature',
         ':feature:cabinet-feature',
+        ':feature:pincode-bubble',
         ':core:article-data',
         ':core:music-data',
         ':core:downloader',

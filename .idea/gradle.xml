@@ -22,6 +22,7 @@
             <option value="$PROJECT_DIR$/feature/article-galery-feature" />
             <option value="$PROJECT_DIR$/feature/article-page-feature" />
             <option value="$PROJECT_DIR$/feature/cabinet-feature" />
+            <option value="$PROJECT_DIR$/feature/pincode-bubble" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
