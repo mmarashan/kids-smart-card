@@ -25,7 +25,6 @@ class CabinetFragment : Fragment(R.layout.cabinet_fragment) {
     private val viewModel: CabinetViewModel by viewModel()
 
     private val musicMediaPlayer by lazy { BackgroundMediaPlayer() }
-    private val cardsMediaPlayer by lazy { BackgroundMediaPlayer() }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -35,10 +34,10 @@ class CabinetFragment : Fragment(R.layout.cabinet_fragment) {
             setOnItemClickListener(object : CategoryCardAdapter.OnItemClickListener {
                 override fun onClick(categoryName: String, clickedView: View) {
                     val clickedCategory =
-                        viewModel.categories.value?.first { category -> category.name == categoryName }
+                        viewModel.marketCategories.value?.first { category -> category.category.name == categoryName }
                     clickedCategory?.let { category ->
                         logger.debug("On click category $category")
-                        viewModel.onClickCategory(category)
+                        viewModel.onClickCategory(category.category)
                     }
                 }
             })
@@ -60,9 +59,9 @@ class CabinetFragment : Fragment(R.layout.cabinet_fragment) {
             }
         }
 
-        viewModel.categories.observe(viewLifecycleOwner, Observer { categorys ->
-            logger.debug("Set new ${categorys.size} categories")
-            categoriesAdapter.setData(categorys)
+        viewModel.marketCategories.observe(viewLifecycleOwner, Observer { categories ->
+            logger.debug("Set new ${categories.size} categories")
+            categoriesAdapter.setData(categories)
         })
     }
 

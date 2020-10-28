@@ -7,11 +7,11 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.AnyThread
 import androidx.cardview.widget.CardView
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import ru.volgadev.article_data.model.ArticleCategory
 import ru.volgadev.common.log.Logger
 
 class CategoryCardAdapter :
@@ -24,12 +24,12 @@ class CategoryCardAdapter :
     @Volatile
     private var onItemClickListener: OnItemClickListener? = null
 
-    private val logger = Logger.get("ArticleCategoryCardAdapter")
+    private val logger = Logger.get("MarketCategoryCardAdapter")
 
-    private val categoryList = ArrayList<ArticleCategory>()
+    private val categoryList = ArrayList<MarketCategory>()
 
     @AnyThread
-    fun setData(dataset: Collection<ArticleCategory>) {
+    fun setData(dataset: Collection<MarketCategory>) {
         logger.debug("Set dataset with ${dataset.size} members")
 
         if (categoryList.isNotEmpty()) {
@@ -70,14 +70,15 @@ class CategoryCardAdapter :
             }
         }
 
-        private val cardArticleCategoryView: CardView =
+        private val cardMarketCategoryView: CardView =
             card.findViewById(R.id.categoryCardView)
         private val starStatus: ImageView = card.findViewById(R.id.categoryStatus)
         private val title: TextView = card.findViewById(R.id.categoryTitle)
         private val image: ImageView = card.findViewById(R.id.categoryImage)
         private val description: TextView = card.findViewById(R.id.categoryDescription)
 
-        fun bind(category: ArticleCategory) {
+        fun bind(marketCategory: MarketCategory) {
+            val category = marketCategory.category
             val holder = this
             card.tag = category.name
             val image = holder.image
@@ -89,6 +90,12 @@ class CategoryCardAdapter :
                     .transition(DrawableTransitionOptions.withCrossFade())
                     .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                     .into(image)
+            }
+
+            starStatus.isVisible = marketCategory.isPaid
+
+            if (!marketCategory.isPaid && !marketCategory.isFree) {
+                cardMarketCategoryView.alpha = 0.8f
             }
 
             holder.card.setOnClickListener(viewClickListener)

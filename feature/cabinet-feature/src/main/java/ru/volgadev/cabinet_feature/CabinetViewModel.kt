@@ -18,14 +18,46 @@ class CabinetViewModel(
 
     private val logger = Logger.get("CabinetViewModel")
 
-    val marketCategories: LiveData<List<MarketCategory>> = MutableLiveData<List<MarketCategory>>()
+    private val categories: LiveData<List<ArticleCategory>> = articleRepository.categories().asLiveData()
 
-    val categories: LiveData<List<ArticleCategory>> = articleRepository.categories().asLiveData()
-
-    val payedCategoriesItemIds: LiveData<List<String>> =
+    private val payedCategoriesItemIds: LiveData<List<String>> =
         paymentManager.ownedProductsFlow().asLiveData().map { detailsList ->
-            return@map detailsList.map { skuDetails -> skuDetails.productId }
+            val productIds: List<String> = detailsList.map { skuDetails -> skuDetails.productId }
+            return@map productIds
         }.distinctUntilChanged()
+
+    val marketCategories = MediatorLiveData<List<MarketCategory>>().apply {
+        var _categories: ArrayList<ArticleCategory>? = null
+        var _payedIds: HashSet<String>? = null
+
+        fun checkMergeData() {
+            val categories = _categories
+            val payedIds = _payedIds
+            if (categories != null && payedIds != null) {
+                val marketCategoriesList = ArrayList<MarketCategory>()
+                categories.forEach { category ->
+                    val isPayed = payedIds.contains(category.marketItemId)
+                    val isFree = category.marketItemId == null
+                    val marketCategory = MarketCategory(category, isFree, isPayed)
+                    marketCategoriesList.add(marketCategory)
+                }
+                this.postValue(marketCategoriesList)
+            }
+        }
+
+        addSource(categories) { catagoriesList ->
+            _categories = ArrayList<ArticleCategory>().apply {
+                addAll(catagoriesList)
+            }
+            checkMergeData()
+        }
+        addSource(payedCategoriesItemIds) { payedItemIds ->
+            _payedIds = HashSet<String>().apply {
+                addAll(payedItemIds)
+            }
+            checkMergeData()
+        }
+    }
 
     @MainThread
     fun onClickCategory(category: ArticleCategory) {
