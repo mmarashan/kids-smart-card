@@ -63,6 +63,10 @@ class CabinetViewModel(
         }
     }
 
+    init {
+        paymentManager.init()
+    }
+
     @MainThread
     fun onClickCategory(marketCategory: MarketCategory) {
         val category = marketCategory.category
@@ -93,6 +97,7 @@ class CabinetViewModel(
 
     override fun onCleared() {
         logger.debug("onCleared()")
+        paymentManager.dispose()
         super.onCleared()
     }
 }

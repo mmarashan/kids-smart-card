@@ -107,13 +107,15 @@ internal class PaymentManagerImpl(
         val isOneTimePurchaseSupported = billingProcessor.isOneTimePurchaseSupported
         val isSubsUpdateSupported = billingProcessor.isSubscriptionUpdateSupported
 
-        if ((isOneTimePurchaseSupported && paymentRequest.type == PaymentType.PURCHASE)
-            || isSubsUpdateSupported && paymentRequest.type == PaymentType.SUBSCRIPTION
-        ) {
-            logger.error("Payment not supported type = ${paymentRequest.type} ")
-            resultListener.onResult(RequestPaymentResult.NOT_ALLOWED_PAYMENT_TYPE)
-            return
-        }
+        // TODO: find out why not supported
+//        if (
+//            (isOneTimePurchaseSupported && paymentRequest.type == PaymentType.PURCHASE)
+//            || (isSubsUpdateSupported && paymentRequest.type == PaymentType.SUBSCRIPTION)
+//        ) {
+//            logger.error("Payment not supported type = ${paymentRequest.type} ")
+//            resultListener.onResult(RequestPaymentResult.NOT_ALLOWED_PAYMENT_TYPE)
+//            return
+//        }
 
         if (paymentRequest.type == PaymentType.PURCHASE) {
             val transactionDetails =

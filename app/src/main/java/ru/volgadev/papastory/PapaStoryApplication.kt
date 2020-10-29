@@ -59,7 +59,7 @@ class PapaStoryApplication : Application() {
     }
 
     private val paymentModule = module {
-        single<PaymentManager> {
+        factory<PaymentManager> {
             PaymentManagerFactory.createPaymentManager(get(), GOOGLE_PLAY_LICENSE_KEY)
         }
     }
