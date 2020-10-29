@@ -72,7 +72,7 @@ class CategoryCardAdapter :
 
         private val cardMarketCategoryView: CardView =
             card.findViewById(R.id.categoryCardView)
-        private val starStatus: ImageView = card.findViewById(R.id.categoryStatus)
+        private val paymentStatus: ImageView = card.findViewById(R.id.categoryStatus)
         private val title: TextView = card.findViewById(R.id.categoryTitle)
         private val image: ImageView = card.findViewById(R.id.categoryImage)
         private val description: TextView = card.findViewById(R.id.categoryDescription)
@@ -92,10 +92,12 @@ class CategoryCardAdapter :
                     .into(image)
             }
 
-            starStatus.isVisible = marketCategory.isPaid
+            paymentStatus.isVisible = !marketCategory.isFree
 
-            if (!marketCategory.isPaid && !marketCategory.isFree) {
-                cardMarketCategoryView.alpha = 0.8f
+            if (!marketCategory.isFree && !marketCategory.isPaid) {
+                paymentStatus.setImageResource(R.drawable.ic_baseline_lock_24)
+            } else {
+                paymentStatus.setImageResource(R.drawable.ic_baseline_star_24)
             }
 
             holder.card.setOnClickListener(viewClickListener)

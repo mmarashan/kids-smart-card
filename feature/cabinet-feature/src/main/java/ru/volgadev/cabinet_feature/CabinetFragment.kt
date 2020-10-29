@@ -16,7 +16,7 @@ import ru.volgadev.common.log.Logger
 
 class CabinetFragment : Fragment(R.layout.cabinet_fragment) {
 
-    private val logger = Logger.get("categoryGalleryFragment")
+    private val logger = Logger.get("CabinetFragment")
 
     companion object {
         fun newInstance() = CabinetFragment()
@@ -37,7 +37,7 @@ class CabinetFragment : Fragment(R.layout.cabinet_fragment) {
                         viewModel.marketCategories.value?.first { category -> category.category.name == categoryName }
                     clickedCategory?.let { category ->
                         logger.debug("On click category $category")
-                        viewModel.onClickCategory(category.category)
+                        viewModel.onClickCategory(category)
                     }
                 }
             })
@@ -60,7 +60,7 @@ class CabinetFragment : Fragment(R.layout.cabinet_fragment) {
         }
 
         viewModel.marketCategories.observe(viewLifecycleOwner, Observer { categories ->
-            logger.debug("Set new ${categories.size} categories")
+            logger.debug("Set new market categories ${categories.joinToString(",")} ")
             categoriesAdapter.setData(categories)
         })
     }
