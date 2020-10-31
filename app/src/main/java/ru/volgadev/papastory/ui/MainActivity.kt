@@ -8,7 +8,6 @@ import android.transition.Slide
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import androidx.annotation.MainThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -26,6 +25,7 @@ import ru.volgadev.common.isPermissionGranted
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.setVisibleWithTransition
 import ru.volgadev.papastory.R
+import ru.volgadev.pincode_bubble.PinCodeBubbleAlertDialog
 
 const val HOME_ITEM_ID = R.id.action_home
 const val GALLERY_ITEM_ID = R.id.action_galery
@@ -111,6 +111,12 @@ class MainActivity : AppCompatActivity() {
                     }
                     GALLERY_ITEM_ID -> {
                         logger.debug("galleryFragment selected")
+//                        PinCodeBubbleAlertDialog(
+//                            this@MainActivity,
+//                            "Get your answer",
+//                            "2x2",
+//                            answers = listOf("4")
+//                        ).show()
                         showFragment(galleryFragment)
                         return true
                     }
@@ -137,7 +143,7 @@ class MainActivity : AppCompatActivity() {
         }, 500L)
     }
 
-    override fun onPause(){
+    override fun onPause() {
         super.onPause()
         logger.debug("onPause()")
     }
@@ -157,7 +163,7 @@ class MainActivity : AppCompatActivity() {
         transaction.commit()
     }
 
-    private fun provideNavigationPanelVisibitity(fragment: Fragment){
+    private fun provideNavigationPanelVisibitity(fragment: Fragment) {
         if (FragmentProvider.isFullscreen(fragment)) {
             hideNavigationPanel()
         } else {
