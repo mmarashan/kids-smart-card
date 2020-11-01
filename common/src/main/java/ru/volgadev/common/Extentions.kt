@@ -16,6 +16,7 @@ import android.transition.TransitionManager
 import android.util.Patterns
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
 import android.view.animation.Animation
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.ScaleAnimation
@@ -55,13 +56,21 @@ fun Drawable.toBitmap(): Bitmap {
 }
 
 fun Activity.hideNavBar() {
-    val decorView: View = window.decorView
+    window.hideNavBar()
+}
+
+fun Activity.showNavBar() {
+    window.showNavBar()
+}
+
+fun Window.hideNavBar() {
+    val decorView: View = this.decorView
     val uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
     decorView.systemUiVisibility = uiOptions
 }
 
-fun Activity.showNavBar() {
-    val decorView: View = window.decorView
+fun Window.showNavBar() {
+    val decorView: View = this.decorView
     val uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
     decorView.systemUiVisibility = uiOptions
 }

@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name" translatable="false">PapaStory</string>
     <string name="request_storage_permission_text">This application can working offline. You should give permission for storage</string>
+    <string name="false_answer">False answer</string>
 </resources>

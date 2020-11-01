@@ -7,9 +7,9 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.MainThread
 import androidx.appcompat.app.AlertDialog
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.consumeAsFlow
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import ru.volgadev.common.hideNavBar
 import ru.volgadev.common.log.Logger
 
 @MainThread
@@ -17,7 +17,8 @@ class PinCodeBubbleAlertDialog(
     private val activity: Activity,
     private val title: String,
     private val question: String,
-    private val answers: Collection<String>
+    private val answers: Collection<String>,
+    private val hideNavigationBar: Boolean = false
 ) : AlertDialog(activity, false, null) {
 
     private val logger = Logger.get("PinCodeBubbleAlertDialog")
@@ -28,6 +29,7 @@ class PinCodeBubbleAlertDialog(
     private val questionTextView = view.findViewById<TextView>(R.id.questionTextView)
     private val answerEditText = view.findViewById<EditText>(R.id.answerEditText)
     private val okBtn = view.findViewById<Button>(R.id.okBtn)
+    private val cancelBtn = view.findViewById<Button>(R.id.cancelBtn)
 
     init {
         setTitle(title)
@@ -36,23 +38,36 @@ class PinCodeBubbleAlertDialog(
         questionTextView.text = question
     }
 
-    fun showForResult(): Flow<Boolean> {
+    fun showForResult(): LiveData<Boolean> {
         logger.debug("showForResult()")
-        val channel = Channel<Boolean>()
+        val resultLiveData = MutableLiveData<Boolean>()
         okBtn.setOnClickListener {
             logger.debug("on click OK")
             val answer = answerEditText.text.toString()
             val isCorrectAnswer = answers.contains(answer)
-            logger.debug("answer = $answer; Result = $isCorrectAnswer")
-            channel.offer(isCorrectAnswer)
-            channel.close()
+            logger.debug("Answer = $answer; Result = $isCorrectAnswer")
+            resultLiveData.value = isCorrectAnswer
+            dismiss()
+        }
+        cancelBtn.setOnClickListener {
+            logger.debug("on click cancel")
+            resultLiveData.value =  false
+            hide()
+            dismiss()
         }
         show()
-        return channel.consumeAsFlow()
+        return resultLiveData
     }
 
     override fun show() {
-        logger.warn("You should call showForResult() for handle user answer")
+        logger.debug("show()")
         super.show()
+        if (hideNavigationBar) window?.hideNavBar()
+    }
+
+    override fun onStop() {
+        logger.debug("onStop()")
+        super.onStop()
+        if (hideNavigationBar) window?.hideNavBar()
     }
 }

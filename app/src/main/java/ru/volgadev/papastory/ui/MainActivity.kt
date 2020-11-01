@@ -16,10 +16,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.android.synthetic.main.main_activity.*
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 import ru.volgadev.article_data.model.Article
 import ru.volgadev.article_data.model.ArticleType
 import ru.volgadev.article_galery.ui.ArticleGalleryFragment
@@ -28,6 +25,7 @@ import ru.volgadev.article_page.ITEM_ID_KEY
 import ru.volgadev.common.hideNavBar
 import ru.volgadev.common.isPermissionGranted
 import ru.volgadev.common.log.Logger
+import ru.volgadev.common.observeOnce
 import ru.volgadev.common.setVisibleWithTransition
 import ru.volgadev.papastory.R
 import ru.volgadev.pincode_bubble.PinCodeBubbleAlertDialog
@@ -112,26 +110,29 @@ class MainActivity : AppCompatActivity() {
                 when (item.itemId) {
                     HOME_ITEM_ID -> {
                         logger.debug("cabinetFragment selected")
-                        showFragment(cabinetFragment)
+                        PinCodeBubbleAlertDialog(
+                            activity = this@MainActivity,
+                            title = "Get your answer",
+                            question = "2x2",
+                            answers = listOf("4"),
+                            hideNavigationBar = true
+                        ).showForResult().observeOnce { isCorrectAnswer ->
+                            if (isCorrectAnswer) {
+                                logger.debug("Show gallery fragment")
+                                showFragment(cabinetFragment)
+                            } else {
+                                Toast.makeText(
+                                    this@MainActivity,
+                                    getString(R.string.false_answer),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
                         return true
                     }
                     GALLERY_ITEM_ID -> {
                         logger.debug("galleryFragment selected")
-
-                        GlobalScope.launch {
-                            PinCodeBubbleAlertDialog(
-                                this@MainActivity,
-                                "Get your answer",
-                                "2x2",
-                                answers = listOf("4")
-                            ).showForResult().collect { isCorrectAnswer ->
-                                if (isCorrectAnswer){
-                                    showFragment(galleryFragment)
-                                } else {
-                                    Toast.makeText(this@MainActivity, "", Toast.LENGTH_SHORT).show()
-                                }
-                            }
-                        }
+                        showFragment(galleryFragment)
                         return true
                     }
                 }
@@ -143,7 +144,7 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager.addOnBackStackChangedListener {
             supportFragmentManager.findFragmentById(
                 R.id.contentContainer
-            )?.let { provideNavigationPanelVisibitity(it) }
+            )?.let { provideNavigationPanelVisibility(it) }
         }
     }
 
@@ -153,7 +154,7 @@ class MainActivity : AppCompatActivity() {
         hideNavBar()
         bottomNavigation.isVisible = false
         bottomNavigation.postDelayed({
-            showNavigationPanel()
+            showBottomNavigationPanel()
         }, 500L)
     }
 
@@ -177,24 +178,24 @@ class MainActivity : AppCompatActivity() {
         transaction.commit()
     }
 
-    private fun provideNavigationPanelVisibitity(fragment: Fragment) {
+    private fun provideNavigationPanelVisibility(fragment: Fragment) {
         if (FragmentProvider.isFullscreen(fragment)) {
-            hideNavigationPanel()
+            hideBottomNavigationPanel()
         } else {
-            showNavigationPanel()
+            showBottomNavigationPanel()
         }
     }
 
-    private fun showNavigationPanel() {
-        logger.debug("showNavigationPanel()")
+    private fun showBottomNavigationPanel() {
+        logger.debug("showBottomNavigationPanel()")
         bottomNavigation.setVisibleWithTransition(
             View.VISIBLE,
             Slide(Gravity.BOTTOM), 600, mainActivityLayout
         )
     }
 
-    private fun hideNavigationPanel() {
-        logger.debug("hideNavigationPanel()")
+    private fun hideBottomNavigationPanel() {
+        logger.debug("hideBottomNavigationPanel()")
         bottomNavigation.setVisibleWithTransition(
             View.GONE,
             Slide(Gravity.BOTTOM), 600, mainActivityLayout
