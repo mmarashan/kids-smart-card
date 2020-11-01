@@ -8,6 +8,7 @@ import android.transition.Slide
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.annotation.MainThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -15,6 +16,10 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.android.synthetic.main.main_activity.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import ru.volgadev.article_data.model.Article
 import ru.volgadev.article_data.model.ArticleType
 import ru.volgadev.article_galery.ui.ArticleGalleryFragment
@@ -41,6 +46,7 @@ class MainActivity : AppCompatActivity() {
 
     private val logger = Logger.get("MainActivity")
 
+    @InternalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         logger.debug("onCreate($savedInstanceState)")
         setTheme(R.style.AppTheme)
@@ -111,13 +117,21 @@ class MainActivity : AppCompatActivity() {
                     }
                     GALLERY_ITEM_ID -> {
                         logger.debug("galleryFragment selected")
-//                        PinCodeBubbleAlertDialog(
-//                            this@MainActivity,
-//                            "Get your answer",
-//                            "2x2",
-//                            answers = listOf("4")
-//                        ).show()
-                        showFragment(galleryFragment)
+
+                        GlobalScope.launch {
+                            PinCodeBubbleAlertDialog(
+                                this@MainActivity,
+                                "Get your answer",
+                                "2x2",
+                                answers = listOf("4")
+                            ).showForResult().collect { isCorrectAnswer ->
+                                if (isCorrectAnswer){
+                                    showFragment(galleryFragment)
+                                } else {
+                                    Toast.makeText(this@MainActivity, "", Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        }
                         return true
                     }
                 }
