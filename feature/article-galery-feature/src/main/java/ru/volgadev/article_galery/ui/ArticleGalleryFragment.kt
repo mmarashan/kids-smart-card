@@ -14,9 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import jp.wasabeef.recyclerview.animators.LandingAnimator
 import kotlinx.android.synthetic.main.main_fragment.*
-import org.koin.androidx.viewmodel.ext.android.getViewModel
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
-import org.koin.androidx.viewmodel.ext.android.viewModel
 import ru.volgadev.article_data.model.Article
 import ru.volgadev.article_data.model.ArticleType
 import ru.volgadev.article_galery.R
