@@ -13,8 +13,9 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import jp.wasabeef.recyclerview.animators.LandingAnimator
-import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
 import kotlinx.android.synthetic.main.main_fragment.*
+import org.koin.androidx.viewmodel.ext.android.getViewModel
+import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import ru.volgadev.article_data.model.Article
 import ru.volgadev.article_data.model.ArticleType
@@ -31,7 +32,7 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
         fun newInstance() = ArticleGalleryFragment()
     }
 
-    private val viewModel: ArticleGalleryViewModel by viewModel()
+    private val viewModel: ArticleGalleryViewModel by sharedViewModel()
 
     private val musicMediaPlayer by lazy { BackgroundMediaPlayer() }
     private val cardsMediaPlayer by lazy { BackgroundMediaPlayer() }
@@ -66,7 +67,8 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
                             clickedView.scaleToFitAnimatedAndBack(
                                 1000L,
                                 1000L,
-                                1000L) {
+                                1000L
+                            ) {
                                 clickedView.elevation = startElevation
                             }
                         }
@@ -163,7 +165,7 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
             }
             trackUrl?.let { url ->
                 try {
-                    musicMediaPlayer.playAudio(context!!, Uri.parse(url))
+                    musicMediaPlayer.playAudio(requireContext(), Uri.parse(url))
                 } catch (e: Exception) {
                     logger.error("Exception when playing: ${e.message}")
                 }
