@@ -19,8 +19,8 @@
 
         <ImageView
             android:id="@+id/categoryImage"
-            android:layout_width="72dp"
-            android:layout_height="72dp"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="16dp"
             android:scaleType="fitCenter"
@@ -30,7 +30,8 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
-            android:layout_weight="0.8"
+            android:gravity="center"
+            android:layout_weight="0.9"
             android:orientation="vertical">
 
             <TextView
@@ -39,11 +40,10 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="4dp"
-                android:textSize="22sp"
+                android:layout_marginTop="4dp"
+                android:textSize="20sp"
                 android:textStyle="bold"
-                tools:text="Alphabet" />
+                tools:text="Цифры от логопеда Алешки" />
 
             <TextView
                 android:id="@+id/categoryDescription"
@@ -54,8 +54,8 @@
                 android:layout_marginBottom="4dp"
                 android:lineSpacingExtra="-0.02dp"
                 android:lines="2"
-                android:textSize="18sp"
-                tools:text="English alphabet with pretty animals" />
+                android:textSize="16sp"
+                tools:text="Цифры с авторской методикой от логопеда Алешки" />
 
         </LinearLayout>
 
@@ -65,7 +65,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="24dp"
-            android:layout_weight="0.2"
+            android:layout_weight="0.1"
             android:layout_gravity="center_vertical"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_baseline_star_24" />

@@ -109,25 +109,8 @@ class MainActivity : AppCompatActivity() {
             override fun onNavigationItemSelected(item: MenuItem): Boolean {
                 when (item.itemId) {
                     HOME_ITEM_ID -> {
-                        logger.debug("cabinetFragment selected")
-                        PinCodeBubbleAlertDialog(
-                            activity = this@MainActivity,
-                            title = "Get your answer",
-                            question = "2x2",
-                            answers = listOf("4"),
-                            hideNavigationBar = true
-                        ).showForResult().observeOnce { isCorrectAnswer ->
-                            if (isCorrectAnswer) {
-                                logger.debug("Show gallery fragment")
-                                showFragment(cabinetFragment)
-                            } else {
-                                Toast.makeText(
-                                    this@MainActivity,
-                                    getString(R.string.false_answer),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        }
+                        logger.debug("Show gallery fragment")
+                        showFragment(cabinetFragment)
                         return true
                     }
                     GALLERY_ITEM_ID -> {

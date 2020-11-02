@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="categories">Категории</string>
+    <string name="false_answer">Неверно :)</string>
 </resources>

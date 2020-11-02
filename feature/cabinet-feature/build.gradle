@@ -50,4 +50,5 @@ dependencies {
     implementation project(':core:article-data')
     implementation project(':core:music-data')
     implementation project(':core:pay-lib')
+    implementation project(':feature:pincode-bubble')
 }

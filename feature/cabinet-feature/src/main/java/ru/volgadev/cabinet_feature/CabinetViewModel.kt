@@ -68,7 +68,7 @@ class CabinetViewModel(
     }
 
     @MainThread
-    fun onClickCategory(marketCategory: MarketCategory) {
+    fun onReadyToPayment(marketCategory: MarketCategory) {
         val category = marketCategory.category
         logger.debug("onClickCategory ${category.name}")
         val itemId = category.marketItemId

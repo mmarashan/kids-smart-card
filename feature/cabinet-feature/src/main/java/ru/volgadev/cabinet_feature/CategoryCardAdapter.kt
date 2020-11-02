@@ -26,7 +26,7 @@ class CategoryCardAdapter :
 
     private val logger = Logger.get("MarketCategoryCardAdapter")
 
-    private val categoryList = ArrayList<MarketCategory>()
+    private var categoryList = ArrayList<MarketCategory>()
 
     @AnyThread
     fun setData(dataset: Collection<MarketCategory>) {
@@ -35,14 +35,10 @@ class CategoryCardAdapter :
         if (categoryList.isNotEmpty()) {
             val length = categoryList.size
             categoryList.clear()
-            (0..length).iterator().forEach { index ->
-                notifyItemRemoved(index)
-            }
+            notifyItemRangeRemoved(0, length);
         }
-        dataset.forEachIndexed { index, article ->
-            categoryList.add(article)
-            notifyItemChanged(index)
-        }
+        categoryList = ArrayList(dataset)
+        notifyItemRangeInserted(0, categoryList.size)
     }
 
     override fun onCreateViewHolder(

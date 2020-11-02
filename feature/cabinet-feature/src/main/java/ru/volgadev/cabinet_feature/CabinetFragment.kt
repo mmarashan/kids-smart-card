@@ -3,7 +3,9 @@ package ru.volgadev.cabinet_feature
 import android.os.Bundle
 import android.view.View
 import android.view.animation.OvershootInterpolator
+import android.widget.Toast
 import androidx.annotation.AnyThread
+import androidx.annotation.MainThread
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,6 +15,8 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import ru.volgadev.article_data.model.ArticleCategory
 import ru.volgadev.common.BackgroundMediaPlayer
 import ru.volgadev.common.log.Logger
+import ru.volgadev.common.observeOnce
+import ru.volgadev.pincode_bubble.PinCodeBubbleAlertDialog
 
 class CabinetFragment : Fragment(R.layout.cabinet_fragment) {
 
@@ -37,12 +41,13 @@ class CabinetFragment : Fragment(R.layout.cabinet_fragment) {
                         viewModel.marketCategories.value?.first { category -> category.category.name == categoryName }
                     clickedCategory?.let { category ->
                         logger.debug("On click category $category")
-                        viewModel.onClickCategory(category)
+                        if (!category.isFree && !category.isPaid) {
+                            checkCorrectPayment(category)
+                        }
                     }
                 }
             })
         }
-
 
         contentRecyclerView.run {
             layoutManager = LinearLayoutManager(
@@ -64,6 +69,32 @@ class CabinetFragment : Fragment(R.layout.cabinet_fragment) {
             categoriesAdapter.setData(categories)
         })
     }
+
+    @MainThread
+    private fun checkCorrectPayment(marketCategory: MarketCategory){
+        logger.debug("checkCorrectPayment()")
+        val activity = this@CabinetFragment.requireActivity()
+        PinCodeBubbleAlertDialog(
+            activity = activity,
+            title = "Сначала ответьте на вопрос",
+            question = "Дважды два",
+            answers = listOf("4", "четыре", "Четыре"),
+            hideNavigationBar = true
+        ).showForResult().observeOnce { isCorrectAnswer ->
+            if (isCorrectAnswer) {
+                logger.debug("correct answer")
+                viewModel.onReadyToPayment(marketCategory)
+            } else {
+                logger.debug("incorrect answer")
+                Toast.makeText(
+                    activity,
+                    getString(R.string.false_answer),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
 
     override fun onResume() {
         super.onResume()
