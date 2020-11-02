@@ -33,7 +33,7 @@ class ArticleCardAdapter :
 
     private val logger = Logger.get("ArticleCardAdapter")
 
-    private val articleList = ArrayList<Article>()
+    private var articleList = ArrayList<Article>()
 
     @AnyThread
     fun setData(dataset: Collection<Article>) {
@@ -42,17 +42,10 @@ class ArticleCardAdapter :
         if (articleList.isNotEmpty()) {
             val length = articleList.size
             articleList.clear()
-            (0..length).iterator().forEach { index ->
-                notifyItemRemoved(index)
-            }
-            // notifyDataSetChanged()
+            notifyItemRangeRemoved(0, length);
         }
-        dataset.forEachIndexed { index, article ->
-            articleList.add(article)
-            notifyItemChanged(index)
-        }
-        // notifyItemRangeInserted(0, articleList.size)
-        // notifyDataSetChanged()
+        articleList = ArrayList(dataset)
+        notifyItemRangeInserted(0, articleList.size)
     }
 
     override fun onCreateViewHolder(
