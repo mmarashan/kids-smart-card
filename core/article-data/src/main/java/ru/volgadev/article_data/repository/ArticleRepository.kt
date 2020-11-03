@@ -10,11 +10,9 @@ import ru.volgadev.common.DataResult
 @WorkerThread
 interface ArticleRepository {
 
-    suspend fun updateArticles()
-
-    fun articles(): Flow<ArrayList<Article>>
-
     fun categories(): Flow<ArrayList<ArticleCategory>>
+
+    suspend fun getCategoryArticles(category: ArticleCategory): List<Article>
 
     suspend fun getArticle(id: Long): Article?
 

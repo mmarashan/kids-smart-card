@@ -1,9 +1,6 @@
 package ru.volgadev.article_data.model
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.Index
-import androidx.room.PrimaryKey
+import androidx.room.*
 
 @Entity
 data class Article(
@@ -51,4 +48,7 @@ data class ArticleCategory(
     val iconUrl: String? = null,
     val fileUrl: String,
     val marketItemId: String? = null
-)
+) {
+    @Ignore
+    val isFree = marketItemId == null
+}

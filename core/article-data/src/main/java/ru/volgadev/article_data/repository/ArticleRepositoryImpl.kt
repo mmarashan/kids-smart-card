@@ -10,11 +10,11 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.volgadev.article_data.api.ArticleBackendApi
-import ru.volgadev.article_data.storage.ArticleDatabase
 import ru.volgadev.article_data.model.Article
 import ru.volgadev.article_data.model.ArticleCategory
 import ru.volgadev.article_data.model.ArticlePage
 import ru.volgadev.article_data.storage.ArticleCategoriesDatabase
+import ru.volgadev.article_data.storage.ArticleDatabase
 import ru.volgadev.common.DataResult
 import ru.volgadev.common.ErrorResult
 import ru.volgadev.common.SuccessResult
@@ -38,66 +38,101 @@ class ArticleRepositoryImpl(
         ArticleCategoriesDatabase.getInstance(context)
     }
 
-
-    override fun articles(): Flow<ArrayList<Article>> = articleChannel.asFlow()
     override fun categories(): Flow<ArrayList<ArticleCategory>> = categoriesChannel.asFlow()
+
+    @Volatile
+    private var isUpdated = false
+
+    init {
+        logger.debug("init")
+        CoroutineScope(Dispatchers.Default).launch {
+            logger.debug("loadData..")
+            try {
+                loadFromServer()
+            } catch (e: ConnectException) {
+                logger.error("Exception when load from server $e")
+                loadFromDB()
+            }
+        }
+    }
 
     override suspend fun getArticle(id: Long): Article? = withContext(Dispatchers.Default) {
         logger.debug("Get article with id $id")
-        val articles = articleChannel.value
-        return@withContext articles.first { article -> article.id == id }
+        updateIfNotUpdated()
+        return@withContext articleChannel.value.first { article -> article.id == id }
     }
 
-    init {
-        logger.debug("Init")
-        CoroutineScope(Dispatchers.Default).launch {
-            updateArticles()
+    override suspend fun getCategoryArticles(category: ArticleCategory): List<Article> =
+        withContext(Dispatchers.Default) {
+            logger.debug("getCategoryArticles(${category.name})")
+            logger.debug("Articles(${articleChannel.value.joinToString(",")})")
+            updateIfNotUpdated()
+            val categoryArticles =
+                articleChannel.value.filter { article -> article.categoryId == category.id }
+            logger.debug("getCategoryArticles(${category.name}) - ${categoryArticles.size} articles")
+            return@withContext categoryArticles
         }
-    }
 
-    @WorkerThread
-    override suspend fun updateArticles() {
+    @Throws(ConnectException::class)
+    private suspend fun updateCategoriesFromApi(): List<ArticleCategory> =
+        withContext(Dispatchers.IO) {
+            val categories = articleBackendApi.getCategories()
+            categoriesDb.dao().insertAll(*categories.toTypedArray())
+            return@withContext categories
+        }
+
+    @Throws(ConnectException::class)
+    private suspend fun updateArticlesFromApi(categories: List<ArticleCategory>): List<Article> =
+        withContext(Dispatchers.IO) {
+            logger.debug("updateArticlesFromApi()")
+            val articles = ArrayList<Article>()
+            categories.forEach { category ->
+                val categoryArticles = articleBackendApi.getArticles(category)
+                logger.debug("Load ${categoryArticles.size} articles from category ${category.name}")
+                articlesDb.dao().insertAll(*categoryArticles.toTypedArray())
+                articles.addAll(categoryArticles)
+            }
+            return@withContext articles
+        }
+
+    private suspend fun updateIfNotUpdated() {
+        if (isUpdated) return
         try {
-            logger.debug("Try to update data")
-            updateArticlesFromApi()
-            updateCategoriesFromApi()
+            loadFromServer()
         } catch (e: ConnectException) {
-            logger.error("Exception when update article $e")
-            logger.debug("Load data from DB")
-            loadFromDB()
+            logger.error("Exception when load from server $e")
         }
     }
 
     @Throws(ConnectException::class)
-    private suspend fun updateArticlesFromApi() = withContext(Dispatchers.IO) {
-        val newArticles = articleBackendApi.getUpdates(System.currentTimeMillis())
-        articlesDb.dao().insertAll(*newArticles.toTypedArray())
-        articleChannel.offer(ArrayList(newArticles))
-    }
-
-    @Throws(ConnectException::class)
-    private suspend fun updateCategoriesFromApi() = withContext(Dispatchers.IO) {
-        val categories = articleBackendApi.getCategories()
-        categoriesDb.dao().insertAll(*categories.toTypedArray())
+    private suspend fun loadFromServer() {
+        logger.debug("loadFromServer()")
+        val categories = updateCategoriesFromApi()
+        val articles = updateArticlesFromApi(categories)
+        isUpdated = true
+        logger.debug("loadFromServer() OK")
         categoriesChannel.offer(ArrayList(categories))
+        articleChannel.offer(ArrayList(articles))
     }
 
     private suspend fun loadFromDB() = withContext(Dispatchers.Default) {
         val articles = articlesDb.dao().getAll()
-        logger.debug("Load ${articles.size} entities from Db")
+        val categories = categoriesDb.dao().getAll()
+        logger.debug("Load ${categories.size} categories and ${articles.size} articles from Db")
         articleChannel.offer(ArrayList(articles))
+        categoriesChannel.offer(ArrayList(categories))
     }
 
     @WorkerThread
-    override suspend fun getArticlePages(article: Article): DataResult<List<ArticlePage>> = withContext(Dispatchers.IO) {
-        try {
-            logger.debug("getArticlePages(${article.id})")
-            val newArticles = articleBackendApi.getArticlePages(article)
-            logger.debug("${newArticles.size} pages")
-            return@withContext SuccessResult(newArticles)
-        } catch (e: Exception) {
-            return@withContext ErrorResult(e)
+    override suspend fun getArticlePages(article: Article): DataResult<List<ArticlePage>> =
+        withContext(Dispatchers.IO) {
+            try {
+                logger.debug("getArticlePages(${article.id})")
+                val newArticles = articleBackendApi.getArticlePages(article)
+                logger.debug("${newArticles.size} pages")
+                return@withContext SuccessResult(newArticles)
+            } catch (e: Exception) {
+                return@withContext ErrorResult(e)
+            }
         }
-    }
-
 }

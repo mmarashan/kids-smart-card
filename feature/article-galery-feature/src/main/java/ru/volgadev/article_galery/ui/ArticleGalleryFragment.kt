@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import jp.wasabeef.recyclerview.animators.LandingAnimator
+import jp.wasabeef.recyclerview.animators.SlideInDownAnimator
 import kotlinx.android.synthetic.main.main_fragment.*
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import ru.volgadev.article_data.model.Article
@@ -111,14 +112,17 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
             setOnItemClickListener(object : TagsAdapter.OnItemClickListener {
                 override fun onClick(item: String, clickedView: CardView) {
                     logger.debug("on click $item")
-                    viewModel.onClickCategory(item)
+                    val category = viewModel.categories.value?.first { c -> c.name == item }
+                    category?.let { cat ->
+                        viewModel.onClickCategory(cat)
+                    }
                 }
             })
         }
 
         viewModel.currentCategory.observe(viewLifecycleOwner, Observer { category ->
-            logger.debug("Set category $category")
-            categoryTagsAdapter.onChose(category)
+            logger.debug("Set category ${category.id}")
+            categoryTagsAdapter.onChose(category.name)
         })
 
         categoryRecyclerView.run {
@@ -136,13 +140,14 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
                     setDrawable(dividerDrawable)
                 }
             addItemDecoration(dividerDecorator)
-            itemAnimator = null
+            itemAnimator = SlideInDownAnimator()
         }
 
         viewModel.categories.observe(viewLifecycleOwner, Observer { categories ->
+            logger.debug("On load categories: ${categories.size}")
             val categoryNames = categories.map { category -> category.name }
             categoryTagsAdapter.setData(categoryNames)
-            categoryNames.firstOrNull()?.let { firstCategory ->
+            categories.firstOrNull()?.let { firstCategory ->
                 viewModel.onClickCategory(firstCategory)
             }
         })
