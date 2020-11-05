@@ -89,15 +89,10 @@ internal class PaymentManagerImpl(
     }
 
     override fun isAvailable(): Boolean {
-        logger.debug("init()")
+        logger.debug("isAvailable()")
         val isAvailable = BillingProcessor.isIabServiceAvailable(context)
         logger.debug("BillingProcessor.isAvailable = $isAvailable")
-        return if (!isAvailable) {
-            false
-        } else {
-            billingProcessor.initialize()
-            true
-        }
+        return isAvailable
     }
 
     override fun requestPayment(
