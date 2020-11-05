@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import ru.volgadev.article_data.model.ArticleCategory
 import ru.volgadev.common.log.Logger
 
 class CategoryCardAdapter :
@@ -26,10 +27,10 @@ class CategoryCardAdapter :
 
     private val logger = Logger.get("MarketCategoryCardAdapter")
 
-    private var categoryList = ArrayList<MarketCategory>()
+    private var categoryList = ArrayList<ArticleCategory>()
 
     @AnyThread
-    fun setData(dataset: Collection<MarketCategory>) {
+    fun setData(dataset: Collection<ArticleCategory>) {
         logger.debug("Set dataset with ${dataset.size} members")
 
         if (categoryList.isNotEmpty()) {
@@ -73,8 +74,7 @@ class CategoryCardAdapter :
         private val image: ImageView = card.findViewById(R.id.categoryImage)
         private val description: TextView = card.findViewById(R.id.categoryDescription)
 
-        fun bind(marketCategory: MarketCategory) {
-            val category = marketCategory.category
+        fun bind(category: ArticleCategory) {
             val holder = this
             card.tag = category.name
             val image = holder.image
@@ -88,9 +88,9 @@ class CategoryCardAdapter :
                     .into(image)
             }
 
-            paymentStatus.isVisible = !marketCategory.isFree
+            paymentStatus.isVisible = !category.isFree
 
-            if (!marketCategory.isFree && !marketCategory.isPaid) {
+            if (!category.isFree && !category.isPaid) {
                 paymentStatus.setImageResource(R.drawable.ic_baseline_lock_24)
             } else {
                 paymentStatus.setImageResource(R.drawable.ic_baseline_star_24)

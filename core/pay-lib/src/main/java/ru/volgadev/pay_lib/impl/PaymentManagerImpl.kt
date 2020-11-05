@@ -56,7 +56,9 @@ internal class PaymentManagerImpl(
         context,
         googlePlayLicenseKey,
         billingHandler
-    )
+    ).apply {
+        initialize()
+    }
 
     private var resultListener: PaymentResultListener? = null
 
@@ -86,7 +88,7 @@ internal class PaymentManagerImpl(
         ownedSubscriptionChannel.offer(ownedSubscriptions)
     }
 
-    override fun init(): Boolean {
+    override fun isAvailable(): Boolean {
         logger.debug("init()")
         val isAvailable = BillingProcessor.isIabServiceAvailable(context)
         logger.debug("BillingProcessor.isAvailable = $isAvailable")

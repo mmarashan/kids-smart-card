@@ -18,7 +18,7 @@ interface ArticleChannelsDao {
     fun delete(user: ArticleCategory)
 }
 
-@Database(entities = [ArticleCategory::class], version = 1)
+@Database(entities = [ArticleCategory::class], version = 2)
 abstract class ArticleCategoriesDatabase : RoomDatabase() {
 
     abstract fun dao(): ArticleChannelsDao

@@ -18,61 +18,13 @@ class CabinetViewModel(
 
     private val logger = Logger.get("CabinetViewModel")
 
-    private val categories: LiveData<List<ArticleCategory>> =
-        articleRepository.categories().asLiveData()
-
-    private val payedCategoriesItemIds: LiveData<List<String>> =
-        paymentManager.ownedProductsFlow().asLiveData().map { detailsList ->
-            val productIds: List<String> = detailsList.map { skuDetails -> skuDetails.productId }
-            return@map productIds
-        }.distinctUntilChanged()
-
-    val marketCategories = MediatorLiveData<List<MarketCategory>>().apply {
-        var _categories: ArrayList<ArticleCategory>? = null
-        var _payedIds: HashSet<String>? = null
-
-        fun checkMergeData() {
-            logger.debug("checkMergeData()")
-            val categories = _categories
-            val payedIds = _payedIds
-            logger.debug("categories = ${categories?.joinToString(",")}")
-            logger.debug("payedIds = ${payedIds?.joinToString(",")}")
-            if (categories != null && payedIds != null) {
-                val marketCategoriesList = ArrayList<MarketCategory>()
-                categories.forEach { category ->
-                    val isPayed = payedIds.contains(category.marketItemId)
-                    val isFree = category.marketItemId.isNullOrEmpty()
-                    val marketCategory = MarketCategory(category, isFree, isPayed)
-                    marketCategoriesList.add(marketCategory)
-                }
-                this.postValue(marketCategoriesList)
-            }
-        }
-
-        addSource(categories) { catagoriesList ->
-            _categories = ArrayList<ArticleCategory>().apply {
-                addAll(catagoriesList)
-            }
-            checkMergeData()
-        }
-        addSource(payedCategoriesItemIds) { payedItemIds ->
-            _payedIds = HashSet<String>().apply {
-                addAll(payedItemIds)
-            }
-            checkMergeData()
-        }
-    }
-
-    init {
-        paymentManager.init()
-    }
+    val categories: LiveData<List<ArticleCategory>> = articleRepository.categories().asLiveData()
 
     @MainThread
-    fun onReadyToPayment(marketCategory: MarketCategory) {
-        val category = marketCategory.category
+    fun onReadyToPayment(category: ArticleCategory) {
         logger.debug("onClickCategory ${category.name}")
         val itemId = category.marketItemId
-        if (itemId != null && !marketCategory.isPaid) {
+        if (itemId != null && !category.isPaid) {
             logger.debug("Start payment for $itemId")
             val paymentRequest = PaymentRequest(
                 itemId = itemId,

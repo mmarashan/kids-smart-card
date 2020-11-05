@@ -30,10 +30,12 @@ class ArticleGalleryViewModel(
 
     val audioToPlay = LiveEvent<MusicTrack>()
 
-    val categories = articleRepository.categories().asLiveData()
+    val availableCategories = articleRepository.categories().asLiveData().map { categories ->
+        return@map categories.filter { category -> category.isFree || category.isPaid }
+    }
 
     init {
-        categories.observeOnce { categories ->
+        availableCategories.observeOnce { categories ->
             categories.firstOrNull()?.let { c ->
                 _category.postValue(c)
             }

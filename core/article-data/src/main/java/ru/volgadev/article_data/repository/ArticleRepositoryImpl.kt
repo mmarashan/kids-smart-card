@@ -2,13 +2,12 @@ package ru.volgadev.article_data.repository
 
 import android.content.Context
 import androidx.annotation.WorkerThread
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import com.anjlab.android.iab.v3.SkuDetails
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import ru.volgadev.article_data.api.ArticleBackendApi
 import ru.volgadev.article_data.model.Article
 import ru.volgadev.article_data.model.ArticleCategory
@@ -19,11 +18,14 @@ import ru.volgadev.common.DataResult
 import ru.volgadev.common.ErrorResult
 import ru.volgadev.common.SuccessResult
 import ru.volgadev.common.log.Logger
+import ru.volgadev.pay_lib.PaymentManager
 import java.net.ConnectException
 
+@InternalCoroutinesApi
 class ArticleRepositoryImpl(
     private val context: Context,
-    private val articleBackendApi: ArticleBackendApi
+    private val articleBackendApi: ArticleBackendApi,
+    private val paymentManager: PaymentManager
 ) : ArticleRepository {
 
     private val logger = Logger.get("ArticleRepositoryImpl")
@@ -43,6 +45,10 @@ class ArticleRepositoryImpl(
     @Volatile
     private var isUpdated = false
 
+    @Volatile
+    private var ownedProductIds: List<String> = ArrayList()
+    private var categories = ArrayList<ArticleCategory>()
+
     init {
         logger.debug("init")
         CoroutineScope(Dispatchers.Default).launch {
@@ -53,6 +59,15 @@ class ArticleRepositoryImpl(
                 logger.error("Exception when load from server $e")
                 loadFromDB()
             }
+        }
+
+        CoroutineScope(Dispatchers.Default).launch {
+            paymentManager.ownedProductsFlow().collect(object : FlowCollector<ArrayList<SkuDetails>>{
+                override suspend fun emit(value: ArrayList<SkuDetails>) {
+                    ownedProductIds = value.map { skuDetails -> skuDetails.productId }
+                    updatePayedCategories(categories, ownedProductIds)
+                }
+            })
         }
     }
 
@@ -111,16 +126,18 @@ class ArticleRepositoryImpl(
         val articles = updateArticlesFromApi(categories)
         isUpdated = true
         logger.debug("loadFromServer() OK")
-        categoriesChannel.offer(ArrayList(categories))
+        this.categories = ArrayList(categories)
+        updatePayedCategories(this.categories, ownedProductIds)
         articleChannel.offer(ArrayList(articles))
     }
 
     private suspend fun loadFromDB() = withContext(Dispatchers.Default) {
         val articles = articlesDb.dao().getAll()
-        val categories = categoriesDb.dao().getAll()
+        val dbCategories = categoriesDb.dao().getAll()
         logger.debug("Load ${categories.size} categories and ${articles.size} articles from Db")
         articleChannel.offer(ArrayList(articles))
-        categoriesChannel.offer(ArrayList(categories))
+        categories = ArrayList(dbCategories)
+        updatePayedCategories(categories, ownedProductIds)
     }
 
     @WorkerThread
@@ -135,4 +152,15 @@ class ArticleRepositoryImpl(
                 return@withContext ErrorResult(e)
             }
         }
+
+    private fun updatePayedCategories(categories: ArrayList<ArticleCategory>, payedIds: List<String>){
+        logger.debug("updatePayedCategories(${categories.size}, ${payedIds.size})")
+        logger.debug("categories = ${categories.joinToString(",")}")
+        logger.debug("payedIds = ${payedIds.joinToString(",")}")
+        categories.forEach { category ->
+            val isPayed = payedIds.contains(category.marketItemId)
+            category.isPaid = isPayed
+        }
+        categoriesChannel.offer(ArrayList(categories))
+    }
 }

@@ -8,7 +8,7 @@ import ru.volgadev.pay_lib.impl.BillingProcessorActivity
 
 interface PaymentManager {
 
-    fun init(): Boolean
+    fun isAvailable(): Boolean
 
     fun requestPayment(
         paymentRequest: PaymentRequest,
