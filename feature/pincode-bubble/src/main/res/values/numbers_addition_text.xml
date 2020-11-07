@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="numbers_addition_question">Get result of %1$d plus %2$d</string>
+</resources>

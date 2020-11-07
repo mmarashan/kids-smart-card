@@ -16,6 +16,7 @@ import ru.volgadev.common.BackgroundMediaPlayer
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.observeOnce
 import ru.volgadev.pincode_bubble.PinCodeBubbleAlertDialog
+import ru.volgadev.pincode_bubble.quizgenerator.NumbersAdditionQuizGenerator
 
 class CabinetFragment : Fragment(R.layout.cabinet_fragment) {
 
@@ -70,14 +71,13 @@ class CabinetFragment : Fragment(R.layout.cabinet_fragment) {
     }
 
     @MainThread
-    private fun checkCorrectPayment(marketCategory: ArticleCategory){
+    private fun checkCorrectPayment(marketCategory: ArticleCategory) {
         logger.debug("checkCorrectPayment()")
         val activity = this@CabinetFragment.requireActivity()
-        PinCodeBubbleAlertDialog(
+        PinCodeBubbleAlertDialog.create(
             activity = activity,
             title = "Сначала ответьте на вопрос",
-            question = "Дважды два",
-            answers = listOf("4", "четыре", "Четыре"),
+            NumbersAdditionQuizGenerator::class.java,
             hideNavigationBar = true
         ).showForResult().observeOnce { isCorrectAnswer ->
             if (isCorrectAnswer) {

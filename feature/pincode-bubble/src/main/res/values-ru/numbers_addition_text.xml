@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="numbers_addition_question">Сколько будет %1$d плюс %2$d</string>
+</resources>

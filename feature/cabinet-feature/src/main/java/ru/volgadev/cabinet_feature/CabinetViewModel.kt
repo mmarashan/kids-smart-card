@@ -34,11 +34,11 @@ class CabinetViewModel(
                 description = category.description,
                 imageUrl = category.iconUrl
             )
-            viewModelScope.launch(Dispatchers.Default) {
+            viewModelScope.launch {
                 articleRepository.requestPaymentForCategory(paymentRequest)
             }
         } else {
-            viewModelScope.launch(Dispatchers.Default) {
+            viewModelScope.launch {
                 if (itemId != null && BuildConfig.DEBUG) {
                     logger.debug("debug consume purchase $itemId")
                     articleRepository.consumePurchase(itemId)
