@@ -73,12 +73,12 @@ class ArticleCardAdapter :
             }
         }
 
-        private val cardArticleView: CardView = card.findViewById<CardView>(R.id.cardArticleView)
-        private val author: TextView = card.findViewById<TextView>(R.id.cardAuthor)
-        private val title: TextView = card.findViewById<TextView>(R.id.cardTitle)
-        private val image: ImageView = card.findViewById<ImageView>(R.id.cardImage)
+        private val cardArticleView = card.findViewById<CardView>(R.id.cardArticleView)
+        private val author = card.findViewById<TextView>(R.id.cardAuthor)
+        private val title = card.findViewById<TextView>(R.id.cardTitle)
+        private val image = card.findViewById<ImageView>(R.id.cardImage)
 
-        private val tagsRecyclerView: RecyclerView =
+        private val tagsRecyclerView =
             card.findViewById<RecyclerView>(R.id.cardTagsRecyclerView)
         private val tagsAdapter = TagsAdapter(R.layout.card_tag)
 
