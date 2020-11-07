@@ -6,6 +6,9 @@ import ru.volgadev.article_data.model.Article
 import ru.volgadev.article_data.model.ArticleCategory
 import ru.volgadev.article_data.model.ArticlePage
 import ru.volgadev.common.DataResult
+import ru.volgadev.pay_lib.PaymentRequest
+import ru.volgadev.pay_lib.PaymentResultListener
+import ru.volgadev.pay_lib.impl.BillingProcessorActivity
 
 @WorkerThread
 interface ArticleRepository {
@@ -17,4 +20,8 @@ interface ArticleRepository {
     suspend fun getArticle(id: Long): Article?
 
     suspend fun getArticlePages(article: Article): DataResult<List<ArticlePage>>
+
+    suspend fun requestPaymentForCategory(paymentRequest: PaymentRequest)
+
+    suspend fun consumePurchase(itemId: String): Boolean
 }

@@ -1,19 +1,20 @@
 package ru.volgadev.cabinet_feature
 
 import androidx.annotation.MainThread
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import ru.volgadev.article_data.model.ArticleCategory
 import ru.volgadev.article_data.repository.ArticleRepository
 import ru.volgadev.common.log.Logger
-import ru.volgadev.pay_lib.PaymentManager
 import ru.volgadev.pay_lib.PaymentRequest
-import ru.volgadev.pay_lib.PaymentResultListener
 import ru.volgadev.pay_lib.PaymentType
-import ru.volgadev.pay_lib.impl.DefaultPaymentActivity
 
 class CabinetViewModel(
-    private val articleRepository: ArticleRepository,
-    private val paymentManager: PaymentManager
+    private val articleRepository: ArticleRepository
 ) : ViewModel() {
 
     private val logger = Logger.get("CabinetViewModel")
@@ -22,7 +23,7 @@ class CabinetViewModel(
 
     @MainThread
     fun onReadyToPayment(category: ArticleCategory) {
-        logger.debug("onClickCategory ${category.name}")
+        logger.debug("onReadyToPayment ${category.name}")
         val itemId = category.marketItemId
         if (itemId != null && !category.isPaid) {
             logger.debug("Start payment for $itemId")
@@ -33,23 +34,21 @@ class CabinetViewModel(
                 description = category.description,
                 imageUrl = category.iconUrl
             )
-            paymentManager.requestPayment(paymentRequest,
-                DefaultPaymentActivity::class.java,
-                object : PaymentResultListener {
-
-                }
-            )
+            viewModelScope.launch(Dispatchers.Default) {
+                articleRepository.requestPaymentForCategory(paymentRequest)
+            }
         } else {
-            if (itemId != null && BuildConfig.DEBUG){
-                logger.debug("debug consume purchase $itemId")
-                paymentManager.consumePurchase(itemId)
+            viewModelScope.launch(Dispatchers.Default) {
+                if (itemId != null && BuildConfig.DEBUG) {
+                    logger.debug("debug consume purchase $itemId")
+                    articleRepository.consumePurchase(itemId)
+                }
             }
         }
     }
 
     override fun onCleared() {
         logger.debug("onCleared()")
-        paymentManager.dispose()
         super.onCleared()
     }
 }

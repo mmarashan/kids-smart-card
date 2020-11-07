@@ -19,6 +19,10 @@ import ru.volgadev.common.ErrorResult
 import ru.volgadev.common.SuccessResult
 import ru.volgadev.common.log.Logger
 import ru.volgadev.pay_lib.PaymentManager
+import ru.volgadev.pay_lib.PaymentRequest
+import ru.volgadev.pay_lib.PaymentResultListener
+import ru.volgadev.pay_lib.RequestPaymentResult
+import ru.volgadev.pay_lib.impl.DefaultPaymentActivity
 import java.net.ConnectException
 
 @InternalCoroutinesApi
@@ -62,12 +66,14 @@ class ArticleRepositoryImpl(
         }
 
         CoroutineScope(Dispatchers.Default).launch {
-            paymentManager.ownedProductsFlow().collect(object : FlowCollector<ArrayList<SkuDetails>>{
-                override suspend fun emit(value: ArrayList<SkuDetails>) {
-                    ownedProductIds = value.map { skuDetails -> skuDetails.productId }
-                    updatePayedCategories(categories, ownedProductIds)
-                }
-            })
+            paymentManager.ownedProductsFlow()
+                .collect(object : FlowCollector<ArrayList<SkuDetails>> {
+                    override suspend fun emit(value: ArrayList<SkuDetails>) {
+                        logger.debug("New owned product list: ${value.size} categories")
+                        ownedProductIds = value.map { skuDetails -> skuDetails.productId }
+                        updatePayedCategories(categories, ownedProductIds)
+                    }
+                })
         }
     }
 
@@ -153,7 +159,10 @@ class ArticleRepositoryImpl(
             }
         }
 
-    private fun updatePayedCategories(categories: ArrayList<ArticleCategory>, payedIds: List<String>){
+    private fun updatePayedCategories(
+        categories: ArrayList<ArticleCategory>,
+        payedIds: List<String>
+    ) {
         logger.debug("updatePayedCategories(${categories.size}, ${payedIds.size})")
         logger.debug("categories = ${categories.joinToString(",")}")
         logger.debug("payedIds = ${payedIds.joinToString(",")}")
@@ -162,5 +171,23 @@ class ArticleRepositoryImpl(
             category.isPaid = isPayed
         }
         categoriesChannel.offer(ArrayList(categories))
+    }
+
+    override suspend fun requestPaymentForCategory(paymentRequest: PaymentRequest) =
+        withContext(Dispatchers.Default) {
+            logger.debug("requestPaymentForCategory($paymentRequest)")
+            paymentManager.requestPayment(paymentRequest,
+                DefaultPaymentActivity::class.java,
+                object : PaymentResultListener {
+                    override fun onResult(result: RequestPaymentResult) {
+                        logger.debug("PaymentResultListener.onResult $result")
+                    }
+                }
+            )
+        }
+
+    override suspend fun consumePurchase(itemId: String): Boolean = withContext(Dispatchers.Default) {
+        logger.debug("consumePurchase $itemId")
+        paymentManager.consumePurchase(itemId)
     }
 }

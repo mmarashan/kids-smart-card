@@ -28,6 +28,7 @@ internal class PaymentManagerImpl(
         override fun onProductPurchased(productId: String, details: TransactionDetails?) {
             logger.debug("onProductPurchased($productId)")
             resultListener?.onResult(RequestPaymentResult.SUCCESS_PAYMENT)
+            resultListener = null
             updateOwnedItems()
         }
 
@@ -44,6 +45,7 @@ internal class PaymentManagerImpl(
                 resultListener?.onResult(RequestPaymentResult.USER_CANCELED)
             }
             resultListener?.onResult(RequestPaymentResult.PAYMENT_ERROR)
+            resultListener = null
         }
 
         override fun onBillingInitialized() {
@@ -132,6 +134,7 @@ internal class PaymentManagerImpl(
         logger.debug("consumePurchase($itemId)")
         val consumptionResult = billingProcessor.consumePurchase(itemId)
         logger.debug("consumptionResult=$consumptionResult")
+        if (consumptionResult) updateOwnedItems()
         return consumptionResult
     }
 
@@ -142,6 +145,7 @@ internal class PaymentManagerImpl(
 
     override fun dispose() {
         logger.debug("dispose()")
+        resultListener = null
         billingProcessor.release()
     }
 }

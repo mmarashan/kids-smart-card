@@ -48,6 +48,7 @@ open class BillingProcessorActivity : AppCompatActivity() {
         if (!billingProcessor.handleActivityResult(requestCode, resultCode, data)) {
             super.onActivityResult(requestCode, resultCode, data)
         }
+        finish()
     }
 
     companion object {
