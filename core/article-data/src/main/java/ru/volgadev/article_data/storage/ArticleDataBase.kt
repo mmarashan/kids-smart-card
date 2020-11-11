@@ -23,10 +23,10 @@ interface ArticleDao {
     fun delete(user: Article)
 
     @Query("SELECT EXISTS(SELECT * FROM article WHERE id = :id)")
-    fun isRowIsExist(id : Int) : Boolean
+    fun isRowIsExist(id: Int): Boolean
 }
 
-@Database(entities = [Article::class], version = 1)
+@Database(entities = [Article::class], version = 2)
 @TypeConverters(ListStringConverter::class, ArticleTypeConverter::class)
 abstract class ArticleDatabase : RoomDatabase() {
 
@@ -62,7 +62,7 @@ private class ListStringConverter {
 
     @TypeConverter
     fun to(data: String): List<String> {
-        return data.split(DELIMITER)
+        return if (data.isEmpty()) listOf() else data.split(DELIMITER)
     }
 }
 

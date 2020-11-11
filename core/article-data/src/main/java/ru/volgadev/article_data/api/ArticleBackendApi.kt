@@ -7,7 +7,7 @@ import ru.volgadev.article_data.model.ArticlePage
 
 @WorkerThread
 interface ArticleBackendApi {
-    fun getUpdates(lastUpdateTime: Long): List<Article>
-    fun getArticlePages(article: Article): List<ArticlePage>
     fun getCategories(): List<ArticleCategory>
+    fun getArticles(category: ArticleCategory): List<Article>
+    fun getArticlePages(article: Article): List<ArticlePage>
 }

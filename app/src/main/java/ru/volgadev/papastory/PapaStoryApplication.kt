@@ -1,6 +1,7 @@
 package ru.volgadev.papastory
 
 import android.app.Application
+import kotlinx.coroutines.InternalCoroutinesApi
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -24,6 +25,7 @@ import ru.volgadev.music_data.repository.MusicRepositoryImpl
 import ru.volgadev.pay_lib.PaymentManager
 import ru.volgadev.pay_lib.PaymentManagerFactory
 
+@InternalCoroutinesApi
 class PapaStoryApplication : Application() {
 
     private val logger = Logger.get("PapaStoryApplication")
@@ -36,7 +38,8 @@ class PapaStoryApplication : Application() {
         single<ArticleRepository> {
             ArticleRepositoryImpl(
                 context = get(),
-                articleBackendApi = get()
+                articleBackendApi = get(),
+                paymentManager = get()
             )
         }
         single<ArticleBackendApi> { ArticleBackendApiImpl() }
@@ -54,7 +57,7 @@ class PapaStoryApplication : Application() {
             ArticlePageViewModel(get(), get())
         }
         viewModel {
-            CabinetViewModel(get(), get())
+            CabinetViewModel(get())
         }
     }
 

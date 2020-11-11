@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.View
 import android.view.animation.OvershootInterpolator
 import android.widget.Toast
-import androidx.annotation.AnyThread
 import androidx.annotation.MainThread
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -17,6 +16,7 @@ import ru.volgadev.common.BackgroundMediaPlayer
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.observeOnce
 import ru.volgadev.pincode_bubble.PinCodeBubbleAlertDialog
+import ru.volgadev.pincode_bubble.quizgenerator.NumbersAdditionQuizGenerator
 
 class CabinetFragment : Fragment(R.layout.cabinet_fragment) {
 
@@ -38,10 +38,10 @@ class CabinetFragment : Fragment(R.layout.cabinet_fragment) {
             setOnItemClickListener(object : CategoryCardAdapter.OnItemClickListener {
                 override fun onClick(categoryName: String, clickedView: View) {
                     val clickedCategory =
-                        viewModel.marketCategories.value?.first { category -> category.category.name == categoryName }
+                        viewModel.categories.value?.first { category -> category.name == categoryName }
                     clickedCategory?.let { category ->
                         logger.debug("On click category $category")
-                        if (!category.isFree && !category.isPaid) {
+                        if (!category.isFree && (!category.isPaid || BuildConfig.DEBUG)) {
                             checkCorrectPayment(category)
                         }
                     }
@@ -64,21 +64,20 @@ class CabinetFragment : Fragment(R.layout.cabinet_fragment) {
             }
         }
 
-        viewModel.marketCategories.observe(viewLifecycleOwner, Observer { categories ->
+        viewModel.categories.observe(viewLifecycleOwner, Observer { categories ->
             logger.debug("Set new market categories ${categories.joinToString(",")} ")
             categoriesAdapter.setData(categories)
         })
     }
 
     @MainThread
-    private fun checkCorrectPayment(marketCategory: MarketCategory){
+    private fun checkCorrectPayment(marketCategory: ArticleCategory) {
         logger.debug("checkCorrectPayment()")
         val activity = this@CabinetFragment.requireActivity()
-        PinCodeBubbleAlertDialog(
+        PinCodeBubbleAlertDialog.create(
             activity = activity,
             title = "Сначала ответьте на вопрос",
-            question = "Дважды два",
-            answers = listOf("4", "четыре", "Четыре"),
+            NumbersAdditionQuizGenerator::class.java,
             hideNavigationBar = true
         ).showForResult().observeOnce { isCorrectAnswer ->
             if (isCorrectAnswer) {

@@ -28,6 +28,7 @@ internal class PaymentManagerImpl(
         override fun onProductPurchased(productId: String, details: TransactionDetails?) {
             logger.debug("onProductPurchased($productId)")
             resultListener?.onResult(RequestPaymentResult.SUCCESS_PAYMENT)
+            resultListener = null
             updateOwnedItems()
         }
 
@@ -44,6 +45,7 @@ internal class PaymentManagerImpl(
                 resultListener?.onResult(RequestPaymentResult.USER_CANCELED)
             }
             resultListener?.onResult(RequestPaymentResult.PAYMENT_ERROR)
+            resultListener = null
         }
 
         override fun onBillingInitialized() {
@@ -56,7 +58,9 @@ internal class PaymentManagerImpl(
         context,
         googlePlayLicenseKey,
         billingHandler
-    )
+    ).apply {
+        initialize()
+    }
 
     private var resultListener: PaymentResultListener? = null
 
@@ -86,16 +90,11 @@ internal class PaymentManagerImpl(
         ownedSubscriptionChannel.offer(ownedSubscriptions)
     }
 
-    override fun init(): Boolean {
-        logger.debug("init()")
+    override fun isAvailable(): Boolean {
+        logger.debug("isAvailable()")
         val isAvailable = BillingProcessor.isIabServiceAvailable(context)
         logger.debug("BillingProcessor.isAvailable = $isAvailable")
-        return if (!isAvailable) {
-            false
-        } else {
-            billingProcessor.initialize()
-            true
-        }
+        return isAvailable
     }
 
     override fun requestPayment(
@@ -135,6 +134,7 @@ internal class PaymentManagerImpl(
         logger.debug("consumePurchase($itemId)")
         val consumptionResult = billingProcessor.consumePurchase(itemId)
         logger.debug("consumptionResult=$consumptionResult")
+        if (consumptionResult) updateOwnedItems()
         return consumptionResult
     }
 
@@ -145,6 +145,7 @@ internal class PaymentManagerImpl(
 
     override fun dispose() {
         logger.debug("dispose()")
+        resultListener = null
         billingProcessor.release()
     }
 }

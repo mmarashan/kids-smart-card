@@ -18,15 +18,15 @@ class ArticleBackendApiImpl : ArticleBackendApi {
     private val logger = Logger.get("ArticleBackendApiImpl")
 
     private companion object {
-        const val ARTICLES_BACKEND_URL = "$BACKEND_URL/articles.json"
         const val ARTICLE_PAGES_BACKEND_URL = "$BACKEND_URL/articles"
         const val CATEGORIES_BACKEND_URL = "$BACKEND_URL/category.json"
     }
 
     @Throws(ConnectException::class)
-    override fun getUpdates(lastUpdateTime: Long): List<Article> {
+    override fun getArticles(category: ArticleCategory): List<Article> {
+        logger.debug("getArticles(${category.fileUrl})")
         val request: Request = Request.Builder().apply {
-            url(ARTICLES_BACKEND_URL)
+            url(category.fileUrl)
         }.build()
 
         val result = arrayListOf<Article>()
@@ -56,7 +56,7 @@ class ArticleBackendApiImpl : ArticleBackendApi {
                 val author = articleJson.optString("author")
                 val title = articleJson.optString("title")
                 val type = articleJson.optString("type")
-                val category = articleJson.optString("category")
+                val categoryId = articleJson.optString("categoryId")
                 val pagesFile = articleJson.optString("pagesFile")
                 val iconUrl = articleJson.optString("iconUrl")
                 val averageTimeReadingMin = articleJson.optInt("averageTimeReadingMin")
@@ -67,7 +67,7 @@ class ArticleBackendApiImpl : ArticleBackendApi {
                         tags = tags,
                         author = author,
                         title = title,
-                        category = category,
+                        categoryId = categoryId,
                         type = ArticleType.valueOf(type),
                         pagesFile = pagesFile,
                         iconUrl = iconUrl,
@@ -78,7 +78,6 @@ class ArticleBackendApiImpl : ArticleBackendApi {
                 )
             }
         } catch (e: Exception) {
-            logger.error("Error when get new articles $e")
             throw ConnectException("Error when get new articles $e")
         }
         return result
@@ -120,7 +119,6 @@ class ArticleBackendApiImpl : ArticleBackendApi {
                 )
             }
         } catch (e: Exception) {
-            logger.error("Error when get new article pages $e")
             throw ConnectException("Error when get new article pages $e")
         }
         return result
@@ -160,7 +158,6 @@ class ArticleBackendApiImpl : ArticleBackendApi {
                 )
             }
         } catch (e: Exception) {
-            logger.error("Error when get new categories $e")
             throw ConnectException("Error when get new categories $e")
         }
         return result

@@ -1,9 +1,6 @@
 package ru.volgadev.article_data.model
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.Index
-import androidx.room.PrimaryKey
+import androidx.room.*
 
 @Entity
 data class Article(
@@ -12,7 +9,7 @@ data class Article(
     val tags: List<String> = listOf(),
     val author: String,
     val title: String,
-    val category: String,
+    val categoryId: String,
     val type: ArticleType,
     val pagesFile: String? = null,
     val iconUrl: String? = null,
@@ -50,5 +47,9 @@ data class ArticleCategory(
     val description: String,
     val iconUrl: String? = null,
     val fileUrl: String,
-    val marketItemId: String? = null
-)
+    val marketItemId: String? = null,
+    var isPaid: Boolean = false
+) {
+    @Ignore
+    val isFree = marketItemId == null
+}
