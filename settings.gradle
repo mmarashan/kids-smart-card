@@ -11,4 +11,5 @@ include ':app',
         ':core:article-data',
         ':core:music-data',
         ':core:downloader',
-        ':core:pay-lib'
+        ':core:pay-lib',
+        ':core:speaking-character'
