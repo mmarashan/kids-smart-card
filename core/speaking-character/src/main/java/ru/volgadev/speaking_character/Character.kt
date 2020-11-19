@@ -1,5 +1,5 @@
 package ru.volgadev.speaking_character
 
-import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 
-class Character(val name: String, val bitmap: Bitmap)
+class Character(val name: String, val drawable: Drawable)

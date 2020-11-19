@@ -2,13 +2,13 @@ package ru.volgadev.papastory.ui
 
 import android.Manifest
 import android.app.AlertDialog
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.transition.Fade
 import android.transition.Slide
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import androidx.annotation.MainThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -25,10 +25,11 @@ import ru.volgadev.article_page.ITEM_ID_KEY
 import ru.volgadev.common.hideNavBar
 import ru.volgadev.common.isPermissionGranted
 import ru.volgadev.common.log.Logger
-import ru.volgadev.common.observeOnce
 import ru.volgadev.common.setVisibleWithTransition
 import ru.volgadev.papastory.R
-import ru.volgadev.pincode_bubble.PinCodeBubbleAlertDialog
+import ru.volgadev.speaking_character.Character
+import ru.volgadev.speaking_character.SpeakingCharacterManager
+
 
 const val HOME_ITEM_ID = R.id.action_home
 const val GALLERY_ITEM_ID = R.id.action_galery
@@ -89,6 +90,15 @@ class MainActivity : AppCompatActivity() {
                             Bundle().apply { putLong(ITEM_ID_KEY, article.id) },
                             true,
                             clickedView
+                        )
+                    } else {
+                        val drawable = resources.getDrawable( R.drawable.cat1, null)
+                        val character = Character("cat", drawable)
+                        SpeakingCharacterManager().show(
+                            this@MainActivity,
+                            character,
+                            "Hello",
+                            1000L
                         )
                     }
                 }
