@@ -7,12 +7,14 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.transition.Transition
 import android.transition.TransitionManager
+import android.util.DisplayMetrics
 import android.util.Patterns
 import android.view.View
 import android.view.ViewGroup
@@ -188,4 +190,14 @@ fun String.isValidUrlString(): Boolean {
 
 fun File.isExistsNonEmptyFile(): Boolean {
     return isFile && exists() && length() > 0
+}
+
+fun Context.dpToPx(dp: Float): Float {
+    val metrics = resources.displayMetrics
+    return dp * (metrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
+}
+
+fun Context.pxToDp(px: Float): Float {
+    val metrics = resources.displayMetrics
+    return px / (metrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
 }
