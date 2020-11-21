@@ -97,8 +97,8 @@ class MainActivity : AppCompatActivity() {
                         SpeakingCharacterManager().show(
                             this@MainActivity,
                             character,
-                            "Hello",
-                            1000L
+                            article.title,
+                            4000L
                         )
                     }
                 }

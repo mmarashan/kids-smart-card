@@ -3,7 +3,9 @@ package ru.volgadev.speaking_character
 import android.app.Activity
 import android.graphics.Color
 import android.graphics.PixelFormat
+import android.view.Gravity
 import android.view.View
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.view.WindowManager
 import android.view.animation.TranslateAnimation
 import android.widget.ImageView
@@ -34,6 +36,7 @@ class SpeakingCharacterManager {
         val view = LinearLayout(context).apply {
             setBackgroundColor(Color.TRANSPARENT)
             orientation = LinearLayout.VERTICAL
+            layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
 
             setOnClickListener {
                 windowManager.removeViewFromOverlay(this)
@@ -48,6 +51,11 @@ class SpeakingCharacterManager {
         }
 
         windowManager.showViewInOverlay(view)
+        textView.slide(256f, 0f, 500L, -256f, 0f)
+        imageView.slide(256f, 0f, 500L, -256f, 0f)
+
+        textView.slide(-256f, 0f, 500L, 0f, 0f)
+        imageView.slide(-256f, 0f, 500L, 0f, 0f)
 
         logger.debug("show(). ok")
     }
@@ -60,11 +68,11 @@ class SpeakingCharacterManager {
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
                     WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN,
             PixelFormat.TRANSLUCENT
-        )
+        ).apply {
+            gravity = Gravity.START
+        }
 
         this.addView(view, params)
-        view.slideDown()
-        view.slideUp()
     }
 
     private fun WindowManager.removeViewFromOverlay(view: View) {
@@ -72,29 +80,23 @@ class SpeakingCharacterManager {
         this.removeView(view)
     }
 
-    private fun View.slideUp() {
-        this.visibility = View.VISIBLE
-        val animate = TranslateAnimation(
-            0f,
-            0f,
-            300f,//this.height.toFloat(),
-            0f
-        )
-        animate.duration = 500
-        animate.fillAfter = true
-        this.startAnimation(animate)
-    }
-
-    private fun View.slideDown() {
-        val animate = TranslateAnimation(
-            0f,
-            0f,
-            0f,
-            300f // this.height.toFloat()
-        )
-        animate.duration = 500
-        animate.fillAfter = true
-        this.startAnimation(animate)
+    private fun View.slide(
+        dx: Float,
+        dy: Float,
+        durationMs: Long,
+        dxStart: Float = 0f,
+        dyStart: Float = 0f
+    ) {
+        val translateAnimation = TranslateAnimation(
+            dxStart,
+            dx + dxStart,
+            dyStart,
+            dy + dyStart
+        ).apply {
+            duration = durationMs
+            fillAfter = true
+        }
+        this.startAnimation(translateAnimation)
     }
 
     private companion object {
