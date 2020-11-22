@@ -98,7 +98,7 @@ class MainActivity : AppCompatActivity() {
                             this@MainActivity,
                             character,
                             article.title,
-                            4000L
+                            2000L
                         )
                     }
                 }
