@@ -12,9 +12,15 @@ import android.view.animation.TranslateAnimation
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.view.children
 import ru.volgadev.common.log.Logger
 
-
+/**
+ * TODO LIST:
+ * 1. Рандомные направления выхода
+ * 2. Облачко позади текста - кординаты расположения текста
+ * 3.
+ */
 class SpeakingCharacterManager {
 
     private val logger = Logger.get("SpeakingCharacterManager")
@@ -40,7 +46,6 @@ class SpeakingCharacterManager {
             setBackgroundColor(Color.TRANSPARENT)
             orientation = LinearLayout.VERTICAL
             layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
-            setPadding(PADDING_PX, PADDING_PX, PADDING_PX, PADDING_PX)
 
             addView(textView)
             addView(imageView)
@@ -51,24 +56,17 @@ class SpeakingCharacterManager {
         }
 
         windowManager.showViewInOverlay(view)
-        textView.slideAndBack(
-            -imageSizePx.toFloat(),
-            imageSizePx.toFloat(),
-            -imageSizePx.toFloat(),
-            imageSizePx.toFloat(),
-            SLIDE_ANIMATION_TIME_MS,
-            showTimeMs,
-            SLIDE_ANIMATION_TIME_MS
-        )
-        imageView.slideAndBack(
-            -imageSizePx.toFloat(),
-            imageSizePx.toFloat(),
-            -imageSizePx.toFloat(),
-            imageSizePx.toFloat(),
-            SLIDE_ANIMATION_TIME_MS,
-            showTimeMs,
-            SLIDE_ANIMATION_TIME_MS
-        )
+        view.children.iterator().forEach { child ->
+            child.slideAndBack(
+                0f,
+                0f,
+                imageSizePx.toFloat(),
+                -1f * imageSizePx,
+                SLIDE_ANIMATION_TIME_MS,
+                showTimeMs,
+                SLIDE_ANIMATION_TIME_MS
+            )
+        }
 
         logger.debug("show(). ok")
     }
@@ -82,7 +80,8 @@ class SpeakingCharacterManager {
                     WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN,
             PixelFormat.TRANSLUCENT
         ).apply {
-            gravity = (Gravity.START or Gravity.TOP)
+            gravity = (Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM)
+            verticalMargin = 0.1f
          }
 
         this.addView(view, params)
