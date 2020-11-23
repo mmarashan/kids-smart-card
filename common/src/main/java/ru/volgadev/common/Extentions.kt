@@ -107,9 +107,10 @@ fun View.scaleToFitAnimatedAndBack(
     timeUp: Long,
     timeDelay: Long,
     timeDown: Long,
+    scaleRate: Float = 1f,
     onEnd: () -> Unit = {}
 ) {
-    val animPair = scaleToFitParentAnimation(this)
+    val animPair = scaleToFitParentAnimation(this, scaleRate)
     val animScaleUp = animPair.first
     val animScaleDown = animPair.second
     val view = this
@@ -139,15 +140,15 @@ fun View.scaleToFitAnimatedAndBack(
     this.startAnimation(animScaleUp)
 }
 
-private fun scaleToFitParentAnimation(view: View): Pair<ScaleAnimation, ScaleAnimation> {
-    val screenSize = getScreenSize(view.context)
-    val screenW = screenSize.first
-    val screenH = screenSize.second
+private fun scaleToFitParentAnimation(view: View, scaleRate: Float = 0f): Pair<ScaleAnimation, ScaleAnimation> {
+    val parent = (view.parent as View)
+    val screenW = parent.width
+    val screenH = parent.height
     val yBelowCenter = view.bottom - view.height / 2 - screenH / 2
     val xBelowCenter = view.right - view.width / 2 - screenW / 2
     val scaleX = screenW.toFloat() / view.width
     val scaleY = screenH.toFloat() / view.height
-    val scaleFactor = min(scaleX, scaleY)
+    val scaleFactor = min(scaleX, scaleY) * scaleRate
     val pivotY = 0.5f + yBelowCenter.toFloat() / (screenH / 2)
     val pivotX = 0.5f + xBelowCenter.toFloat() / (screenW / 2)
     val scaleUpAnimation = ScaleAnimation(

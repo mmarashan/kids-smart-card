@@ -66,7 +66,8 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
                             clickedView.scaleToFitAnimatedAndBack(
                                 1000L,
                                 1000L,
-                                1000L
+                                1000L,
+                                0.8f
                             ) {
                                 clickedView.elevation = startElevation
                             }
@@ -112,7 +113,8 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
             setOnItemClickListener(object : TagsAdapter.OnItemClickListener {
                 override fun onClick(item: String, clickedView: CardView) {
                     logger.debug("on click $item")
-                    val category = viewModel.availableCategories.value?.first { c -> c.name == item }
+                    val category =
+                        viewModel.availableCategories.value?.first { c -> c.name == item }
                     category?.let { cat ->
                         viewModel.onClickCategory(cat)
                     }
