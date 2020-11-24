@@ -2,7 +2,6 @@ package ru.volgadev.papastory.ui
 
 import android.Manifest
 import android.app.AlertDialog
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.transition.Fade
 import android.transition.Slide
@@ -29,6 +28,7 @@ import ru.volgadev.common.setVisibleWithTransition
 import ru.volgadev.papastory.R
 import ru.volgadev.speaking_character.Character
 import ru.volgadev.speaking_character.SpeakingCharacterManager
+import ru.volgadev.speaking_character.TextBound
 
 
 const val HOME_ITEM_ID = R.id.action_home
@@ -92,8 +92,9 @@ class MainActivity : AppCompatActivity() {
                             clickedView
                         )
                     } else {
-                        val drawable = resources.getDrawable( R.drawable.cat1, null)
-                        val character = Character("cat", drawable)
+                        val drawable = resources.getDrawable(R.drawable.ginger_cat, null)
+                        val character =
+                            Character("cat", drawable, TextBound(0.35f, 0.09f, 0.88f, 0.35f))
                         SpeakingCharacterManager().show(
                             this@MainActivity,
                             character,

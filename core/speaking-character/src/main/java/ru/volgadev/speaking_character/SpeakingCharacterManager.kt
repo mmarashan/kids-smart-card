@@ -3,17 +3,20 @@ package ru.volgadev.speaking_character
 import android.app.Activity
 import android.graphics.Color
 import android.graphics.PixelFormat
+import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.view.WindowManager
 import android.view.animation.Animation
 import android.view.animation.TranslateAnimation
+import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.children
 import ru.volgadev.common.log.Logger
+import kotlin.math.roundToInt
 
 /**
  * TODO LIST:
@@ -29,26 +32,43 @@ class SpeakingCharacterManager {
         logger.debug("show()")
 
         val imageSizePx = 360
+        val viewWidth = imageSizePx
+        val viewHeight = imageSizePx
 
         val context = activity.applicationContext
         val windowManager = activity.windowManager
 
         val imageView = ImageView(context).apply {
-            layoutParams = LinearLayout.LayoutParams(imageSizePx, imageSizePx)
+            layoutParams = FrameLayout.LayoutParams(imageSizePx, imageSizePx)
             setImageDrawable(character.drawable)
         }
         val textView = TextView(context).apply {
-            textSize = 24f
+            val textViewWidth =
+                ((character.textBound.x1 - character.textBound.x0) * viewWidth).roundToInt()
+            val textViewHeight =
+                ((character.textBound.y1 - character.textBound.y0) * viewHeight).roundToInt()
+            setAutoSizeTextTypeWithDefaults(TextView.AUTO_SIZE_TEXT_TYPE_UNIFORM)
+            setAutoSizeTextTypeUniformWithConfiguration(
+                16, 24, 1, TypedValue.COMPLEX_UNIT_SP
+            )
             text = showPhrase
+            gravity = Gravity.CENTER
+            layoutParams = FrameLayout.LayoutParams(textViewWidth, textViewHeight).apply {
+                setMargins(
+                    (viewWidth * character.textBound.x0).roundToInt(),
+                    (viewHeight * character.textBound.y0).roundToInt(),
+                    (viewWidth - viewWidth * character.textBound.x1).roundToInt(),
+                    (viewHeight - viewHeight * character.textBound.y1).roundToInt()
+                )
+            }
         }
 
-        val view = LinearLayout(context).apply {
+        val view = FrameLayout(context).apply {
             setBackgroundColor(Color.TRANSPARENT)
-            orientation = LinearLayout.VERTICAL
             layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
 
-            addView(textView)
             addView(imageView)
+            addView(textView)
 
             postDelayed({
                 windowManager.removeViewFromOverlay(this)
@@ -82,7 +102,7 @@ class SpeakingCharacterManager {
         ).apply {
             gravity = (Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM)
             verticalMargin = 0.1f
-         }
+        }
 
         this.addView(view, params)
     }
