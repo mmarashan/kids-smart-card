@@ -7,7 +7,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.BitmapDrawable
@@ -27,6 +26,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import java.io.File
+import java.lang.ref.WeakReference
 import java.net.MalformedURLException
 import kotlin.math.min
 
@@ -92,15 +92,34 @@ fun View.setVisibleWithTransition(
 }
 
 
-fun View.runLevitateAnimation(amplitudeY: Float, duration: Long) {
+fun View.runLevitateAnimation(amplitudeY: Float, period: Long) {
+    val viewRef = WeakReference<View>(this)
     val interpolator: TimeInterpolator = DecelerateInterpolator()
-    this.animate().translationYBy(amplitudeY).setDuration(duration)
-        .setInterpolator(interpolator).setListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
-                super.onAnimationEnd(animation)
-                runLevitateAnimation(-amplitudeY, duration)
-            }
-        })
+    val animator = this.animate().apply {
+        setInterpolator(interpolator)
+        setDuration(period / 2)
+    }
+    animator.translationYBy(amplitudeY).setListener(object : AnimatorListenerAdapter() {
+        override fun onAnimationEnd(animation: Animator?) {
+            super.onAnimationEnd(animation)
+            viewRef.get()?.runLevitateAnimation(-amplitudeY, period)
+        }
+    })
+}
+
+fun View.runSwingAnimation(amplitudeZ: Float, period: Long) {
+    val viewRef = WeakReference<View>(this)
+    val interpolator: TimeInterpolator = DecelerateInterpolator()
+    val animator = this.animate().apply {
+        setInterpolator(interpolator)
+        duration = period / 2
+    }
+    animator.rotationBy(amplitudeZ).setListener(object : AnimatorListenerAdapter() {
+        override fun onAnimationEnd(animation: Animator?) {
+            super.onAnimationEnd(animation)
+            viewRef.get()?.runSwingAnimation(-amplitudeZ, period)
+        }
+    })
 }
 
 fun View.scaleToFitAnimatedAndBack(
@@ -140,7 +159,10 @@ fun View.scaleToFitAnimatedAndBack(
     this.startAnimation(animScaleUp)
 }
 
-private fun scaleToFitParentAnimation(view: View, scaleRate: Float = 0f): Pair<ScaleAnimation, ScaleAnimation> {
+private fun scaleToFitParentAnimation(
+    view: View,
+    scaleRate: Float = 0f
+): Pair<ScaleAnimation, ScaleAnimation> {
     val parent = (view.parent as View)
     val screenW = parent.width
     val screenH = parent.height
@@ -166,8 +188,8 @@ private fun scaleToFitParentAnimation(view: View, scaleRate: Float = 0f): Pair<S
     return Pair(scaleUpAnimation, scaleDownAnimation)
 }
 
-fun getScreenSize(context: Context): Pair<Int, Int> {
-    val displayMetrics = context.resources.displayMetrics
+fun Context.getScreenSize(): Pair<Int, Int> {
+    val displayMetrics = resources.displayMetrics
     return Pair(displayMetrics.widthPixels, displayMetrics.heightPixels)
 }
 

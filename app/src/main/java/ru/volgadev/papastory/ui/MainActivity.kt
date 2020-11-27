@@ -27,6 +27,7 @@ import ru.volgadev.common.log.Logger
 import ru.volgadev.common.setVisibleWithTransition
 import ru.volgadev.papastory.R
 import ru.volgadev.speaking_character.Character
+import ru.volgadev.speaking_character.Directon
 import ru.volgadev.speaking_character.SpeakingCharacterManager
 import ru.volgadev.speaking_character.TextBound
 
@@ -99,7 +100,8 @@ class MainActivity : AppCompatActivity() {
                             this@MainActivity,
                             character,
                             article.title,
-                            2000L
+                            2000L,
+                            listOf(Directon.FROM_BOTTOM, Directon.FROM_LEFT, Directon.FROM_RIGHT)
                         )
                     }
                 }

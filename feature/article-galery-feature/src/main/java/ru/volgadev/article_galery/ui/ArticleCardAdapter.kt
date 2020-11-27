@@ -100,7 +100,7 @@ class ArticleCardAdapter :
                     }
                 addItemDecoration(dividerDecorator)
             }
-            image.runLevitateAnimation(4f, 700L)
+            image.runLevitateAnimation(5f, 1200L)
         }
 
         fun bind(article: Article) {
