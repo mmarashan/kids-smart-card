@@ -65,6 +65,24 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        val characterManager = SpeakingCharacterManager(this)
+        val gingerCatDrawable = resources.getDrawable(R.drawable.ginger_cat, null)
+        val catAvailableDirections = setOf(
+            Directon.FROM_BOTTOM,
+            Directon.FROM_TOP,
+            Directon.FROM_BOTTOM_LEFT,
+            Directon.FROM_BOTTOM_RIGHT,
+            Directon.FROM_TOP_LEFT,
+            Directon.FROM_TOP_RIGHT
+        )
+        val gingerCat =
+            Character(
+                "cat", gingerCatDrawable,
+                TextBound(0.35f, 0.09f, 0.88f, 0.35f),
+                CharacterSize(400, 400),
+                catAvailableDirections
+            )
+
         val galleryFragment: ArticleGalleryFragment =
             FragmentProvider.get(AppFragment.GALERY_FRAGMENT) as ArticleGalleryFragment
         galleryFragment.run {
@@ -90,16 +108,9 @@ class MainActivity : AppCompatActivity() {
                             clickedView
                         )
                     } else {
-                        val drawable = resources.getDrawable(R.drawable.ginger_cat, null)
-                        val character =
-                            Character("cat", drawable,
-                                TextBound(0.35f, 0.09f, 0.88f, 0.35f),
-                                CharacterSize(400, 400),
-                                arrayListOf(Directon.FROM_LEFT, Directon.FROM_BOTTOM, Directon.FROM_TOP)
-                            )
-                        SpeakingCharacterManager().show(
+                        characterManager.show(
                             this@MainActivity,
-                            character,
+                            gingerCat,
                             article.title,
                             2000L
                         )

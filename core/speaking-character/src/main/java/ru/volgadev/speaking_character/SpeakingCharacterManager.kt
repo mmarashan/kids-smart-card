@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.graphics.Color
 import android.graphics.PixelFormat
-import android.media.Image
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
@@ -17,8 +16,10 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.children
-import ru.volgadev.common.*
+import ru.volgadev.common.getNavigationBarHeight
+import ru.volgadev.common.getScreenSize
 import ru.volgadev.common.log.Logger
+import ru.volgadev.common.runSwingAnimation
 import kotlin.math.roundToInt
 
 /**
@@ -37,6 +38,9 @@ class SpeakingCharacterManager(private val context: Context) {
     private val navigationBarHeight by lazy {
         context.getNavigationBarHeight()
     }
+
+    private val needNavBarPaddingDirections =
+        setOf(Directon.FROM_BOTTOM, Directon.FROM_BOTTOM_RIGHT, Directon.FROM_BOTTOM_LEFT)
 
     fun show(
         activity: Activity,
@@ -101,8 +105,8 @@ class SpeakingCharacterManager(private val context: Context) {
             PixelFormat.TRANSLUCENT
         ).apply {
             gravity = direction.layoutGravity
-            if (direction == Directon.FROM_BOTTOM) {
-                verticalMargin = 1f*context.getNavigationBarHeight()/context.getScreenSize().second
+            if (direction in needNavBarPaddingDirections) {
+                verticalMargin = 1f * navigationBarHeight / screenSize.second
             }
         }
 
@@ -131,6 +135,10 @@ class SpeakingCharacterManager(private val context: Context) {
                 Directon.FROM_BOTTOM -> (Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM)
                 Directon.FROM_LEFT -> (Gravity.CENTER_VERTICAL or Gravity.START)
                 Directon.FROM_RIGHT -> (Gravity.CENTER_VERTICAL or Gravity.END)
+                Directon.FROM_TOP_LEFT -> (Gravity.START or Gravity.TOP)
+                Directon.FROM_BOTTOM_LEFT -> (Gravity.START or Gravity.BOTTOM)
+                Directon.FROM_TOP_RIGHT -> (Gravity.END or Gravity.TOP)
+                Directon.FROM_BOTTOM_RIGHT -> (Gravity.END or Gravity.BOTTOM)
             }
         }
 
@@ -141,6 +149,10 @@ class SpeakingCharacterManager(private val context: Context) {
                 Directon.FROM_BOTTOM -> arrayOf(0, 0, 1, -1)
                 Directon.FROM_LEFT -> arrayOf(-1, 1, 0, 0)
                 Directon.FROM_RIGHT -> arrayOf(1, -1, 0, 0)
+                Directon.FROM_TOP_LEFT -> arrayOf(-1, 1, -1, 1)
+                Directon.FROM_BOTTOM_LEFT -> arrayOf(-1, 1, 1, -1)
+                Directon.FROM_TOP_RIGHT -> arrayOf(1, -1, -1, 1)
+                Directon.FROM_BOTTOM_RIGHT -> arrayOf(1, -1, 1, -1)
             }
         }
 

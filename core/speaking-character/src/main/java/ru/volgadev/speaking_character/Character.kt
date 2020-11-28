@@ -9,11 +9,11 @@ data class Character(
     val drawable: Drawable,
     val textBound: TextBound,
     var size: CharacterSize,
-    var availableDirections: List<Directon> = Directon.values().toList()
+    var availableDirections: Set<Directon> = Directon.values().toSet()
 )
 
 enum class Directon {
-    FROM_TOP, FROM_BOTTOM, FROM_LEFT, FROM_RIGHT //, FROM_TOP_LEFT, FROM_BOTTOM_LEFT, FROM_TOP_RIGHT, FROM_BOTTOM_RIGHT
+    FROM_TOP, FROM_BOTTOM, FROM_LEFT, FROM_RIGHT, FROM_TOP_LEFT, FROM_BOTTOM_LEFT, FROM_TOP_RIGHT, FROM_BOTTOM_RIGHT
 }
 
 data class CharacterSize(val width: Int, val height: Int)
