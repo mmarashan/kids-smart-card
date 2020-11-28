@@ -1,5 +1,6 @@
 package ru.volgadev.article_galery.ui
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,17 +16,18 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
+import jp.wasabeef.recyclerview.animators.OvershootInLeftAnimator
 import ru.volgadev.article_data.model.Article
 import ru.volgadev.article_galery.R
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.runLevitateAnimation
 
 
-class ArticleCardAdapter :
+class ArticleCardAdapter(val context: Context) :
     RecyclerView.Adapter<ArticleCardAdapter.ViewHolder>() {
 
     interface OnItemClickListener {
-        fun onClick(itemId: Long, clickedView: View)
+        fun onClick(itemId: Long, clickedView: View, position: Int)
     }
 
     @Volatile
@@ -34,6 +36,12 @@ class ArticleCardAdapter :
     private val logger = Logger.get("ArticleCardAdapter")
 
     private var articleList = ArrayList<Article>()
+
+    private val layoutInflater by lazy { LayoutInflater.from(context) }
+
+    private val dividerDrawable4 by lazy {
+        ContextCompat.getDrawable(context, R.drawable.empty_divider_4)!!
+    }
 
     @AnyThread
     fun setData(dataset: Collection<Article>) {
@@ -52,28 +60,17 @@ class ArticleCardAdapter :
         parent: ViewGroup,
         viewType: Int
     ): ViewHolder {
-        val card = LayoutInflater.from(parent.context)
-            .inflate(R.layout.card_article, parent, false) as CardView
-
-        return ViewHolder(card, parent)
+        val card = layoutInflater.inflate(R.layout.card_article, parent, false) as CardView
+        return ViewHolder(card)
     }
 
     fun setOnItemClickListener(listener: OnItemClickListener) {
         onItemClickListener = listener
     }
 
-    inner class ViewHolder(val card: CardView, val parent: ViewGroup) :
-        RecyclerView.ViewHolder(card) {
+    inner class ViewHolder(val card: CardView) :
+        RecyclerView.ViewHolder(card), View.OnClickListener {
 
-        private val viewClickListener = View.OnClickListener { view ->
-            view?.let {
-                val id = view.tag as Long
-                logger.debug("On click $id")
-                onItemClickListener?.onClick(id, view)
-            }
-        }
-
-        private val cardArticleView = card.findViewById<CardView>(R.id.cardArticleView)
         private val author = card.findViewById<TextView>(R.id.cardAuthor)
         private val title = card.findViewById<TextView>(R.id.cardTitle)
         private val image = card.findViewById<ImageView>(R.id.cardImage)
@@ -81,6 +78,8 @@ class ArticleCardAdapter :
         private val tagsRecyclerView =
             card.findViewById<RecyclerView>(R.id.cardTagsRecyclerView)
         private val tagsAdapter = TagsAdapter(R.layout.card_tag)
+
+        private var currentPosition = 0
 
         init {
             tagsRecyclerView.run {
@@ -91,20 +90,19 @@ class ArticleCardAdapter :
                         LinearLayoutManager.HORIZONTAL,
                         false
                     )
+                itemAnimator = null
                 adapter = tagsAdapter
-                val dividerDrawable =
-                    ContextCompat.getDrawable(context, R.drawable.empty_divider_4)!!
                 val dividerDecorator =
                     DividerItemDecoration(context, DividerItemDecoration.HORIZONTAL).apply {
-                        setDrawable(dividerDrawable)
+                        setDrawable(dividerDrawable4)
                     }
                 addItemDecoration(dividerDecorator)
             }
-            image.runLevitateAnimation(5f, 1200L)
         }
 
-        fun bind(article: Article) {
+        fun bind(position: Int, article: Article) {
             val holder = this
+            holder.currentPosition = position
             card.tag = article.id
             val image = holder.image
             holder.title.text = article.title
@@ -131,20 +129,28 @@ class ArticleCardAdapter :
             }
             article.iconUrl?.let { url ->
                 Glide.with(image.context).load(url)
-                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .transition(DrawableTransitionOptions.withCrossFade(500))
                     .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                     .into(image)
             }
 
-            holder.card.setOnClickListener(viewClickListener)
+            holder.card.setOnClickListener(this)
 
             logger.debug("Bind card elevation = ${card.elevation} ${card.cardElevation}")
+        }
+
+        override fun onClick(view: View?) {
+            view?.let {
+                val id = view.tag as Long
+                logger.debug("On click $id")
+                onItemClickListener?.onClick(id, view, currentPosition)
+            }
         }
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val article = articleList[position]
-        holder.bind(article)
+        holder.bind(position, article)
     }
 
     // Return the size of your dataset (invoked by the layout manager)

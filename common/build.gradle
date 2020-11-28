@@ -28,4 +28,5 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation "androidx.core:core-ktx:${versions.corektx}"
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
+    implementation "androidx.recyclerview:recyclerview:${versions.recyclerview}"
 }
