@@ -29,6 +29,7 @@ import java.io.File
 import java.lang.ref.WeakReference
 import java.net.MalformedURLException
 import kotlin.math.min
+import kotlin.math.roundToInt
 
 
 fun Context.applicationDataDir(): String {
@@ -215,12 +216,20 @@ fun File.isExistsNonEmptyFile(): Boolean {
     return isFile && exists() && length() > 0
 }
 
-fun Context.dpToPx(dp: Float): Float {
+fun Context.dpToPx(dp: Float): Int {
     val metrics = resources.displayMetrics
-    return dp * (metrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
+    return (dp * (metrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)).roundToInt()
 }
 
-fun Context.pxToDp(px: Float): Float {
+fun Context.pxToDp(px: Int): Float {
     val metrics = resources.displayMetrics
     return px / (metrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
+}
+
+fun Context.getNavigationBarHeight(): Int {
+    val resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
+    if (resourceId > 0) {
+        return resources.getDimensionPixelSize(resourceId)
+    }
+    return 0
 }

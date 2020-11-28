@@ -1,8 +1,10 @@
 package ru.volgadev.speaking_character
 
 import android.app.Activity
+import android.content.Context
 import android.graphics.Color
 import android.graphics.PixelFormat
+import android.media.Image
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
@@ -15,47 +17,45 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.children
-import ru.volgadev.common.getScreenSize
+import ru.volgadev.common.*
 import ru.volgadev.common.log.Logger
-import ru.volgadev.common.runSwingAnimation
 import kotlin.math.roundToInt
 
 /**
  * TODO LIST:
-1. Адаптивый размер - 0.5 ч
-2. Выезжание сверху - 0.25 ч - OK
 3. Записать видео - 0.5 ч
 4. Добавить параметр "текст произнесения" - 1ч
-5. Фичафлаг на музыку - 0.25 ч - OK
  */
-class SpeakingCharacterManager {
+class SpeakingCharacterManager(private val context: Context) {
 
     private val logger = Logger.get("SpeakingCharacterManager")
+
+    private val screenSize by lazy {
+        context.getScreenSize()
+    }
+
+    private val navigationBarHeight by lazy {
+        context.getNavigationBarHeight()
+    }
 
     fun show(
         activity: Activity,
         character: Character,
         showPhrase: String,
-        showTimeMs: Long,
-        availableDirections: List<Directon> = listOf(
-            Directon.FROM_TOP,
-            Directon.FROM_BOTTOM,
-            Directon.FROM_LEFT,
-            Directon.FROM_RIGHT
-        )
+        showTimeMs: Long
     ) {
         logger.debug("show()")
 
-        val imageSizePx = 360
-        val viewWidth = imageSizePx
-        val viewHeight = imageSizePx
+        val viewWidth = character.size.width
+        val viewHeight = character.size.height
 
         val context = activity.applicationContext
         val windowManager = activity.windowManager
 
         val imageView = ImageView(context).apply {
-            layoutParams = FrameLayout.LayoutParams(imageSizePx, imageSizePx)
+            layoutParams = FrameLayout.LayoutParams(viewWidth, viewHeight)
             setImageDrawable(character.drawable)
+            scaleType = ImageView.ScaleType.CENTER_INSIDE
         }
         val textView = TextView(context).apply {
             val textViewWidth =
@@ -64,7 +64,7 @@ class SpeakingCharacterManager {
                 ((character.textBound.y1 - character.textBound.y0) * viewHeight).roundToInt()
             setAutoSizeTextTypeWithDefaults(TextView.AUTO_SIZE_TEXT_TYPE_UNIFORM)
             setAutoSizeTextTypeUniformWithConfiguration(
-                16, 24, 1, TypedValue.COMPLEX_UNIT_SP
+                12, 32, 1, TypedValue.COMPLEX_UNIT_SP
             )
             text = showPhrase
             gravity = Gravity.CENTER
@@ -90,7 +90,7 @@ class SpeakingCharacterManager {
             }, showTimeMs + SLIDE_ANIMATION_TIME_MS * 2)
         }
 
-        val directon: Directon = availableDirections.random()
+        val direction: Directon = character.availableDirections.random()
 
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
@@ -100,16 +100,15 @@ class SpeakingCharacterManager {
                     WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN,
             PixelFormat.TRANSLUCENT
         ).apply {
-            gravity = directon.layoutGravity
-            if (directon == Directon.FROM_BOTTOM) {
-                val screenSize = context.getScreenSize()
-                verticalMargin = 1f * viewHeight / screenSize.second
+            gravity = direction.layoutGravity
+            if (direction == Directon.FROM_BOTTOM) {
+                verticalMargin = 1f*context.getNavigationBarHeight()/context.getScreenSize().second
             }
         }
 
         windowManager.addView(view, params)
 
-        val showCoeff = directon.showCoefficients
+        val showCoeff = direction.showCoefficients
         view.children.iterator().forEach { child ->
             child.slideAndBack(
                 viewWidth * showCoeff[0].toFloat(),
@@ -172,7 +171,7 @@ class SpeakingCharacterManager {
                 }
 
                 override fun onAnimationEnd(animation: Animation?) {
-                    view.runSwingAnimation(1f, showTimeMs)
+                    view.runSwingAnimation(2f, showTimeMs)
                     view.postDelayed({
                         val translateAnimationBack = TranslateAnimation(
                             dx + xStart,

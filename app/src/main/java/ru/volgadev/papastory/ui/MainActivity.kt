@@ -26,10 +26,7 @@ import ru.volgadev.common.isPermissionGranted
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.setVisibleWithTransition
 import ru.volgadev.papastory.R
-import ru.volgadev.speaking_character.Character
-import ru.volgadev.speaking_character.Directon
-import ru.volgadev.speaking_character.SpeakingCharacterManager
-import ru.volgadev.speaking_character.TextBound
+import ru.volgadev.speaking_character.*
 
 
 const val HOME_ITEM_ID = R.id.action_home
@@ -95,7 +92,11 @@ class MainActivity : AppCompatActivity() {
                     } else {
                         val drawable = resources.getDrawable(R.drawable.ginger_cat, null)
                         val character =
-                            Character("cat", drawable, TextBound(0.35f, 0.09f, 0.88f, 0.35f))
+                            Character("cat", drawable,
+                                TextBound(0.35f, 0.09f, 0.88f, 0.35f),
+                                CharacterSize(400, 400),
+                                arrayListOf(Directon.FROM_LEFT, Directon.FROM_BOTTOM, Directon.FROM_TOP)
+                            )
                         SpeakingCharacterManager().show(
                             this@MainActivity,
                             character,
