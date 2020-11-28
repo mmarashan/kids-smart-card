@@ -100,8 +100,7 @@ class MainActivity : AppCompatActivity() {
                             this@MainActivity,
                             character,
                             article.title,
-                            2000L,
-                            listOf(Directon.FROM_BOTTOM, Directon.FROM_LEFT, Directon.FROM_RIGHT)
+                            2000L
                         )
                     }
                 }

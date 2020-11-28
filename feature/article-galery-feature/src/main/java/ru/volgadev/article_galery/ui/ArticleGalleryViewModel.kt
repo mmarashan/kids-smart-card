@@ -6,6 +6,7 @@ import kotlinx.coroutines.launch
 import ru.volgadev.article_data.model.Article
 import ru.volgadev.article_data.model.ArticleCategory
 import ru.volgadev.article_data.repository.ArticleRepository
+import ru.volgadev.common.ENABLE_BACKGROUND_MUSIC
 import ru.volgadev.common.LiveEvent
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.observeOnce
@@ -26,7 +27,11 @@ class ArticleGalleryViewModel(
     private val _articles = MutableLiveData<List<Article>>()
     val currentArticles: LiveData<List<Article>> = _articles
 
-    val tracks = musicRepository.musicTracks().asLiveData()
+    val tracks = if (ENABLE_BACKGROUND_MUSIC) {
+        musicRepository.musicTracks().asLiveData()
+    } else {
+        MutableLiveData<List<MusicTrack>>()
+    }
 
     val audioToPlay = LiveEvent<MusicTrack>()
 

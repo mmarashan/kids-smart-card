@@ -22,9 +22,11 @@ import kotlin.math.roundToInt
 
 /**
  * TODO LIST:
- * 1. Рандомные направления выхода - 1ч - OK
- * 2. Облачко позади текста - кординаты расположения текста - 2ч - OK
- * 3. Анимация легкого вращения - 30 мин
+1. Адаптивый размер - 0.5 ч
+2. Выезжание сверху - 0.25 ч - OK
+3. Записать видео - 0.5 ч
+4. Добавить параметр "текст произнесения" - 1ч
+5. Фичафлаг на музыку - 0.25 ч - OK
  */
 class SpeakingCharacterManager {
 
@@ -35,7 +37,12 @@ class SpeakingCharacterManager {
         character: Character,
         showPhrase: String,
         showTimeMs: Long,
-        availableDirections: List<Directon> = listOf(Directon.FROM_BOTTOM)
+        availableDirections: List<Directon> = listOf(
+            Directon.FROM_TOP,
+            Directon.FROM_BOTTOM,
+            Directon.FROM_LEFT,
+            Directon.FROM_RIGHT
+        )
     ) {
         logger.debug("show()")
 
@@ -121,6 +128,7 @@ class SpeakingCharacterManager {
     private val Directon.layoutGravity: Int
         get() {
             return when (this) {
+                Directon.FROM_TOP -> (Gravity.CENTER_HORIZONTAL or Gravity.TOP)
                 Directon.FROM_BOTTOM -> (Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM)
                 Directon.FROM_LEFT -> (Gravity.CENTER_VERTICAL or Gravity.START)
                 Directon.FROM_RIGHT -> (Gravity.CENTER_VERTICAL or Gravity.END)
@@ -130,6 +138,7 @@ class SpeakingCharacterManager {
     private val Directon.showCoefficients: Array<Int>
         get() {
             return when (this) {
+                Directon.FROM_TOP -> arrayOf(0, 0, -1, 1)
                 Directon.FROM_BOTTOM -> arrayOf(0, 0, 1, -1)
                 Directon.FROM_LEFT -> arrayOf(-1, 1, 0, 0)
                 Directon.FROM_RIGHT -> arrayOf(1, -1, 0, 0)
