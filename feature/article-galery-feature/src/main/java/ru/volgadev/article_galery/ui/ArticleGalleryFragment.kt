@@ -86,7 +86,11 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
         }
 
         articlesAdapter.setOnItemClickListener(object : ArticleCardAdapter.OnItemClickListener {
+
+            private var canClick = true
+
             override fun onClick(itemId: Long, clickedView: View, position: Int) {
+                if (!canClick) return
                 val clickedArticle =
                     viewModel.currentArticles.value?.first { article -> article.id == itemId }
                 clickedArticle?.let { article ->
@@ -95,12 +99,14 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
                     val startElevation = clickedView.elevation
                     clickedView.elevation = startElevation + 1
                     if (article.type == ArticleType.NO_PAGES) {
+                        canClick = false
                         clickedView.scaleToFitAnimatedAndBack(
                             1000L,
                             1000L,
                             1000L,
                             0.75f
                         ) {
+                            canClick = true
                             clickedView.elevation = startElevation
                         }
                     }
