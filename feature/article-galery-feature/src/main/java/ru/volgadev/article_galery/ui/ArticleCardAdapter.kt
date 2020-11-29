@@ -23,7 +23,7 @@ import ru.volgadev.common.log.Logger
 import ru.volgadev.common.runLevitateAnimation
 
 
-class ArticleCardAdapter(val context: Context) :
+class ArticleCardAdapter(private val context: Context) :
     RecyclerView.Adapter<ArticleCardAdapter.ViewHolder>() {
 
     interface OnItemClickListener {
@@ -77,7 +77,7 @@ class ArticleCardAdapter(val context: Context) :
 
         private val tagsRecyclerView =
             card.findViewById<RecyclerView>(R.id.cardTagsRecyclerView)
-        private val tagsAdapter = TagsAdapter(R.layout.card_tag)
+        private val tagsAdapter = TagsAdapter(tagsRecyclerView.context, R.layout.card_tag)
 
         private var currentPosition = 0
 

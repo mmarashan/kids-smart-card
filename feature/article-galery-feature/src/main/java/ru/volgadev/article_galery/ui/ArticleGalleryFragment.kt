@@ -121,12 +121,12 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
             canClick = true
         })
 
-        val categoryTagsAdapter = TagsAdapter(R.layout.category_tag).apply {
+        val categoryTagsAdapter = TagsAdapter(view.context, R.layout.category_tag).apply {
             setOnItemClickListener(object : TagsAdapter.OnItemClickListener {
-                override fun onClick(item: String, clickedView: CardView) {
+                override fun onClick(item: String, clickedView: CardView, position: Int) {
                     logger.debug("on click $item")
-                    val category =
-                        viewModel.availableCategories.value?.first { c -> c.name == item }
+                    categoryRecyclerView.scrollToItemToCenter(position)
+                    val category = viewModel.availableCategories.value?.first { c -> c.name == item }
                     category?.let { cat ->
                         viewModel.onClickCategory(cat)
                     }
