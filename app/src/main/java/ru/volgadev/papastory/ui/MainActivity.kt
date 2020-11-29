@@ -108,12 +108,14 @@ class MainActivity : AppCompatActivity() {
                             clickedView
                         )
                     } else {
-                        characterManager.show(
-                            this@MainActivity,
-                            gingerCat,
-                            article.title,
-                            2000L
-                        )
+                        article.openPhrase?.let { phrase ->
+                            characterManager.show(
+                                this@MainActivity,
+                                gingerCat,
+                                phrase,
+                                2000L
+                            )
+                        }
                     }
                 }
             })

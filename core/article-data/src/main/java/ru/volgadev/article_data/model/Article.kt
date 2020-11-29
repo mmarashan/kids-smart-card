@@ -15,7 +15,8 @@ data class Article(
     val iconUrl: String? = null,
     val onClickSounds: List<String> = listOf(),
     val averageTimeReadingMin: Int? = 0,
-    val timestamp: Long
+    val timestamp: Long,
+    val openPhrase: String?
 )
 
 enum class ArticleType {

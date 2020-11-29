@@ -85,9 +85,9 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
             }
         }
 
-        articlesAdapter.setOnItemClickListener(object : ArticleCardAdapter.OnItemClickListener {
+        var canClick = true
 
-            private var canClick = true
+        articlesAdapter.setOnItemClickListener(object : ArticleCardAdapter.OnItemClickListener {
 
             override fun onClick(itemId: Long, clickedView: View, position: Int) {
                 if (!canClick) return
@@ -118,6 +118,7 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
         viewModel.currentArticles.observe(viewLifecycleOwner, Observer { articles ->
             logger.debug("Set new ${articles.size} articles")
             articlesAdapter.setData(articles)
+            canClick = true
         })
 
         val categoryTagsAdapter = TagsAdapter(R.layout.category_tag).apply {
