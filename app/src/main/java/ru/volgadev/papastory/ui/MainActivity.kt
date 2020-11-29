@@ -79,7 +79,7 @@ class MainActivity : AppCompatActivity() {
             Character(
                 "cat", gingerCatDrawable,
                 TextBound(0.35f, 0.09f, 0.88f, 0.35f),
-                CharacterSize(400, 400),
+                CharacterSize(420, 420),
                 catAvailableDirections
             )
 
