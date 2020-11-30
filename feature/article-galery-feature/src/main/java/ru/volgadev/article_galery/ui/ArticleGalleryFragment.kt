@@ -162,7 +162,7 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
             itemAnimator = SlideInDownAnimator()
         }
 
-        viewModel.availableCategories.observe(viewLifecycleOwner, Observer { categories ->
+        viewModel.availableCategories.observe(viewLifecycleOwner, { categories ->
             logger.debug("On load categories: ${categories.size}")
             val categoryNames = categories.map { category -> category.name }
             categoryTagsAdapter.setData(categoryNames)

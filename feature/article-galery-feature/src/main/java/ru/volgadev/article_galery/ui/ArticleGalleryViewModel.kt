@@ -22,7 +22,7 @@ class ArticleGalleryViewModel(
     private val logger = Logger.get("ArticleGalleryViewModel")
 
     private val _category = MutableLiveData<ArticleCategory>()
-    val currentCategory: LiveData<ArticleCategory> = _category
+    val currentCategory: LiveData<ArticleCategory> = _category.distinctUntilChanged()
 
     private val _articles = MutableLiveData<List<Article>>()
     val currentArticles: LiveData<List<Article>> = _articles
@@ -35,17 +35,10 @@ class ArticleGalleryViewModel(
 
     val audioToPlay = LiveEvent<MusicTrack>()
 
-    val availableCategories = articleRepository.categories().asLiveData().map { categories ->
-        return@map categories.filter { category -> category.isFree || category.isPaid }
-    }
-
-    init {
-        availableCategories.observeOnce { categories ->
-            categories.firstOrNull()?.let { c ->
-                _category.postValue(c)
-            }
+    val availableCategories =
+        articleRepository.categories().asLiveData().distinctUntilChanged().map { categories ->
+            return@map categories.filter { category -> category.isFree || category.isPaid }
         }
-    }
 
     @MainThread
     fun onClickCategory(category: ArticleCategory) {

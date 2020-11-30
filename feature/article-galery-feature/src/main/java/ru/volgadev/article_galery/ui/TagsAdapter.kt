@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import ru.volgadev.article_galery.R
 import ru.volgadev.common.log.Logger
 
-class TagsAdapter(private val context: Context, private val itemLayout: Int) :
+class TagsAdapter(context: Context, private val itemLayout: Int) :
     RecyclerView.Adapter<TagsAdapter.ViewHolder>() {
 
     private val logger = Logger.get("TagsAdapter")

@@ -23,7 +23,7 @@ import ru.volgadev.common.log.Logger
 import ru.volgadev.common.runLevitateAnimation
 
 
-class ArticleCardAdapter(private val context: Context) :
+class ArticleCardAdapter(context: Context) :
     RecyclerView.Adapter<ArticleCardAdapter.ViewHolder>() {
 
     interface OnItemClickListener {
@@ -135,8 +135,6 @@ class ArticleCardAdapter(private val context: Context) :
             }
 
             holder.card.setOnClickListener(this)
-
-            logger.debug("Bind card elevation = ${card.elevation} ${card.cardElevation}")
         }
 
         override fun onClick(view: View?) {
