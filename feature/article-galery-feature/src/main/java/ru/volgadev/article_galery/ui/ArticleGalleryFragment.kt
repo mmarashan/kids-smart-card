@@ -1,10 +1,10 @@
 package ru.volgadev.article_galery.ui
 
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.view.View.OVER_SCROLL_NEVER
-import android.view.animation.OvershootInterpolator
 import androidx.annotation.AnyThread
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
@@ -12,9 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.LinearSnapHelper
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import jp.wasabeef.recyclerview.animators.LandingAnimator
 import jp.wasabeef.recyclerview.animators.OvershootInLeftAnimator
 import jp.wasabeef.recyclerview.animators.SlideInDownAnimator
 import kotlinx.android.synthetic.main.main_fragment.*
@@ -26,6 +24,7 @@ import ru.volgadev.common.BackgroundMediaPlayer
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.scaleToFitAnimatedAndBack
 import ru.volgadev.common.view.scrollToItemToCenter
+
 
 class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
 
@@ -73,8 +72,13 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
             )
         })
 
+        val isPortraitOrientation =
+            requireActivity().resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+        val spanCount = if (isPortraitOrientation) 2 else 3
+
+
         contentRecyclerView.run {
-            layoutManager = StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL)
+            layoutManager = StaggeredGridLayoutManager(spanCount, LinearLayoutManager.VERTICAL)
             adapter = articlesAdapter
             overScrollMode = OVER_SCROLL_NEVER
             itemAnimator = OvershootInLeftAnimator(1f).apply {
@@ -126,7 +130,8 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
                 override fun onClick(item: String, clickedView: CardView, position: Int) {
                     logger.debug("on click $item")
                     categoryRecyclerView.scrollToItemToCenter(position)
-                    val category = viewModel.availableCategories.value?.first { c -> c.name == item }
+                    val category =
+                        viewModel.availableCategories.value?.first { c -> c.name == item }
                     category?.let { cat ->
                         viewModel.onClickCategory(cat)
                     }
