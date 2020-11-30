@@ -72,6 +72,8 @@ class CategoryCardAdapter :
         private val image: ImageView = card.findViewById(R.id.categoryImage)
         private val description: TextView = card.findViewById(R.id.categoryDescription)
 
+        private val notPayedAlpha = 0.6f
+
         fun bind(category: ArticleCategory) {
             val holder = this
             card.tag = category.name
@@ -90,8 +92,13 @@ class CategoryCardAdapter :
 
             if (!category.isFree && !category.isPaid) {
                 paymentStatus.setImageResource(R.drawable.ic_baseline_lock_24)
+                image.alpha = notPayedAlpha
+                holder.title.alpha = notPayedAlpha
+                holder.description.alpha = notPayedAlpha
             } else {
                 paymentStatus.setImageResource(R.drawable.ic_baseline_star_24)
+                holder.title.alpha = 1f
+                holder.description.alpha = 1f
             }
 
             holder.card.setOnClickListener(viewClickListener)
