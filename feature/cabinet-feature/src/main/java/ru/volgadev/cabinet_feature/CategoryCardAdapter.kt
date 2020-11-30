@@ -67,8 +67,6 @@ class CategoryCardAdapter :
             }
         }
 
-        private val cardMarketCategoryView: CardView =
-            card.findViewById(R.id.categoryCardView)
         private val paymentStatus: ImageView = card.findViewById(R.id.categoryStatus)
         private val title: TextView = card.findViewById(R.id.categoryTitle)
         private val image: ImageView = card.findViewById(R.id.categoryImage)

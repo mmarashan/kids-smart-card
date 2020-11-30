@@ -7,8 +7,8 @@
     android:layout_height="100dp"
     android:layout_margin="8dp"
     android:minHeight="100dp"
-    card_view:cardCornerRadius="50dp"
-    card_view:cardElevation="10dp">
+    card_view:cardCornerRadius="8dp"
+    card_view:cardElevation="8dp">
 
     <LinearLayout
         android:id="@+id/cardLinearLayout"
