@@ -5,7 +5,6 @@ import coil.load
 import kotlinx.android.synthetic.main.default_billing_activity.*
 import ru.volgadev.pay_lib.R
 
-
 class DefaultPaymentActivity : BillingProcessorActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
