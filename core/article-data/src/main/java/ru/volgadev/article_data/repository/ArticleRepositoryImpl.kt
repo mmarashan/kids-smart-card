@@ -2,7 +2,6 @@ package ru.volgadev.article_data.repository
 
 import android.content.Context
 import androidx.annotation.WorkerThread
-import com.anjlab.android.iab.v3.SkuDetails
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import ru.volgadev.article_data.api.ArticleBackendApi
@@ -15,10 +14,7 @@ import ru.volgadev.common.DataResult
 import ru.volgadev.common.ErrorResult
 import ru.volgadev.common.SuccessResult
 import ru.volgadev.common.log.Logger
-import ru.volgadev.pay_lib.PaymentManager
-import ru.volgadev.pay_lib.PaymentRequest
-import ru.volgadev.pay_lib.PaymentResultListener
-import ru.volgadev.pay_lib.RequestPaymentResult
+import ru.volgadev.pay_lib.*
 import ru.volgadev.pay_lib.impl.DefaultPaymentActivity
 import java.net.ConnectException
 
@@ -67,8 +63,8 @@ class ArticleRepositoryImpl(
 
         CoroutineScope(Dispatchers.Default).launch {
             paymentManager.ownedProductsFlow()
-                .collect(object : FlowCollector<ArrayList<SkuDetails>> {
-                    override suspend fun emit(value: ArrayList<SkuDetails>) {
+                .collect(object : FlowCollector<List<MarketItem>> {
+                    override suspend fun emit(value: List<MarketItem>) {
                         logger.debug("New owned product list: ${value.size} categories")
                         ownedProductIds = value.map { skuDetails -> skuDetails.productId }
                         updatePayedCategories(categories, ownedProductIds)

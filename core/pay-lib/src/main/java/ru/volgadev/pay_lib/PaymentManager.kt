@@ -20,9 +20,9 @@ interface PaymentManager {
 
     fun consumePurchase(itemId: String): Boolean
 
-    fun ownedProductsFlow(): Flow<ArrayList<SkuDetails>>
+    fun ownedProductsFlow(): Flow<List<MarketItem>>
 
-    fun ownedSubscriptionsFlow(): Flow<ArrayList<SkuDetails>>
+    fun ownedSubscriptionsFlow(): Flow<List<MarketItem>>
 
     fun dispose()
 }
@@ -47,3 +47,23 @@ data class PaymentRequest(
     val description: String?,
     val imageUrl: String?
 ) : Parcelable
+
+
+data class MarketItem(
+    val productId: String,
+    val type: String,
+    val price: String,
+    val priceAmountMicros: Long,
+    val priceCurrencyCode: String,
+    val originalPrice: String,
+    val originalPriceAmountMicros: Long?,
+    val title: String,
+    val description: String,
+    val subscriptionPeriod: String,
+    val freeTrialPeriod: String,
+    val introductoryPrice: String,
+    val introductoryPriceAmountMicros: Long?,
+    val introductoryPricePeriod: String,
+    val introductoryPriceCycles: Int,
+    val iconUrl: String
+)

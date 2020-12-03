@@ -4,51 +4,36 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.anjlab.android.iab.v3.BillingProcessor
-import com.anjlab.android.iab.v3.SkuDetails
+import com.android.billingclient.api.BillingClient
+import com.android.billingclient.api.BillingFlowParams
 import ru.volgadev.pay_lib.PaymentRequest
-import ru.volgadev.pay_lib.PaymentType
 
 open class BillingProcessorActivity : AppCompatActivity() {
 
-    private val billingProcessor: BillingProcessor by lazy { BillingProcessorServiceLocator.get() }
+    private val billingProcessor: BillingClient by lazy { BillingProcessorServiceLocator.get() }
+    private val params: BillingFlowParams by lazy { BillingProcessorServiceLocator.getParams() }
 
     lateinit var paymentRequest: PaymentRequest
-    lateinit var skuDetails: SkuDetails
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         paymentRequest = intent.getParcelableExtra(PAYMENT_REQUEST_EXTRA)
             ?: throw IllegalStateException("You should open pay activity via PaymentActivity.openPaymentActivity(...)")
-
-        skuDetails = if (paymentRequest.type == PaymentType.PURCHASE) {
-            billingProcessor.getPurchaseListingDetails(paymentRequest.itemId)
-        } else {
-            billingProcessor.getSubscriptionListingDetails(paymentRequest.itemId)
-        } ?: throw IllegalStateException("You should open pay activity with actual itemId")
     }
 
     fun onClickPay() {
-        val paymentId = paymentRequest.itemId
-        val type = paymentRequest.type
-        if (type == PaymentType.PURCHASE) {
-            billingProcessor.purchase(
-                this,
-                paymentId
-            )
-        } else {
-            billingProcessor.subscribe(
-                this,
-                paymentId
-            )
-        }
+        val responseCode =
+            billingProcessor.launchBillingFlow(this, params)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (!billingProcessor.handleActivityResult(requestCode, resultCode, data)) {
-            super.onActivityResult(requestCode, resultCode, data)
-        }
         finish()
+    }
+
+    override fun onDestroy() {
+        billingProcessor = null
+        params = null
+        super.onDestroy()
     }
 
     companion object {

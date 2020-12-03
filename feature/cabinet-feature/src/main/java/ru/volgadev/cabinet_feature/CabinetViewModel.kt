@@ -25,7 +25,7 @@ class CabinetViewModel(
     fun onReadyToPayment(category: ArticleCategory) {
         logger.debug("onReadyToPayment ${category.name}")
         val itemId = category.marketItemId
-        if (itemId != null && !category.isPaid) {
+        if (itemId != null /*&& !category.isPaid*/) {
             logger.debug("Start payment for $itemId")
             val paymentRequest = PaymentRequest(
                 itemId = itemId,
@@ -37,14 +37,15 @@ class CabinetViewModel(
             viewModelScope.launch {
                 articleRepository.requestPaymentForCategory(paymentRequest)
             }
-        } else {
-            viewModelScope.launch {
-                if (itemId != null && BuildConfig.DEBUG) {
-                    logger.debug("debug consume purchase $itemId")
-                    articleRepository.consumePurchase(itemId)
-                }
-            }
         }
+//        else {
+//            viewModelScope.launch {
+//                if (itemId != null && BuildConfig.DEBUG) {
+//                    logger.debug("debug consume purchase $itemId")
+//                    articleRepository.consumePurchase(itemId)
+//                }
+//            }
+//        }
     }
 
     override fun onCleared() {

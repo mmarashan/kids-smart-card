@@ -36,6 +36,7 @@ internal class PaymentManagerImpl(
                 billingResult: BillingResult,
                 purchases: MutableList<Purchase>?
             ) {
+                logger.debug("onPurchasesUpdated($billingResult, $purchases)")
                 if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && purchases != null) {
                     //здесь мы можем запросить информацию о товарах и покупках
                 }
@@ -49,13 +50,15 @@ internal class PaymentManagerImpl(
              * Callback for setup process. This listener's onBillingSetupFinished(BillingResult)
              * method is called when the setup process is complete.
              */
-            override fun onBillingSetupFinished(p0: BillingResult) {
-                if (p0.responseCode == BillingClient.BillingResponseCode.OK) {
+            override fun onBillingSetupFinished(billingResult: BillingResult) {
+                logger.debug("onBillingSetupFinished($billingResult)")
+                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
                     //здесь мы можем запросить информацию о товарах и покупках
                     val idsList = listOf("numbers_pro_ru", "test_item_2")
                     querySkuDetails(idsList)
 
                     val purchasesList = queryPurchases() //запрос о покупках
+                    logger.debug("purchasesList = ${purchasesList.joinToString(",")})")
 
                     //если товар уже куплен, предоставить его пользователю
                     for (i in purchasesList.indices) {
@@ -67,6 +70,7 @@ internal class PaymentManagerImpl(
 
             override fun onBillingServiceDisconnected() {
                 //сюда мы попадем если что-то пойдет не так
+                logger.debug("onBillingServiceDisconnected()")
             }
         })
     }
@@ -79,6 +83,7 @@ internal class PaymentManagerImpl(
                 param
             ) { billingResult, skuDetails ->
                 if (billingResult.responseCode == 0 && skuDetails != null) {
+                    logger.debug("skuDetails = ${skuDetails.joinToString(",")})")
                     skuDetails.forEach { skuDetails ->
                         skuDetailsMap.put(skuDetails.sku, skuDetails)
                     }
@@ -104,7 +109,6 @@ internal class PaymentManagerImpl(
 
     override fun requestPayment(
         paymentRequest: PaymentRequest,
-        // TODO: maybe current activity instance
         activityClass: Class<out BillingProcessorActivity>,
         resultListener: PaymentResultListener
     ) {
@@ -119,12 +123,16 @@ internal class PaymentManagerImpl(
         val billingFlowParams = BillingFlowParams.newBuilder()
             .setSkuDetails(item)
             .build()
-        val responseCode =
-            billingClient.launchBillingFlow(activityClass.newInstance(), billingFlowParams)
+        BillingProcessorServiceLocator.register(billingClient, billingFlowParams)
+
+        BillingProcessorActivity.startActivity(context, paymentRequest, activityClass)
     }
 
     override fun consumePurchase(itemId: String): Boolean {
         logger.debug("consumePurchase($itemId)")
+        // TODO: consume purchase
+        val consumeParams = ConsumeParams.newBuilder().setPurchaseToken("")
+        // billingClient.consumeAsync()
         return false
     }
 

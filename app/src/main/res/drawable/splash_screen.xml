@@ -9,12 +9,4 @@
                 android:type="linear" />
         </shape>
     </item>
-    <item
-        android:bottom="48dp"
-        android:top="48dp">
-        <bitmap
-            android:gravity="center"
-            android:src="@drawable/ic_round_layers_24"
-            android:tileMode="disabled" />
-    </item>
 </layer-list>
