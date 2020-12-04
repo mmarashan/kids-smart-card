@@ -8,10 +8,10 @@ import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingFlowParams
 import ru.volgadev.pay_lib.PaymentRequest
 
-open class BillingProcessorActivity : AppCompatActivity() {
+open class BillingClientActivity : AppCompatActivity() {
 
-    private val billingProcessor: BillingClient by lazy { BillingProcessorServiceLocator.get() }
-    private val params: BillingFlowParams by lazy { BillingProcessorServiceLocator.getParams() }
+    internal val billingClient: BillingClient by lazy { BillingProcessorServiceLocator.get() }
+    internal val billingFlowParams: BillingFlowParams by lazy { BillingProcessorServiceLocator.getParams() }
 
     lateinit var paymentRequest: PaymentRequest
 
@@ -22,18 +22,11 @@ open class BillingProcessorActivity : AppCompatActivity() {
     }
 
     fun onClickPay() {
-        val responseCode =
-            billingProcessor.launchBillingFlow(this, params)
+        billingClient.launchBillingFlow(this, billingFlowParams)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         finish()
-    }
-
-    override fun onDestroy() {
-        billingProcessor = null
-        params = null
-        super.onDestroy()
     }
 
     companion object {
@@ -42,7 +35,7 @@ open class BillingProcessorActivity : AppCompatActivity() {
         fun startActivity(
             context: Context,
             paymentRequest: PaymentRequest,
-            activityClass: Class<out BillingProcessorActivity>
+            activityClass: Class<out BillingClientActivity>
         ) {
             val intent = Intent(context, activityClass).apply {
                 putExtra(PAYMENT_REQUEST_EXTRA, paymentRequest)

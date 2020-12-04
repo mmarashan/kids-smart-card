@@ -8,6 +8,12 @@ import kotlinx.coroutines.flow.StateFlow
 import ru.volgadev.common.log.Logger
 import ru.volgadev.pay_lib.*
 
+/** TODOs: - 1ч
+ * 1. Закрывать активити
+ * 2. Реактивное обновление данных оплаты во вью
+ * 3. Проброс ИД товаров
+ */
+
 
 @ExperimentalCoroutinesApi
 internal class PaymentManagerImpl(
@@ -22,7 +28,7 @@ internal class PaymentManagerImpl(
     private val ownedProductsStateFlow = MutableStateFlow<List<MarketItem>>(listOf())
     private val ownedSubscriptionStateFlow = MutableStateFlow<List<MarketItem>>(listOf())
 
-    private val skuDetailsMap = HashMap<String, SkuDetails>()
+    private val itemsMap = HashMap<String, MarketItem>()
 
     private val billingClient =
         BillingClient.newBuilder(context).setListener(object : PurchasesUpdatedListener {
@@ -39,6 +45,7 @@ internal class PaymentManagerImpl(
                 logger.debug("onPurchasesUpdated($billingResult, $purchases)")
                 if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && purchases != null) {
                     //здесь мы можем запросить информацию о товарах и покупках
+                    updateState()
                 }
             }
         }).enablePendingPurchases().build()
@@ -54,17 +61,7 @@ internal class PaymentManagerImpl(
                 logger.debug("onBillingSetupFinished($billingResult)")
                 if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
                     //здесь мы можем запросить информацию о товарах и покупках
-                    val idsList = listOf("numbers_pro_ru", "test_item_2")
-                    querySkuDetails(idsList)
-
-                    val purchasesList = queryPurchases() //запрос о покупках
-                    logger.debug("purchasesList = ${purchasesList.joinToString(",")})")
-
-                    //если товар уже куплен, предоставить его пользователю
-                    for (i in purchasesList.indices) {
-                        val purchaseId = purchasesList[i].sku
-
-                    }
+                    updateState()
                 }
             }
 
@@ -75,27 +72,37 @@ internal class PaymentManagerImpl(
         })
     }
 
-    private fun querySkuDetails(skuIds: List<String>) {
-        val param = SkuDetailsParams.newBuilder().setSkusList(skuIds)
+    private fun updateState() {
+        logger.debug("updateState()")
+        val idsList = listOf("numbers_pro_ru", "test_item_2")
+
+        val param = SkuDetailsParams.newBuilder().setSkusList(idsList)
             .setType(BillingClient.SkuType.INAPP).build()
         scope.launch {
             billingClient.querySkuDetailsAsync(
                 param
             ) { billingResult, skuDetails ->
                 if (billingResult.responseCode == 0 && skuDetails != null) {
-                    logger.debug("skuDetails = ${skuDetails.joinToString(",")})")
                     skuDetails.forEach { skuDetails ->
-                        skuDetailsMap.put(skuDetails.sku, skuDetails)
+                        itemsMap.put(skuDetails.sku, MarketItem(skuDetails))
                     }
-                    ownedProductsStateFlow.value = skuDetails.toList().map { d -> d.toMarketItem() }
+
+                    val purchasesResult = billingClient.queryPurchases(BillingClient.SkuType.INAPP)
+                    val purchasesList = purchasesResult.purchasesList ?: listOf()
+
+                    for (i in purchasesList.indices) {
+                        val purchase = purchasesList[i]
+                        if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
+                            itemsMap.get(purchase.sku)?.purchase = purchase
+                        }
+                    }
+
+                    logger.debug("itemsMap=$itemsMap")
+
+                    ownedProductsStateFlow.value = itemsMap.values.toList()
                 }
             }
         }
-    }
-
-    private fun queryPurchases(): List<Purchase> {
-        val purchasesResult = billingClient.queryPurchases(BillingClient.SkuType.INAPP)
-        return purchasesResult.purchasesList ?: listOf()
     }
 
     private var resultListener: PaymentResultListener? = null
@@ -109,11 +116,11 @@ internal class PaymentManagerImpl(
 
     override fun requestPayment(
         paymentRequest: PaymentRequest,
-        activityClass: Class<out BillingProcessorActivity>,
+        activityClass: Class<out BillingClientActivity>,
         resultListener: PaymentResultListener
     ) {
         this.resultListener = resultListener
-        val item = skuDetailsMap.get(paymentRequest.itemId)
+        val item = itemsMap.get(paymentRequest.itemId)
         if (item == null) {
             logger.error("Call paymentRequest() for not exist item")
             resultListener.onResult(RequestPaymentResult.PAYMENT_ERROR)
@@ -121,50 +128,39 @@ internal class PaymentManagerImpl(
         }
 
         val billingFlowParams = BillingFlowParams.newBuilder()
-            .setSkuDetails(item)
+            .setSkuDetails(item.skuDetails)
             .build()
         BillingProcessorServiceLocator.register(billingClient, billingFlowParams)
 
-        BillingProcessorActivity.startActivity(context, paymentRequest, activityClass)
+        BillingClientActivity.startActivity(context, paymentRequest, activityClass)
     }
 
     override fun consumePurchase(itemId: String): Boolean {
         logger.debug("consumePurchase($itemId)")
-        // TODO: consume purchase
-        val consumeParams = ConsumeParams.newBuilder().setPurchaseToken("")
-        // billingClient.consumeAsync()
+        val item = itemsMap.get(itemId)
+
+        if (item != null) {
+            val token = item.purchase?.purchaseToken ?: ""
+            val consumeParams = ConsumeParams.newBuilder().setPurchaseToken(token).build()
+            billingClient.consumeAsync(
+                consumeParams
+            ) { billingResult, purchaseToken ->
+                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                    logger.debug("consumePurchase($itemId) OK")
+                    updateState()
+                }
+            }
+        }
         return false
     }
 
     override fun ownedProductsFlow(): StateFlow<List<MarketItem>> = ownedProductsStateFlow
 
-    override fun ownedSubscriptionsFlow(): StateFlow<List<MarketItem>> =
-        ownedSubscriptionStateFlow
+//    override fun ownedSubscriptionsFlow(): StateFlow<List<MarketItem>> =
+//        ownedSubscriptionStateFlow
 
     override fun dispose() {
         logger.debug("dispose()")
         resultListener = null
-    }
-
-    private fun SkuDetails.toMarketItem(): MarketItem {
-        val d = this
-        return MarketItem(
-            d.sku,
-            d.type,
-            d.price,
-            d.priceAmountMicros,
-            d.priceCurrencyCode,
-            d.originalPrice,
-            d.originalPriceAmountMicros,
-            d.title,
-            d.description,
-            d.subscriptionPeriod,
-            d.freeTrialPeriod,
-            d.introductoryPrice,
-            d.introductoryPriceAmountMicros,
-            d.introductoryPricePeriod,
-            d.introductoryPriceCycles,
-            d.iconUrl
-        )
     }
 }

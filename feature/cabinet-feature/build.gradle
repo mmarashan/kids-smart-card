@@ -44,7 +44,6 @@ dependencies {
     implementation "androidx.cardview:cardview:${versions.cardview}"
     implementation "com.github.bumptech.glide:glide:${versions.glide}"
     implementation "jp.wasabeef:recyclerview-animators:${versions.recyclerviewanimators}"
-    implementation "com.anjlab.android.iab.v3:library:${versions.anjlabandroidiappbilling}"
 
     implementation project(':common')
     implementation project(':core:article-data')

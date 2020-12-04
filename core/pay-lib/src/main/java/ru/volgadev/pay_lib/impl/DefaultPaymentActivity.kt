@@ -5,7 +5,7 @@ import coil.load
 import kotlinx.android.synthetic.main.default_billing_activity.*
 import ru.volgadev.pay_lib.R
 
-class DefaultPaymentActivity : BillingProcessorActivity() {
+class DefaultPaymentActivity : BillingClientActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -13,12 +13,10 @@ class DefaultPaymentActivity : BillingProcessorActivity() {
 
         itemName.text = paymentRequest.name
         itemDescription.text = paymentRequest.description
+        itemPrice.text = billingFlowParams.skuDetails.price
 
-        params.skuDetails.price?.let { priceText ->
-            itemPrice.text = priceText
-        }
         paymentRequest.imageUrl?.let { imageUrl ->
-            itemImage.load(imageUrl){
+            itemImage.load(imageUrl) {
                 crossfade(true)
             }
         }

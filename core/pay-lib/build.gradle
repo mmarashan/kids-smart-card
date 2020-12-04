@@ -37,7 +37,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:${versions.androidxlifecycle}"
     implementation "androidx.lifecycle:lifecycle-extensions:${versions.androidxlifecycle}"
     implementation "io.coil-kt:coil:${versions.coil}"
-    implementation 'com.android.billingclient:billing:3.0.1'
+    implementation "com.android.billingclient:billing:${versions.billingclient}"
 
     implementation project(':common')
 }

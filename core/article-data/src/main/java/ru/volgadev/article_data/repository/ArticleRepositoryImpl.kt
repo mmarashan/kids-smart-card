@@ -64,9 +64,9 @@ class ArticleRepositoryImpl(
         CoroutineScope(Dispatchers.Default).launch {
             paymentManager.ownedProductsFlow()
                 .collect(object : FlowCollector<List<MarketItem>> {
-                    override suspend fun emit(value: List<MarketItem>) {
-                        logger.debug("New owned product list: ${value.size} categories")
-                        ownedProductIds = value.map { skuDetails -> skuDetails.productId }
+                    override suspend fun emit(items: List<MarketItem>) {
+                        logger.debug("New owned product list: ${items.size} categories")
+                        ownedProductIds = items.filter { item -> item.purchase != null }.map { item -> item.skuDetails.sku }
                         updatePayedCategories(categories, ownedProductIds)
                     }
                 })
