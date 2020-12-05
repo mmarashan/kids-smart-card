@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.StateFlow
 import ru.volgadev.common.log.Logger
 import ru.volgadev.pay_lib.*
 
+
 /** TODOs: - 1ч
- * 1. Закрывать активити
  * 2. Реактивное обновление данных оплаты во вью
  * 3. Проброс ИД товаров
  */
@@ -17,8 +17,7 @@ import ru.volgadev.pay_lib.*
 
 @ExperimentalCoroutinesApi
 internal class PaymentManagerImpl(
-    private val context: Context,
-    private val googlePlayLicenseKey: String
+    private val context: Context
 ) : PaymentManager {
 
     private val logger = Logger.get("PaymentManagerImpl")
@@ -74,7 +73,7 @@ internal class PaymentManagerImpl(
 
     private fun updateState() {
         logger.debug("updateState()")
-        val idsList = listOf("numbers_pro_ru", "test_item_2")
+        val idsList = listOf("numbers_pro_ru")
 
         val param = SkuDetailsParams.newBuilder().setSkusList(idsList)
             .setType(BillingClient.SkuType.INAPP).build()
@@ -92,8 +91,17 @@ internal class PaymentManagerImpl(
 
                     for (i in purchasesList.indices) {
                         val purchase = purchasesList[i]
-                        if (purchase.purchaseState == Purchase.PurchaseState.PURCHASED) {
-                            itemsMap.get(purchase.sku)?.purchase = purchase
+                        itemsMap.get(purchase.sku)?.purchase = purchase
+
+                        if (!purchase.isAcknowledged) {
+                            logger.debug("Try to acknowledgePurchase")
+                            val acknowledgePurchaseParams = AcknowledgePurchaseParams.newBuilder()
+                                .setPurchaseToken(purchase.purchaseToken)
+                                .build()
+                            billingClient.acknowledgePurchase(acknowledgePurchaseParams) { result ->
+                                logger.debug("acknowledgePurchase result=${result.responseCode}")
+                                updateState()
+                            }
                         }
                     }
 
@@ -161,6 +169,7 @@ internal class PaymentManagerImpl(
 
     override fun dispose() {
         logger.debug("dispose()")
+        BillingProcessorServiceLocator.clear()
         resultListener = null
     }
 }

@@ -2,6 +2,7 @@ package ru.volgadev.article_data.repository
 
 import android.content.Context
 import androidx.annotation.WorkerThread
+import com.android.billingclient.api.Purchase
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import ru.volgadev.article_data.api.ArticleBackendApi
@@ -66,7 +67,7 @@ class ArticleRepositoryImpl(
                 .collect(object : FlowCollector<List<MarketItem>> {
                     override suspend fun emit(items: List<MarketItem>) {
                         logger.debug("New owned product list: ${items.size} categories")
-                        ownedProductIds = items.filter { item -> item.purchase != null }.map { item -> item.skuDetails.sku }
+                        ownedProductIds = items.filter { item -> item.purchase?.purchaseState == Purchase.PurchaseState.PURCHASED }.map { item -> item.skuDetails.sku }
                         updatePayedCategories(categories, ownedProductIds)
                     }
                 })

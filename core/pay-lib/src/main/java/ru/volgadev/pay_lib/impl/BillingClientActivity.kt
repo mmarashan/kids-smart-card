@@ -23,9 +23,6 @@ open class BillingClientActivity : AppCompatActivity() {
 
     fun onClickPay() {
         billingClient.launchBillingFlow(this, billingFlowParams)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         finish()
     }
 
