@@ -29,6 +29,8 @@ internal class PaymentManagerImpl(
 
     private val itemsMap = HashMap<String, MarketItem>()
 
+    private val skuIds = ArrayList<String>()// listOf("numbers_pro_ru")
+
     private val billingClient =
         BillingClient.newBuilder(context).setListener(object : PurchasesUpdatedListener {
 
@@ -72,10 +74,11 @@ internal class PaymentManagerImpl(
     }
 
     private fun updateState() {
-        logger.debug("updateState()")
-        val idsList = listOf("numbers_pro_ru")
+        logger.debug("updateState() skuIds = ${skuIds.joinToString(",")}")
 
-        val param = SkuDetailsParams.newBuilder().setSkusList(idsList)
+        if (skuIds.isEmpty()) return
+
+        val param = SkuDetailsParams.newBuilder().setSkusList(skuIds)
             .setType(BillingClient.SkuType.INAPP).build()
         scope.launch {
             billingClient.querySkuDetailsAsync(
@@ -115,11 +118,11 @@ internal class PaymentManagerImpl(
 
     private var resultListener: PaymentResultListener? = null
 
-    override fun isAvailable(): Boolean {
-        logger.debug("isAvailable()")
-        val isAvailable = false
-        logger.debug("BillingProcessor.isAvailable = $isAvailable")
-        return isAvailable
+    override fun setSkuIds(ids: List<String>) {
+        logger.debug("setSkuIds()")
+        skuIds.clear()
+        skuIds.addAll(ids)
+        updateState()
     }
 
     override fun requestPayment(
@@ -162,7 +165,7 @@ internal class PaymentManagerImpl(
         return false
     }
 
-    override fun ownedProductsFlow(): StateFlow<List<MarketItem>> = ownedProductsStateFlow
+    override fun productsFlow(): StateFlow<List<MarketItem>> = ownedProductsStateFlow
 
 //    override fun ownedSubscriptionsFlow(): StateFlow<List<MarketItem>> =
 //        ownedSubscriptionStateFlow

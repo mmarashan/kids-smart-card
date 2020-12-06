@@ -11,7 +11,7 @@ import ru.volgadev.pay_lib.impl.BillingClientActivity
 @WorkerThread
 interface PaymentManager {
 
-    fun isAvailable(): Boolean
+    fun setSkuIds(ids: List<String>)
 
     fun requestPayment(
         paymentRequest: PaymentRequest,
@@ -21,7 +21,7 @@ interface PaymentManager {
 
     fun consumePurchase(itemId: String): Boolean
 
-    fun ownedProductsFlow(): Flow<List<MarketItem>>
+    fun productsFlow(): Flow<List<MarketItem>>
 
     // fun ownedSubscriptionsFlow(): Flow<List<MarketItem>>
 

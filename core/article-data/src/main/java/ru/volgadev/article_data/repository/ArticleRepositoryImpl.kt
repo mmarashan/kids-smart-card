@@ -47,7 +47,7 @@ class ArticleRepositoryImpl(
     private var isUpdated = false
 
     @Volatile
-    private var ownedProductIds: List<String> = ArrayList()
+    private var productIds: List<String> = ArrayList()
     private var categories = ArrayList<ArticleCategory>()
 
     init {
@@ -63,12 +63,14 @@ class ArticleRepositoryImpl(
         }
 
         CoroutineScope(Dispatchers.Default).launch {
-            paymentManager.ownedProductsFlow()
+            paymentManager.productsFlow()
                 .collect(object : FlowCollector<List<MarketItem>> {
                     override suspend fun emit(items: List<MarketItem>) {
-                        logger.debug("New owned product list: ${items.size} categories")
-                        ownedProductIds = items.filter { item -> item.purchase?.purchaseState == Purchase.PurchaseState.PURCHASED }.map { item -> item.skuDetails.sku }
-                        updatePayedCategories(categories, ownedProductIds)
+                        logger.debug("On market product list: ${items.size} categories")
+                        productIds =
+                            items.filter { item -> item.purchase?.purchaseState == Purchase.PurchaseState.PURCHASED }
+                                .map { item -> item.skuDetails.sku }
+                        updatePayedCategories(categories, productIds)
                     }
                 })
         }
@@ -130,17 +132,21 @@ class ArticleRepositoryImpl(
         isUpdated = true
         logger.debug("loadFromServer() OK")
         this.categories = ArrayList(categories)
-        updatePayedCategories(this.categories, ownedProductIds)
+        val categoriesSkuIds = categories.mapNotNull { category -> category.marketItemId }
+        paymentManager.setSkuIds(categoriesSkuIds)
+        updatePayedCategories(this.categories, productIds)
         articleChannel.value = ArrayList(articles)
     }
 
     private suspend fun loadFromDB() = withContext(Dispatchers.Default) {
         val articles = articlesDb.dao().getAll()
         val dbCategories = categoriesDb.dao().getAll()
-        logger.debug("Load ${categories.size} categories and ${articles.size} articles from Db")
+        logger.debug("Load ${dbCategories.size} categories and ${articles.size} articles from Db")
         articleChannel.value = ArrayList(articles)
         categories = ArrayList(dbCategories)
-        updatePayedCategories(categories, ownedProductIds)
+        val categoriesSkuIds = categories.mapNotNull { category -> category.marketItemId }
+        paymentManager.setSkuIds(categoriesSkuIds)
+        updatePayedCategories(categories, productIds)
     }
 
     @WorkerThread
@@ -162,12 +168,15 @@ class ArticleRepositoryImpl(
     ) {
         logger.debug("updatePayedCategories(${categories.size}, ${payedIds.size})")
         if (categories.isEmpty()) return
+        categories.forEach { category ->
+            val isPaid = payedIds.singleOrNull { id -> id == category.marketItemId } != null
+            if (isPaid != category.isPaid) {
+                category.isPaid = isPaid
+                categoriesDb.dao().updateIsPaid(category.id, isPaid)
+            }
+        }
         logger.debug("categories = ${categories.joinToString(",")}")
         logger.debug("payedIds = ${payedIds.joinToString(",")}")
-        categories.forEach { category ->
-            val isPayed = payedIds.contains(category.marketItemId)
-            category.isPaid = isPayed
-        }
         categoriesFlow.value = ArrayList(categories)
     }
 

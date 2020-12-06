@@ -36,9 +36,11 @@ class ArticleGalleryViewModel(
     val audioToPlay = LiveEvent<MusicTrack>()
 
     val availableCategories =
-        articleRepository.categories().asLiveData().distinctUntilChanged().map { categories ->
-            return@map categories.filter { category -> category.isFree || category.isPaid }
-        }
+        articleRepository.categories().asLiveData().distinctUntilChanged()
+// TODO: fix filter!
+//            .map { categories ->
+//            return@map categories.filter { category -> category.isFree || category.isPaid }
+//        }
 
     @MainThread
     fun onClickCategory(category: ArticleCategory) {
