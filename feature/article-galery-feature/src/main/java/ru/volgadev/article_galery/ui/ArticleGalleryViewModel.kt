@@ -9,7 +9,6 @@ import ru.volgadev.article_data.repository.ArticleRepository
 import ru.volgadev.common.ENABLE_BACKGROUND_MUSIC
 import ru.volgadev.common.LiveEvent
 import ru.volgadev.common.log.Logger
-import ru.volgadev.common.observeOnce
 import ru.volgadev.music_data.model.MusicTrack
 import ru.volgadev.music_data.model.MusicTrackType
 import ru.volgadev.music_data.repository.MusicRepository
@@ -36,11 +35,13 @@ class ArticleGalleryViewModel(
     val audioToPlay = LiveEvent<MusicTrack>()
 
     val availableCategories =
-        articleRepository.categories().asLiveData().distinctUntilChanged()
-// TODO: fix filter!
-//            .map { categories ->
-//            return@map categories.filter { category -> category.isFree || category.isPaid }
-//        }
+        articleRepository.categories().asLiveData()
+            .map { categories ->
+                return@map categories.filter { category ->
+                    logger.debug("Filter category ${category.name} isPaid = ${category.isPaid} isFree=${category.isFree}")
+                    (category.isFree || category.isPaid)
+                }
+            }
 
     @MainThread
     fun onClickCategory(category: ArticleCategory) {

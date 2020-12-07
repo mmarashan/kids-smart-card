@@ -177,7 +177,7 @@ class ArticleRepositoryImpl(
         }
         logger.debug("categories = ${categories.joinToString(",")}")
         logger.debug("payedIds = ${payedIds.joinToString(",")}")
-        categoriesFlow.value = ArrayList(categories)
+        categoriesFlow.value = categories
     }
 
     override suspend fun requestPaymentForCategory(paymentRequest: PaymentRequest) =

@@ -49,7 +49,7 @@ data class ArticleCategory(
     val iconUrl: String? = null,
     val fileUrl: String,
     val marketItemId: String? = null,
-    var isPaid: Boolean = false
+    var isPaid: Boolean = true
 ) {
     @Ignore
     val isFree = marketItemId == null

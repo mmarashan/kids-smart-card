@@ -9,12 +9,6 @@ import ru.volgadev.common.log.Logger
 import ru.volgadev.pay_lib.*
 
 
-/** TODOs: - 1ч
- * 2. Реактивное обновление данных оплаты во вью
- * 3. Проброс ИД товаров
- */
-
-
 @ExperimentalCoroutinesApi
 internal class PaymentManagerImpl(
     private val context: Context
