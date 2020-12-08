@@ -40,8 +40,7 @@ class ArticleRepositoryImpl(
         ArticleCategoriesDatabase.getInstance(context)
     }
 
-    override fun categories(): Flow<ArrayList<ArticleCategory>> =
-        categoriesFlow.filter { list -> list.isNotEmpty() }
+    override fun categories(): StateFlow<ArrayList<ArticleCategory>> = categoriesFlow
 
     @Volatile
     private var isUpdated = false

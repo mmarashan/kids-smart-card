@@ -2,6 +2,9 @@ package ru.volgadev.article_galery.ui
 
 import androidx.annotation.MainThread
 import androidx.lifecycle.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.launch
 import ru.volgadev.article_data.model.Article
 import ru.volgadev.article_data.model.ArticleCategory
@@ -13,6 +16,7 @@ import ru.volgadev.music_data.model.MusicTrack
 import ru.volgadev.music_data.model.MusicTrackType
 import ru.volgadev.music_data.repository.MusicRepository
 
+@OptIn(InternalCoroutinesApi::class)
 class ArticleGalleryViewModel(
     private val articleRepository: ArticleRepository,
     private val musicRepository: MusicRepository
@@ -34,14 +38,18 @@ class ArticleGalleryViewModel(
 
     val audioToPlay = LiveEvent<MusicTrack>()
 
-    val availableCategories =
-        articleRepository.categories().asLiveData()
-            .map { categories ->
-                return@map categories.filter { category ->
-                    logger.debug("Filter category ${category.name} isPaid = ${category.isPaid} isFree=${category.isFree}")
-                    (category.isFree || category.isPaid)
-                }
+    val availableCategories = articleRepository.categories().asLiveData()
+        .map { categories ->
+            return@map categories.filter { category ->
+                logger.debug("Filter category ${category.name} isPaid = ${category.isPaid} isFree=${category.isFree}")
+                (category.isFree || category.isPaid)
             }
+        }
+
+    init {
+        logger.debug("init")
+    }
+
 
     @MainThread
     fun onClickCategory(category: ArticleCategory) {

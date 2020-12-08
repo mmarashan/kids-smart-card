@@ -7,6 +7,7 @@ import androidx.annotation.MainThread
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.cabinet_fragment.*
+import org.koin.androidx.viewmodel.ext.android.getViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import ru.volgadev.article_data.model.ArticleCategory
 import ru.volgadev.common.log.Logger
@@ -22,7 +23,7 @@ class CabinetFragment : Fragment(R.layout.cabinet_fragment) {
         fun newInstance() = CabinetFragment()
     }
 
-    private val viewModel: CabinetViewModel by viewModel()
+    private val viewModel:CabinetViewModel by viewModel()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -88,5 +89,10 @@ class CabinetFragment : Fragment(R.layout.cabinet_fragment) {
     override fun onPause() {
         logger.debug("onPause()")
         super.onPause()
+    }
+
+    override fun onDestroy() {
+        logger.debug("onDestroy()")
+        super.onDestroy()
     }
 }
