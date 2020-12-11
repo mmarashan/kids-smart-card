@@ -16,4 +16,4 @@ enum class Directon {
     FROM_TOP, FROM_BOTTOM, FROM_LEFT, FROM_RIGHT, FROM_TOP_LEFT, FROM_BOTTOM_LEFT, FROM_TOP_RIGHT, FROM_BOTTOM_RIGHT
 }
 
-data class CharacterSize(val width: Int, val height: Int)
+data class CharacterSize(val widthDp: Float, val heightDp: Float)

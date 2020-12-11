@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.annotation.WorkerThread
 import com.android.billingclient.api.Purchase
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.*
 import ru.volgadev.article_data.api.ArticleBackendApi
 import ru.volgadev.article_data.model.Article
@@ -30,7 +32,7 @@ class ArticleRepositoryImpl(
     private val logger = Logger.get("ArticleRepositoryImpl")
 
     private val articleChannel = MutableStateFlow<ArrayList<Article>>(value = ArrayList())
-    private val categoriesFlow = MutableStateFlow<ArrayList<ArticleCategory>>(value = ArrayList())
+    private val categoriesFlow = ConflatedBroadcastChannel<List<ArticleCategory>>()
 
     private val articlesDb: ArticleDatabase by lazy {
         ArticleDatabase.getInstance(context)
@@ -40,13 +42,14 @@ class ArticleRepositoryImpl(
         ArticleCategoriesDatabase.getInstance(context)
     }
 
-    override fun categories(): StateFlow<ArrayList<ArticleCategory>> = categoriesFlow
+    override fun categories(): Flow<List<ArticleCategory>> = categoriesFlow.asFlow()
 
     @Volatile
     private var isUpdated = false
 
     @Volatile
     private var productIds: List<String> = ArrayList()
+    @Volatile
     private var categories = ArrayList<ArticleCategory>()
 
     init {
@@ -133,7 +136,7 @@ class ArticleRepositoryImpl(
         this.categories = ArrayList(categories)
         val categoriesSkuIds = categories.mapNotNull { category -> category.marketItemId }
         paymentManager.setSkuIds(categoriesSkuIds)
-        updatePayedCategories(this.categories, productIds)
+        updatePayedCategories(categories, productIds)
         articleChannel.value = ArrayList(articles)
     }
 
@@ -145,7 +148,7 @@ class ArticleRepositoryImpl(
         categories = ArrayList(dbCategories)
         val categoriesSkuIds = categories.mapNotNull { category -> category.marketItemId }
         paymentManager.setSkuIds(categoriesSkuIds)
-        updatePayedCategories(categories, productIds)
+        updatePayedCategories(dbCategories, productIds)
     }
 
     @WorkerThread
@@ -161,13 +164,15 @@ class ArticleRepositoryImpl(
             }
         }
 
+    @Synchronized
     private fun updatePayedCategories(
-        categories: ArrayList<ArticleCategory>,
+        categories: List<ArticleCategory>,
         payedIds: List<String>
     ) {
+        val copyCategories = categories.toList()
         logger.debug("updatePayedCategories(${categories.size}, ${payedIds.size})")
-        if (categories.isEmpty()) return
-        categories.forEach { category ->
+        if (copyCategories.isEmpty()) return
+        copyCategories.forEachIndexed { index, category ->
             val isPaid = payedIds.singleOrNull { id -> id == category.marketItemId } != null
             if (isPaid != category.isPaid) {
                 category.isPaid = isPaid
@@ -176,7 +181,7 @@ class ArticleRepositoryImpl(
         }
         logger.debug("categories = ${categories.joinToString(",")}")
         logger.debug("payedIds = ${payedIds.joinToString(",")}")
-        categoriesFlow.value = categories
+        categoriesFlow.offer(copyCategories)
     }
 
     override suspend fun requestPaymentForCategory(paymentRequest: PaymentRequest) =

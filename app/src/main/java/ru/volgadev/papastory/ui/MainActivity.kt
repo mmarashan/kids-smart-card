@@ -26,6 +26,7 @@ import ru.volgadev.common.isPermissionGranted
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.setVisibleWithTransition
 import ru.volgadev.papastory.R
+import ru.volgadev.papastory.data.CharactersHolder
 import ru.volgadev.speaking_character.*
 
 
@@ -42,6 +43,9 @@ private const val REQUEST_CODE = 123
 class MainActivity : AppCompatActivity() {
 
     private val logger = Logger.get("MainActivity")
+
+    private val characterManager = SpeakingCharacterManager(this)
+    private val charactersHolder = CharactersHolder(this)
 
     @InternalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,24 +68,6 @@ class MainActivity : AppCompatActivity() {
                 )
             }
         }
-
-        val characterManager = SpeakingCharacterManager(this)
-        val gingerCatDrawable = resources.getDrawable(R.drawable.ginger_cat, null)
-        val catAvailableDirections = setOf(
-            Directon.FROM_BOTTOM,
-            Directon.FROM_TOP,
-            Directon.FROM_BOTTOM_LEFT,
-            Directon.FROM_BOTTOM_RIGHT,
-            Directon.FROM_TOP_LEFT,
-            Directon.FROM_TOP_RIGHT
-        )
-        val gingerCat =
-            Character(
-                "cat", gingerCatDrawable,
-                TextBound(0.35f, 0.09f, 0.88f, 0.35f),
-                CharacterSize(420, 420),
-                catAvailableDirections
-            )
 
         val galleryFragment: ArticleGalleryFragment =
             FragmentProvider.get(AppFragment.GALERY_FRAGMENT) as ArticleGalleryFragment
@@ -110,10 +96,10 @@ class MainActivity : AppCompatActivity() {
                     } else {
                         article.openPhrase?.let { phrase ->
                             characterManager.show(
-                                this@MainActivity,
-                                gingerCat,
-                                phrase,
-                                2000L
+                                activity = this@MainActivity,
+                                character = charactersHolder.getRandom(),
+                                utteranceText = null,
+                                showTimeMs = 2000L
                             )
                         }
                     }

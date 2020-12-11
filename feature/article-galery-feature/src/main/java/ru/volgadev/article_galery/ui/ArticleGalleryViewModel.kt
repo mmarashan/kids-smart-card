@@ -38,16 +38,31 @@ class ArticleGalleryViewModel(
 
     val audioToPlay = LiveEvent<MusicTrack>()
 
-    val availableCategories = articleRepository.categories().asLiveData()
-        .map { categories ->
-            return@map categories.filter { category ->
-                logger.debug("Filter category ${category.name} isPaid = ${category.isPaid} isFree=${category.isFree}")
-                (category.isFree || category.isPaid)
-            }
-        }
+    private val _categories = MutableLiveData<List<ArticleCategory>>()
+    val availableCategories = _categories
+//        articleRepository.categories().asLiveData(timeoutInMs = 10*600_000L)
+//        .map { categories ->
+//            return@map categories.filter { category ->
+//                logger.debug("Filter category ${category.name} isPaid = ${category.isPaid} isFree=${category.isFree}")
+//                (category.isFree || category.isPaid)
+//            }
+//        }
 
     init {
         logger.debug("init")
+        viewModelScope.launch(Dispatchers.Default) {
+            articleRepository.categories().collect(object : FlowCollector<List<ArticleCategory>> {
+                override suspend fun emit(value: List<ArticleCategory>) {
+                    logger.debug("On update categories")
+                    val filteredCategories = value.filter { category ->
+                        logger.debug("Filter category ${category.name} isPaid = ${category.isPaid} isFree=${category.isFree}")
+                        (category.isFree || category.isPaid)
+                    }
+
+                    _categories.postValue(filteredCategories)
+                }
+            })
+        }
     }
 
 

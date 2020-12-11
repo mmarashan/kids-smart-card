@@ -16,17 +16,13 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.children
+import ru.volgadev.common.dpToPx
 import ru.volgadev.common.getNavigationBarHeight
 import ru.volgadev.common.getScreenSize
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.runSwingAnimation
 import kotlin.math.roundToInt
 
-/**
- * TODO LIST:
-3. Записать видео - 0.5 ч
-4. Добавить параметр "текст произнесения" - 1ч
- */
 class SpeakingCharacterManager(private val context: Context) {
 
     private val logger = Logger.get("SpeakingCharacterManager")
@@ -45,13 +41,13 @@ class SpeakingCharacterManager(private val context: Context) {
     fun show(
         activity: Activity,
         character: Character,
-        showPhrase: String,
+        utteranceText: String?,
         showTimeMs: Long
     ) {
         logger.debug("show()")
 
-        val viewWidth = character.size.width
-        val viewHeight = character.size.height
+        val viewWidth = context.dpToPx(character.size.widthDp)
+        val viewHeight = context.dpToPx(character.size.heightDp)
 
         val context = activity.applicationContext
         val windowManager = activity.windowManager
@@ -61,6 +57,7 @@ class SpeakingCharacterManager(private val context: Context) {
             setImageDrawable(character.drawable)
             scaleType = ImageView.ScaleType.CENTER_INSIDE
         }
+
         val textView = TextView(context).apply {
             val textViewWidth =
                 ((character.textBound.x1 - character.textBound.x0) * viewWidth).roundToInt()
@@ -70,7 +67,7 @@ class SpeakingCharacterManager(private val context: Context) {
             setAutoSizeTextTypeUniformWithConfiguration(
                 12, 32, 1, TypedValue.COMPLEX_UNIT_SP
             )
-            text = showPhrase
+            text = utteranceText
             gravity = Gravity.CENTER
             layoutParams = FrameLayout.LayoutParams(textViewWidth, textViewHeight).apply {
                 setMargins(
@@ -82,19 +79,22 @@ class SpeakingCharacterManager(private val context: Context) {
             }
         }
 
+
         val view = FrameLayout(context).apply {
             setBackgroundColor(Color.TRANSPARENT)
             layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
 
             addView(imageView)
-            addView(textView)
+            if (utteranceText != null) {
+                addView(textView)
+            }
 
             postDelayed({
                 windowManager.removeViewFromOverlay(this)
             }, showTimeMs + SLIDE_ANIMATION_TIME_MS * 2)
         }
 
-        val direction: Directon = character.availableDirections.random()
+        val direction: Directon = getNewDirection(character.availableDirections)
 
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
@@ -206,8 +206,17 @@ class SpeakingCharacterManager(private val context: Context) {
         view.startAnimation(translateAnimation)
     }
 
+    private fun getNewDirection(availableDirections: Set<Directon>): Directon {
+        if (availableDirections.isEmpty()) lastDirection =  Directon.FROM_BOTTOM
+        if (availableDirections.size == 1) lastDirection =  availableDirections.first()
+        lastDirection = availableDirections.filter { direction -> direction!= lastDirection}.random()
+        return lastDirection!!
+    }
+
     private companion object {
         const val SLIDE_ANIMATION_TIME_MS = 500L
         const val PADDING_PX = 64
+
+        var lastDirection: Directon? = null
     }
 }

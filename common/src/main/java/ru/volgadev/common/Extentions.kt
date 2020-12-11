@@ -218,12 +218,12 @@ fun File.isExistsNonEmptyFile(): Boolean {
 
 fun Context.dpToPx(dp: Float): Int {
     val metrics = resources.displayMetrics
-    return (dp * (metrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)).roundToInt()
+    return (dp * metrics.density).roundToInt()
 }
 
 fun Context.pxToDp(px: Int): Float {
     val metrics = resources.displayMetrics
-    return px / (metrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
+    return px / metrics.density
 }
 
 fun Context.getNavigationBarHeight(): Int {

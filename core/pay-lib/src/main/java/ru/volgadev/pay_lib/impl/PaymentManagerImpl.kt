@@ -78,6 +78,7 @@ internal class PaymentManagerImpl(
             billingClient.querySkuDetailsAsync(
                 param
             ) { billingResult, skuDetails ->
+                logger.debug("SKU detail response ${billingResult.responseCode} ${billingResult.debugMessage}")
                 if (billingResult.responseCode == 0 && skuDetails != null) {
                     skuDetails.forEach { skuDetails ->
                         itemsMap.put(skuDetails.sku, MarketItem(skuDetails))
