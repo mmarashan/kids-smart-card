@@ -53,6 +53,9 @@ class TagsAdapter(context: Context, private val itemLayout: Int) :
         notifyDataSetChanged()
     }
 
+    @AnyThread
+    fun getChoosenTag(): String? = chosenTag
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int

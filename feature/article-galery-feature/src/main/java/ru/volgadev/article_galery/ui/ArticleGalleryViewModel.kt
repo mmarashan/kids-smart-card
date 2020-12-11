@@ -40,13 +40,6 @@ class ArticleGalleryViewModel(
 
     private val _categories = MutableLiveData<List<ArticleCategory>>()
     val availableCategories = _categories
-//        articleRepository.categories().asLiveData(timeoutInMs = 10*600_000L)
-//        .map { categories ->
-//            return@map categories.filter { category ->
-//                logger.debug("Filter category ${category.name} isPaid = ${category.isPaid} isFree=${category.isFree}")
-//                (category.isFree || category.isPaid)
-//            }
-//        }
 
     init {
         logger.debug("init")
@@ -58,7 +51,6 @@ class ArticleGalleryViewModel(
                         logger.debug("Filter category ${category.name} isPaid = ${category.isPaid} isFree=${category.isFree}")
                         (category.isFree || category.isPaid)
                     }
-
                     _categories.postValue(filteredCategories)
                 }
             })

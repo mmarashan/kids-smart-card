@@ -166,8 +166,10 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
             logger.debug("On load categories: ${categories.size}")
             val categoryNames = categories.map { category -> category.name }
             categoryTagsAdapter.setData(categoryNames)
-            categories.firstOrNull()?.let { firstCategory ->
-                viewModel.onClickCategory(firstCategory)
+            if (categoryTagsAdapter.getChosenTag() == null) {
+                categories.firstOrNull()?.let { firstCategory ->
+                    viewModel.onClickCategory(firstCategory)
+                }
             }
         })
 
