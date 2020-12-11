@@ -54,7 +54,7 @@ class TagsAdapter(context: Context, private val itemLayout: Int) :
     }
 
     @AnyThread
-    fun getChoosenTag(): String? = chosenTag
+    fun getChosenTag(): String? = chosenTag
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
