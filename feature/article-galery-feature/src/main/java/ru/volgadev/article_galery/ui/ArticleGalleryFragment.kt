@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.view.View.OVER_SCROLL_NEVER
+import android.view.animation.DecelerateInterpolator
 import androidx.annotation.AnyThread
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
@@ -13,8 +14,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import jp.wasabeef.recyclerview.animators.OvershootInLeftAnimator
-import jp.wasabeef.recyclerview.animators.SlideInDownAnimator
+import jp.wasabeef.recyclerview.animators.*
 import kotlinx.android.synthetic.main.main_fragment.*
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import ru.volgadev.article_data.model.Article
@@ -81,11 +81,11 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
             layoutManager = StaggeredGridLayoutManager(spanCount, LinearLayoutManager.VERTICAL)
             adapter = articlesAdapter
             overScrollMode = OVER_SCROLL_NEVER
-            itemAnimator = OvershootInLeftAnimator(1f).apply {
-                addDuration = 700
-                removeDuration = 100
-                moveDuration = 700
-                changeDuration = 100
+            itemAnimator = SlideInUpAnimator().apply {
+                addDuration = 248
+                removeDuration = 200
+                moveDuration = 200
+                changeDuration = 0
             }
         }
 
