@@ -36,6 +36,7 @@ open class BillingClientActivity : AppCompatActivity() {
         ) {
             val intent = Intent(context, activityClass).apply {
                 putExtra(PAYMENT_REQUEST_EXTRA, paymentRequest)
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
             }
             context.startActivity(intent)
         }
