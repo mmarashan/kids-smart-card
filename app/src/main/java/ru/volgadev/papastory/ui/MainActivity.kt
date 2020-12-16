@@ -21,6 +21,7 @@ import ru.volgadev.article_data.model.ArticleType
 import ru.volgadev.article_galery.ui.ArticleGalleryFragment
 import ru.volgadev.article_page.ArticlePageFragment
 import ru.volgadev.article_page.ITEM_ID_KEY
+import ru.volgadev.common.ENABLE_CHARACTERS
 import ru.volgadev.common.hideNavBar
 import ru.volgadev.common.isPermissionGranted
 import ru.volgadev.common.log.Logger
@@ -44,7 +45,7 @@ class MainActivity : AppCompatActivity() {
 
     private val logger = Logger.get("MainActivity")
 
-    private val characterManager = SpeakingCharacterManager(this)
+    private val characterManager by lazy { SpeakingCharacterManager(this) }
     private val charactersHolder = CharactersHolder(this)
 
     @InternalCoroutinesApi
@@ -93,7 +94,7 @@ class MainActivity : AppCompatActivity() {
                             true,
                             clickedView
                         )
-                    } else {
+                    } else if (ENABLE_CHARACTERS) {
                         article.openPhrase?.let { phrase ->
                             characterManager.show(
                                 activity = this@MainActivity,
