@@ -5,7 +5,7 @@
     <item
         android:id="@+id/action_galery"
         android:enabled="true"
-        android:icon="@drawable/ic_round_layers_24"
+        android:icon="@drawable/ic_baseline_dashboard_24"
         android:title="@string/gallery"
         app:showAsAction="ifRoom" />
 

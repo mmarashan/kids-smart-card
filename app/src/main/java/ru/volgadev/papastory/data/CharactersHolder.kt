@@ -10,12 +10,11 @@ import ru.volgadev.speaking_character.TextBound
 class CharactersHolder(private val context: Context) {
 
     fun getRandom(): Character {
-        return when ((0..3).random()){
+        return when ((0..2).random()){
             0 -> gingerCat
             1 -> mole
             2 -> whale
-            3 -> smartOwl
-            else -> smartOwl
+            else -> gingerCat
         }
     }
 
@@ -62,22 +61,4 @@ class CharactersHolder(private val context: Context) {
             )
         )
     }
-
-    val smartOwl by lazy {
-        Character(
-            "cat",
-            context.resources.getDrawable(R.drawable.smart_owl, null),
-            TextBound(0.35f, 0.09f, 0.88f, 0.35f),
-            CharacterSize(164f, 164f),
-            setOf(
-                Directon.FROM_BOTTOM,
-                Directon.FROM_TOP,
-                Directon.FROM_BOTTOM_LEFT,
-                Directon.FROM_BOTTOM_RIGHT,
-                Directon.FROM_TOP_LEFT
-            )
-        )
-    }
-
-
 }
