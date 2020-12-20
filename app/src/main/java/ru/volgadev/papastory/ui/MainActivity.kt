@@ -52,7 +52,6 @@ class MainActivity : AppCompatActivity() {
         logger.debug("onCreate($savedInstanceState)")
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
-        hideNavBar()
 
         val needRequestPermission =
             NEEDED_PERMISSIONS.map { permission -> this.isPermissionGranted(permission) }
@@ -142,13 +141,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onResume() {
-        super.onResume()
         logger.debug("onResume()")
         hideNavBar()
-        bottomNavigation.isVisible = false
-        bottomNavigation.postDelayed({
-            showBottomNavigationPanel()
-        }, 500L)
+        super.onResume()
     }
 
     override fun onPause() {
