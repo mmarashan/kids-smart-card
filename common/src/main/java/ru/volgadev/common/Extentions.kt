@@ -13,7 +13,6 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.transition.Transition
 import android.transition.TransitionManager
-import android.util.DisplayMetrics
 import android.util.Patterns
 import android.view.View
 import android.view.ViewGroup
@@ -132,16 +131,20 @@ fun View.scaleToFitAnimatedAndBack(
 ) {
     val animPair = scaleToFitParentAnimation(this, scaleRate)
     val animScaleUp = animPair.first
-    val animScaleDown = animPair.second
+    val animScaleDown = animPair.second.apply {
+        duration = timeDown
+    }
     val view = this
     animScaleUp.duration = timeUp
     animScaleUp.fillAfter = true
     animScaleUp.setAnimationListener(object : Animation.AnimationListener {
-        override fun onAnimationStart(animation: Animation?) {}
+        override fun onAnimationStart(animation: Animation?) {
+        }
 
         override fun onAnimationEnd(animation: Animation?) {
             animScaleDown.setAnimationListener(object : Animation.AnimationListener {
-                override fun onAnimationStart(animation: Animation?) {}
+                override fun onAnimationStart(animation: Animation?) {
+                }
 
                 override fun onAnimationEnd(animation: Animation?) {
                     onEnd.invoke()
@@ -149,10 +152,14 @@ fun View.scaleToFitAnimatedAndBack(
 
                 override fun onAnimationRepeat(animation: Animation?) {}
             })
-            animScaleDown.duration = timeDown
-            view.postDelayed({
-                view.startAnimation(animScaleDown)
-            }, timeDelay)
+            if (view.isShown) {
+                view.postDelayed({
+                    view.startAnimation(animScaleDown)
+                }, timeDelay)
+            } else {
+                view.animation?.cancel()
+                onEnd.invoke()
+            }
         }
 
         override fun onAnimationRepeat(animation: Animation?) {}
