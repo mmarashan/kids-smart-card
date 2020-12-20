@@ -3,11 +3,15 @@ package ru.volgadev.article_galery.ui
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
+import android.transition.Explode
 import android.view.View
 import android.view.View.OVER_SCROLL_NEVER
+import android.widget.CompoundButton
+import android.widget.ToggleButton
 import androidx.annotation.AnyThread
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -21,8 +25,10 @@ import ru.volgadev.article_data.model.Article
 import ru.volgadev.article_data.model.ArticleType
 import ru.volgadev.article_galery.R
 import ru.volgadev.common.BackgroundMediaPlayer
+import ru.volgadev.common.ENABLE_BACKGROUND_MUSIC
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.scaleToFitAnimatedAndBack
+import ru.volgadev.common.setVisibleWithTransition
 import ru.volgadev.common.view.scrollToItemToCenter
 
 
@@ -150,6 +156,7 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
                 LinearLayoutManager.HORIZONTAL,
                 false
             )
+            overScrollMode = OVER_SCROLL_NEVER
             adapter = categoryTagsAdapter
             val dividerDrawable =
                 ContextCompat.getDrawable(context, R.drawable.empty_divider_4)!!
@@ -158,7 +165,7 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
                     setDrawable(dividerDrawable)
                 }
             addItemDecoration(dividerDecorator)
-            itemAnimator = SlideInDownAnimator()
+            itemAnimator = null
         }
 
         viewModel.availableCategories.observe(viewLifecycleOwner, { categories ->
@@ -189,11 +196,23 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
             trackUrl?.let { url ->
                 try {
                     musicMediaPlayer.playAudio(requireContext(), Uri.parse(url))
+                    backgroundMusicToggleButton.isChecked = true
+                    backgroundMusicToggleButton.isVisible = true
                 } catch (e: Exception) {
                     logger.error("Exception when playing: ${e.message}")
                 }
             }
         })
+
+        backgroundMusicToggleButton.isVisible = false
+        backgroundMusicToggleButton.setOnCheckedChangeListener { buttonView, isChecked ->
+            logger.debug("on click backgroundMusicToggleButton")
+            if (isChecked) {
+                musicMediaPlayer.start()
+            } else {
+                musicMediaPlayer.pause()
+            }
+        }
     }
 
     override fun onResume() {
