@@ -5,7 +5,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.view.View.OVER_SCROLL_NEVER
-import android.view.animation.DecelerateInterpolator
 import androidx.annotation.AnyThread
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
@@ -14,7 +13,8 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import jp.wasabeef.recyclerview.animators.*
+import jp.wasabeef.recyclerview.animators.SlideInDownAnimator
+import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
 import kotlinx.android.synthetic.main.main_fragment.*
 import org.koin.androidx.viewmodel.ext.android.sharedViewModel
 import ru.volgadev.article_data.model.Article
@@ -75,7 +75,6 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
         val isPortraitOrientation =
             requireActivity().resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
         val spanCount = if (isPortraitOrientation) 2 else 3
-
 
         contentRecyclerView.run {
             layoutManager = StaggeredGridLayoutManager(spanCount, LinearLayoutManager.VERTICAL)

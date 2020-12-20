@@ -37,9 +37,7 @@ class TagsAdapter(context: Context, private val itemLayout: Int) :
     @MainThread
     fun onChose(tag: String) {
         logger.debug("showChosen($tag)")
-        if (tag == chosenTag) {
-            return
-        }
+        if (tag == chosenTag) return
         chosenTag = tag
         notifyDataSetChanged()
     }
@@ -67,7 +65,7 @@ class TagsAdapter(context: Context, private val itemLayout: Int) :
     inner class ViewHolder(private val card: CardView) : RecyclerView.ViewHolder(card),
         View.OnClickListener {
 
-        private val tagTextView: TextView = card.findViewById<TextView>(R.id.tagTextView)
+        private val tagTextView = card.findViewById<TextView>(R.id.tagTextView)
 
         private var currentPosition = 0
 

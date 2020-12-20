@@ -61,10 +61,12 @@ class ArticleGalleryViewModel(
     @MainThread
     fun onClickCategory(category: ArticleCategory) {
         logger.debug("onClickCategory ${category.name}")
-        _category.value = category
-        viewModelScope.launch {
-            val categoryArticles = articleRepository.getCategoryArticles(category)
-            _articles.value = categoryArticles
+        if (_category.value?.id != category.id) {
+            _category.value = category
+            viewModelScope.launch {
+                val categoryArticles = articleRepository.getCategoryArticles(category)
+                _articles.value = categoryArticles
+            }
         }
     }
 
