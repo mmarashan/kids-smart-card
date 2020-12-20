@@ -27,6 +27,7 @@ import androidx.lifecycle.Observer
 import java.io.File
 import java.lang.ref.WeakReference
 import java.net.MalformedURLException
+import java.net.URL
 import kotlin.math.min
 import kotlin.math.roundToInt
 
@@ -212,9 +213,10 @@ fun <T> LiveData<T>.observeOnce(observer: Observer<T>) {
 
 fun String.isValidUrlString(): Boolean {
     try {
-        return this.isNotEmpty() && URLUtil.isValidUrl(this) && Patterns.WEB_URL.matcher(this)
+        URL(this)
+        return URLUtil.isValidUrl(this) && Patterns.WEB_URL.matcher(this)
             .matches()
-    } catch (e: MalformedURLException) {
+    } catch (e: Exception) {
     }
     return false
 }

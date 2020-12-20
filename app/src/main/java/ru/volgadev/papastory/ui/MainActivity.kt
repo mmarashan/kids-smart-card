@@ -30,7 +30,6 @@ import ru.volgadev.papastory.R
 import ru.volgadev.papastory.data.CharactersHolder
 import ru.volgadev.speaking_character.*
 
-
 const val HOME_ITEM_ID = R.id.action_home
 const val GALLERY_ITEM_ID = R.id.action_galery
 const val CONTENT_CONTAINER_ID = R.id.contentContainer
@@ -46,21 +45,19 @@ class MainActivity : AppCompatActivity() {
     private val logger = Logger.get("MainActivity")
 
     private val characterManager by lazy { SpeakingCharacterManager(this) }
-    private val charactersHolder = CharactersHolder(this)
+    private val charactersHolder by lazy { CharactersHolder(this) }
 
     @InternalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         logger.debug("onCreate($savedInstanceState)")
-        setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
-        this.hideNavBar()
+        hideNavBar()
 
         val needRequestPermission =
             NEEDED_PERMISSIONS.map { permission -> this.isPermissionGranted(permission) }
                 .contains(false)
         if (needRequestPermission) {
-
             showPermissionAlertDialog {
                 ActivityCompat.requestPermissions(
                     this,
