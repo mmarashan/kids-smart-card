@@ -9,32 +9,36 @@ enum class AppFragment {
     GALERY_FRAGMENT, ARTICLE_PAGE_FRAGMENT, CABINET_FRAGMENT
 }
 
-class FragmentProvider {
+object FragmentProvider {
 
-    companion object {
+    private val FULLSCREEN_FRAGMENTS_CLASS_NAMES =
+        listOf(ArticlePageFragment::class.java.canonicalName)
 
-        private val FULLSCREEN_FRAGMENTS_CLASS_NAMES =
-            listOf(ArticlePageFragment::class.java.canonicalName)
+    private val articleGalleryFragment by lazy { ArticleGalleryFragment.newInstance() }
+    private val cabinetFragment by lazy { CabinetFragment.newInstance() }
 
-        private val articleGalleryFragment by lazy { ArticleGalleryFragment.newInstance() }
-        private val cabinetFragment by lazy { CabinetFragment.newInstance() }
+    @JvmStatic
+    fun warm() {
+        articleGalleryFragment
+    }
 
-        fun get(code: AppFragment): Fragment {
-            return when (code) {
-                AppFragment.GALERY_FRAGMENT -> {
-                    articleGalleryFragment
-                }
-                AppFragment.ARTICLE_PAGE_FRAGMENT -> {
-                    ArticlePageFragment.newInstance()
-                }
-                AppFragment.CABINET_FRAGMENT -> {
-                    cabinetFragment
-                }
+    @JvmStatic
+    fun get(code: AppFragment): Fragment {
+        return when (code) {
+            AppFragment.GALERY_FRAGMENT -> {
+                articleGalleryFragment
+            }
+            AppFragment.ARTICLE_PAGE_FRAGMENT -> {
+                ArticlePageFragment.newInstance()
+            }
+            AppFragment.CABINET_FRAGMENT -> {
+                cabinetFragment
             }
         }
+    }
 
-        fun isFullscreen(fragment: Fragment): Boolean {
-            return fragment::class.java.canonicalName in FULLSCREEN_FRAGMENTS_CLASS_NAMES
-        }
+    @JvmStatic
+    fun isFullscreen(fragment: Fragment): Boolean {
+        return fragment::class.java.canonicalName in FULLSCREEN_FRAGMENTS_CLASS_NAMES
     }
 }
