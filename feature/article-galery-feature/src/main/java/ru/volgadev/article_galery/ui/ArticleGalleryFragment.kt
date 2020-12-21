@@ -3,11 +3,8 @@ package ru.volgadev.article_galery.ui
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
-import android.transition.Explode
 import android.view.View
 import android.view.View.OVER_SCROLL_NEVER
-import android.widget.CompoundButton
-import android.widget.ToggleButton
 import androidx.annotation.AnyThread
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
@@ -17,18 +14,15 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import jp.wasabeef.recyclerview.animators.SlideInDownAnimator
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
 import kotlinx.android.synthetic.main.main_fragment.*
-import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+import org.koin.androidx.viewmodel.ext.android.getViewModel
 import ru.volgadev.article_data.model.Article
 import ru.volgadev.article_data.model.ArticleType
 import ru.volgadev.article_galery.R
 import ru.volgadev.common.BackgroundMediaPlayer
-import ru.volgadev.common.ENABLE_BACKGROUND_MUSIC
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.scaleToFitAnimatedAndBack
-import ru.volgadev.common.setVisibleWithTransition
 import ru.volgadev.common.view.scrollToItemToCenter
 
 
@@ -39,8 +33,6 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
     companion object {
         fun newInstance() = ArticleGalleryFragment()
     }
-
-    private val viewModel: ArticleGalleryViewModel by sharedViewModel()
 
     private val musicMediaPlayer by lazy { BackgroundMediaPlayer() }
     private val cardsMediaPlayer by lazy { BackgroundMediaPlayer() }
@@ -60,6 +52,8 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         logger.debug("On fragment created; savedInstanceState=$savedInstanceState")
+
+        val viewModel = getViewModel<ArticleGalleryViewModel>()
 
         val articlesAdapter = ArticleCardAdapter(view.context)
 
