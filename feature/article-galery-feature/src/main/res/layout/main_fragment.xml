@@ -40,10 +40,10 @@
 
     <ToggleButton
         android:id="@+id/backgroundMusicToggleButton"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:layout_margin="16dp"
-        android:background="@color/colorPrimary"
+        android:background="@android:color/transparent"
         android:foreground="@drawable/ic_volume_toggle"
         android:textOff=""
         android:textOn=""
