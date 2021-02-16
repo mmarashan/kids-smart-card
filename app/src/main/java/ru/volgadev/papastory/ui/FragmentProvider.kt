@@ -6,7 +6,7 @@ import ru.volgadev.article_page.ArticlePageFragment
 import ru.volgadev.cabinet_feature.CabinetFragment
 
 enum class AppFragment {
-    GALERY_FRAGMENT, ARTICLE_PAGE_FRAGMENT, CABINET_FRAGMENT
+    GALLERY_FRAGMENT, ARTICLE_PAGE_FRAGMENT, CABINET_FRAGMENT
 }
 
 object FragmentProvider {
@@ -14,25 +14,17 @@ object FragmentProvider {
     private val FULLSCREEN_FRAGMENTS_CLASS_NAMES =
         listOf(ArticlePageFragment::class.java.canonicalName)
 
-    private val articleGalleryFragment by lazy { ArticleGalleryFragment.newInstance() }
-    private val cabinetFragment by lazy { CabinetFragment.newInstance() }
-
-    @JvmStatic
-    fun warm() {
-        articleGalleryFragment
-    }
-
     @JvmStatic
     fun get(code: AppFragment): Fragment {
         return when (code) {
-            AppFragment.GALERY_FRAGMENT -> {
-                articleGalleryFragment
+            AppFragment.GALLERY_FRAGMENT -> {
+                ArticleGalleryFragment()
             }
             AppFragment.ARTICLE_PAGE_FRAGMENT -> {
-                ArticlePageFragment.newInstance()
+                ArticlePageFragment()
             }
             AppFragment.CABINET_FRAGMENT -> {
-                cabinetFragment
+                CabinetFragment()
             }
         }
     }

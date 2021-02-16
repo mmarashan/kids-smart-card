@@ -30,10 +30,6 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
 
     private val logger = Logger.get("ArticleGalleryFragment")
 
-    companion object {
-        fun newInstance() = ArticleGalleryFragment()
-    }
-
     private val musicMediaPlayer by lazy { BackgroundMediaPlayer() }
     private val cardsMediaPlayer by lazy { BackgroundMediaPlayer() }
 

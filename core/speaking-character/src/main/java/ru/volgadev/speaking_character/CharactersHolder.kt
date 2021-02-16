@@ -1,7 +1,6 @@
-package ru.volgadev.papastory.data
+package ru.volgadev.speaking_character
 
 import android.content.Context
-import ru.volgadev.papastory.R
 import ru.volgadev.speaking_character.Character
 import ru.volgadev.speaking_character.CharacterSize
 import ru.volgadev.speaking_character.Directon

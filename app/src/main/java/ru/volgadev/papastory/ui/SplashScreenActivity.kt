@@ -23,6 +23,5 @@ class SplashScreenActivity : AppCompatActivity() {
 
     private fun makePreparation() {
         hideNavBar()
-        FragmentProvider.warm()
     }
 }

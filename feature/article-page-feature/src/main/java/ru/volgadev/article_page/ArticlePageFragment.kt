@@ -24,10 +24,6 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
 
     private val logger = Logger.get("ArticlePageFragment")
 
-    companion object {
-        fun newInstance() = ArticlePageFragment()
-    }
-
     private val viewModel: ArticlePageViewModel by viewModel()
 
     private var mediaPlayer: BackgroundMediaPlayer? = null

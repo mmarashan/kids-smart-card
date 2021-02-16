@@ -19,10 +19,6 @@ class CabinetFragment : Fragment(R.layout.cabinet_fragment) {
 
     private val logger = Logger.get("CabinetFragment")
 
-    companion object {
-        fun newInstance() = CabinetFragment()
-    }
-
     private val viewModel:CabinetViewModel by viewModel()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
