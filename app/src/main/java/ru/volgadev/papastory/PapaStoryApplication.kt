@@ -21,6 +21,7 @@ import ru.volgadev.music_data.api.MusicBackendApi
 import ru.volgadev.music_data.api.MusicBackendApiImpl
 import ru.volgadev.music_data.repository.MusicRepository
 import ru.volgadev.music_data.repository.MusicRepositoryImpl
+import ru.volgadev.papastory.di.DaggerApplicationComponent
 import ru.volgadev.pay_lib.PaymentManager
 import ru.volgadev.pay_lib.PaymentManagerFactory
 
@@ -76,5 +77,6 @@ class PapaStoryApplication : Application() {
             modules(listOf(sampleModule, paymentModule))
         }.koin
 
+        val appComponent = DaggerApplicationComponent.create()
     }
 }
