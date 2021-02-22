@@ -5,7 +5,7 @@ import ru.sberdevices.module_injector.BaseDependencies
 import ru.sberdevices.module_injector.ComponentHolder
 import ru.volgadev.article_data.data.ArticleBackendApiImpl
 import ru.volgadev.article_data.storage.ArticleCategoriesDatabaseImpl
-import ru.volgadev.article_data.storage.ArticleDatabaseImpl
+import ru.volgadev.article_data.data.ArticleDatabaseImpl
 import ru.volgadev.pay_lib.PaymentManager
 
 class ArticleRepositoryDependencies(val context: Context, val paymentManager: PaymentManager) : BaseDependencies

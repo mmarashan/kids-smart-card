@@ -1,26 +1,12 @@
 package ru.volgadev.article_data.storage
 
 import android.content.Context
-import androidx.annotation.WorkerThread
-import androidx.room.*
+import androidx.room.Database
+import androidx.room.Room
+import androidx.room.RoomDatabase
 import ru.volgadev.article_data.domain.ArticleCategoriesDatabase
 import ru.volgadev.article_data.domain.ArticleCategory
-
-@Dao
-@WorkerThread
-interface ArticleChannelsDao {
-    @Query("SELECT * FROM articlecategory")
-    fun getAll(): List<ArticleCategory>
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(vararg users: ArticleCategory)
-
-    @Query("UPDATE articlecategory SET isPaid = :isPaid WHERE id == :id")
-    fun updateIsPaid(id: String, isPaid: Boolean)
-
-    @Delete
-    fun delete(user: ArticleCategory)
-}
+import ru.volgadev.article_data.domain.ArticleChannelsDao
 
 @Database(entities = [ArticleCategory::class], version = 2)
 internal abstract class ArticleCategoriesDatabaseImpl : ArticleCategoriesDatabase, RoomDatabase() {

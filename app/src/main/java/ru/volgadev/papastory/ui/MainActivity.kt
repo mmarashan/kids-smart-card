@@ -18,8 +18,7 @@ import kotlinx.coroutines.InternalCoroutinesApi
 import ru.volgadev.article_data.domain.Article
 import ru.volgadev.article_data.domain.ArticleType
 import ru.volgadev.article_galery.presentation.ArticleGalleryFragment
-import ru.volgadev.article_page.ArticlePageFragment
-import ru.volgadev.article_page.ITEM_ID_KEY
+import ru.volgadev.article_page.presentation.ITEM_ID_KEY
 import ru.volgadev.common.hideNavBar
 import ru.volgadev.common.isPermissionGranted
 import ru.volgadev.common.log.Logger
@@ -77,7 +76,7 @@ class MainActivity : AppCompatActivity() {
                 override fun onClick(article: Article, clickedView: View) {
                     logger.debug("Choose ${article.title} to show")
                     val itemPageFragment =
-                        fragmentProvider.get(AppFragment.ARTICLE_PAGE_FRAGMENT) as ArticlePageFragment
+                        fragmentProvider.get(AppFragment.ARTICLE_PAGE_FRAGMENT)
                     itemPageFragment.exitTransition = Fade().apply {
                         duration = EXIT_FRAGMENT_TRANSITION_DURATION_MS
                     }

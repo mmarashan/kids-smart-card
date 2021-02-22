@@ -10,7 +10,6 @@ import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -53,7 +52,7 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
 
         val articlesAdapter = ArticleCardAdapter(view.context)
 
-        viewModel.audioToPlay.observe(viewLifecycleOwner, Observer { track ->
+        viewModel.audioToPlay.observe(viewLifecycleOwner, { track ->
             val audioPath = track.filePath ?: track.url
             logger.debug("Play $audioPath")
             cardsMediaPlayer.setOnCompletionListener {
@@ -114,7 +113,7 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
             }
         })
 
-        viewModel.currentArticles.observe(viewLifecycleOwner, Observer { articles ->
+        viewModel.currentArticles.observe(viewLifecycleOwner, { articles ->
             logger.debug("Set new ${articles.size} articles")
             articlesAdapter.setData(articles)
             canClick = true
@@ -134,7 +133,7 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
             })
         }
 
-        viewModel.currentCategory.observe(viewLifecycleOwner, Observer { category ->
+        viewModel.currentCategory.observe(viewLifecycleOwner, { category ->
             logger.debug("Set category ${category.id}")
             categoryTagsAdapter.onChose(category.name)
         })
@@ -169,7 +168,7 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
             }
         })
 
-        viewModel.tracks.observe(viewLifecycleOwner, Observer { tracks ->
+        viewModel.tracks.observe(viewLifecycleOwner, { tracks ->
             logger.debug("On new ${tracks.size} tracks")
             val downloadedTracks = tracks.filter { track -> track.filePath != null }
             val trackUrl = if (downloadedTracks.isNotEmpty()) {

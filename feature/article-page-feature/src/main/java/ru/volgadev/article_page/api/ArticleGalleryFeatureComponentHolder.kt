@@ -1,44 +1,44 @@
-package ru.volgadev.article_galery.api
+package ru.volgadev.article_page.api
 
 import ru.sberdevices.module_injector.BaseDependencies
 import ru.sberdevices.module_injector.ComponentHolder
 import ru.volgadev.article_data.domain.ArticleRepository
-import ru.volgadev.article_galery.presentation.ArticleGalleryViewModelFactory
+import ru.volgadev.article_page.presentation.ArticlePageViewModelFactory
 import ru.volgadev.music_data.domain.MusicRepository
 
-class ArticleGalleryFeatureDependencies(
+class ArticlePageFeatureDependencies(
     val articleRepository: ArticleRepository,
     val musicRepository: MusicRepository
 ) : BaseDependencies
 
-class ArticleGalleryFeatureComponentHolder :
-    ComponentHolder<ArticleGalleryFeatureApi, ArticleGalleryFeatureDependencies> {
+class ArticlePageFeatureComponentHolder :
+    ComponentHolder<ArticlePageFeatureApi, ArticlePageFeatureDependencies> {
 
     private var articleRepository: ArticleRepository? = null
     private var musicRepository: MusicRepository? = null
-    private var articleGalleryFeatureApiImpl: ArticleGalleryFeatureApiImpl? = null
+    private var articlePageFeatureApiImpl: ArticlePageFeatureApiImpl? = null
 
-    override fun init(dependencies: ArticleGalleryFeatureDependencies) {
+    override fun init(dependencies: ArticlePageFeatureDependencies) {
         articleRepository = dependencies.articleRepository
         musicRepository = dependencies.musicRepository
     }
 
     @Synchronized
-    override fun get(): ArticleGalleryFeatureApi {
+    override fun get(): ArticlePageFeatureApi {
         val articleRepository = articleRepository
         val musicRepository = musicRepository
         checkNotNull(articleRepository) { "articleRepository was not initialized!" }
         checkNotNull(musicRepository) { "musicRepository was not initialized!" }
-        if (articleGalleryFeatureApiImpl == null) {
-            ArticleGalleryViewModelFactory.inject(articleRepository, musicRepository)
-            articleGalleryFeatureApiImpl = ArticleGalleryFeatureApiImpl()
+        if (articlePageFeatureApiImpl == null) {
+            ArticlePageViewModelFactory.inject(articleRepository, musicRepository)
+            articlePageFeatureApiImpl = ArticlePageFeatureApiImpl()
         }
-        return articleGalleryFeatureApiImpl!!
+        return articlePageFeatureApiImpl!!
     }
 
     override fun reset() {
         articleRepository = null
         musicRepository = null
-        ArticleGalleryViewModelFactory.clear()
+        ArticlePageViewModelFactory.clear()
     }
 }

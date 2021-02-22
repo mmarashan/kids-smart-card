@@ -1,4 +1,4 @@
-package ru.volgadev.music_data.repository
+package ru.volgadev.music_data.data
 
 import android.content.Context
 import androidx.annotation.WorkerThread
@@ -9,33 +9,30 @@ import kotlinx.coroutines.flow.asFlow
 import ru.volgadev.common.isValidUrlString
 import ru.volgadev.common.log.Logger
 import ru.volgadev.downloader.Downloader
-import ru.volgadev.music_data.api.MusicBackendApi
-import ru.volgadev.music_data.api.MusicRepository
-import ru.volgadev.music_data.model.MusicTrack
-import ru.volgadev.music_data.model.MusicTrackType
-import ru.volgadev.music_data.storage.MusicTrackDatabase
+import ru.volgadev.music_data.domain.MusicBackendApi
+import ru.volgadev.music_data.domain.MusicRepository
+import ru.volgadev.music_data.domain.MusicTrack
+import ru.volgadev.music_data.domain.MusicTrackDatabase
+import ru.volgadev.music_data.domain.MusicTrackType
 import java.io.File
 import java.net.ConnectException
 
-class MusicRepositoryImpl private constructor(
+internal class MusicRepositoryImpl(
     private val context: Context,
-    private val musicBackendApi: MusicBackendApi
+    private val musicBackendApi: MusicBackendApi,
+    private val musicTrackDatabase: MusicTrackDatabase
 ) : MusicRepository {
 
     private val logger = Logger.get("MusicRepositoryImpl")
     private val musicTracksChannel = ConflatedBroadcastChannel<ArrayList<MusicTrack>>(arrayListOf())
 
+    // TODO: to StateFlow
     private val articleAudiosChannel =
         ConflatedBroadcastChannel<ArrayList<MusicTrack>>(arrayListOf())
 
-    val job = Job()
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + job)
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + Job())
 
     private val downloader = Downloader(context, scope)
-
-    private val storageDao by lazy {
-        MusicTrackDatabase.getInstance(context).dao()
-    }
 
     override fun musicTracks(): Flow<ArrayList<MusicTrack>> = musicTracksChannel.asFlow()
 
@@ -61,7 +58,7 @@ class MusicRepositoryImpl private constructor(
     override suspend fun getTrackFromStorage(url: String): MusicTrack? =
         withContext(Dispatchers.Default) {
             logger.debug("getTrackFromStorage()")
-            return@withContext storageDao.getByUrl(url)
+            return@withContext musicTrackDatabase.dao().getByUrl(url)
         }
 
     private suspend fun loadMusicTrack(url: String, type: MusicTrackType): MusicTrack? =
@@ -77,7 +74,7 @@ class MusicRepositoryImpl private constructor(
                 if (isSuccess) {
                     logger.debug("Success load")
                     val newTrack = MusicTrack(url, newFilePath, type)
-                    storageDao.insertAll(newTrack)
+                    musicTrackDatabase.dao().insertAll(newTrack)
                     return@withContext newTrack
                 } else {
                     logger.warn("Fail load")
@@ -94,22 +91,6 @@ class MusicRepositoryImpl private constructor(
         scope.launch(Dispatchers.Default) {
             loadAudios()
         }
-    }
-
-    companion object {
-        // For Singleton instantiation
-        @Volatile
-        private var instance: MusicRepositoryImpl? = null
-
-        fun getInstance(
-            context: Context, musicBackendApi: MusicBackendApi
-        ) =
-            instance ?: synchronized(this) {
-                instance ?: MusicRepositoryImpl(
-                    context,
-                    musicBackendApi
-                ).also { instance = it }
-            }
     }
 
     @WorkerThread
@@ -130,7 +111,7 @@ class MusicRepositoryImpl private constructor(
         val tracks = mutableListOf<MusicTrack>()
         val tracksToDownloading = mutableListOf<MusicTrack>()
         val inStorageTracks =
-            storageDao.getAll().map { track -> track.url to track.filePath }.toMap()
+            musicTrackDatabase.dao().getAll().map { track -> track.url to track.filePath }.toMap()
         for (track in fromBackendTracks) {
             val urlStr = track.url
             val pathInStorage = inStorageTracks[urlStr]
@@ -165,11 +146,11 @@ class MusicRepositoryImpl private constructor(
     }
 
     private suspend fun loadFromDB() = withContext(Dispatchers.Default) {
-        val musicTracks = storageDao.getAllByType(MusicTrackType.MUSIC)
+        val musicTracks = musicTrackDatabase.dao().getAllByType(MusicTrackType.MUSIC)
         logger.debug("Load ${musicTracks.size} music audio from Db")
         musicTracksChannel.offer(ArrayList(musicTracks))
 
-        val articleAudios = storageDao.getAllByType(MusicTrackType.ARTICLE_AUDIO)
+        val articleAudios = musicTrackDatabase.dao().getAllByType(MusicTrackType.ARTICLE_AUDIO)
         logger.debug("Load ${articleAudios.size} article tracks from Db")
         articleAudiosChannel.offer(ArrayList(articleAudios))
     }

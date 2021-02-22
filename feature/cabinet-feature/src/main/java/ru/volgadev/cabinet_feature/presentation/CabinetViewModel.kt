@@ -1,4 +1,4 @@
-package ru.volgadev.cabinet_feature
+package ru.volgadev.cabinet_feature.presentation
 
 import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
@@ -13,11 +13,12 @@ import kotlinx.coroutines.launch
 import ru.volgadev.article_data.domain.ArticleCategory
 import ru.volgadev.article_data.domain.ArticleRepository
 import ru.volgadev.common.log.Logger
+import ru.volgadev.pay_lib.BuildConfig
 import ru.volgadev.pay_lib.PaymentRequest
 import ru.volgadev.pay_lib.PaymentType
 
 @OptIn(InternalCoroutinesApi::class)
-class CabinetViewModel(
+internal class CabinetViewModel(
     private val articleRepository: ArticleRepository
 ) : ViewModel() {
 

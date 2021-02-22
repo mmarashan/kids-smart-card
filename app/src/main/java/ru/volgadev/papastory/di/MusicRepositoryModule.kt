@@ -1,25 +1,29 @@
 package ru.volgadev.papastory.di
 
 import android.content.Context
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
-import ru.volgadev.music_data.api.MusicBackendApi
-import ru.volgadev.music_data.api.MusicBackendApiImpl
-import ru.volgadev.music_data.repository.MusicRepository
-import ru.volgadev.music_data.repository.MusicRepositoryImpl
+import ru.volgadev.music_data.api.MusicRepositoryComponentHolder
+import ru.volgadev.music_data.api.MusicRepositoryDependencies
+import ru.volgadev.music_data.api.MusicRepositoryApi
 
 @Module
 interface MusicRepositoryModule {
     companion object {
         @Provides
-        fun providesMusicRepository(context: Context, musicBackendApi: MusicBackendApi): MusicRepository =
-            MusicRepositoryImpl.getInstance(
-                context = context,
-                musicBackendApi = musicBackendApi
-            )
-    }
+        fun providesMusicRepositoryDependencies(
+            context: Context
+        ): MusicRepositoryDependencies = MusicRepositoryDependencies(context)
 
-    @Binds
-    fun bindsMusicBackendApi(impl: MusicBackendApiImpl): MusicBackendApi
+        @Provides
+        fun providesMusicRepositoryComponentHolder(
+            musicRepositoryDependencies: MusicRepositoryDependencies
+        ): MusicRepositoryComponentHolder = MusicRepositoryComponentHolder().apply {
+            init(musicRepositoryDependencies)
+        }
+
+        @Provides
+        fun providesMusicRepositoryApi(musicRepositoryComponentHolder: MusicRepositoryComponentHolder): MusicRepositoryApi =
+            musicRepositoryComponentHolder.get()
+    }
 }

@@ -1,16 +1,20 @@
 package ru.volgadev.article_page
 
 import androidx.annotation.AnyThread
-import androidx.annotation.GuardedBy
 import androidx.annotation.MainThread
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.distinctUntilChanged
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import ru.volgadev.article_data.domain.ArticlePage
 import ru.volgadev.article_data.domain.ArticleRepository
 import ru.volgadev.common.ErrorResult
 import ru.volgadev.common.SuccessResult
 import ru.volgadev.common.log.Logger
-import ru.volgadev.music_data.repository.MusicRepository
+import ru.volgadev.music_data.domain.MusicRepository
 
 class ReadingState(
     var page: ArticlePage,
@@ -25,10 +29,6 @@ class ArticlePageViewModel(
 
     private val logger = Logger.get("ArticlePageViewModel")
 
-    private val monitor = Object()
-
-    @GuardedBy("monitor")
-    private var readingState: ReadingState? = null
     private val _state = MutableLiveData<ReadingState>()
     val state: LiveData<ReadingState> = _state
 
@@ -55,9 +55,7 @@ class ArticlePageViewModel(
                         pages = pagesResult.data
                         if (pages.isNotEmpty()) {
                             val firstPage = pages[0]
-                            synchronized(monitor) {
-                                readingState = ReadingState(firstPage, 0, pages.size)
-                            }
+                            val readingState = ReadingState(firstPage, 0, pages.size)
                             _state.postValue(readingState)
                         } else {
                             logger.warn("No pages in article $id")
@@ -82,15 +80,12 @@ class ArticlePageViewModel(
     @MainThread
     fun onClickNext() {
         logger.debug("onClickNext()")
-        val state = readingState
+        val state = _state.value
         val currentPosition = state?.pageNum ?: Int.MAX_VALUE
         if (state != null && pages.isNotEmpty() && pages.size > currentPosition) {
             val newPosition = currentPosition + 1
             val page = pages[newPosition]
-            synchronized(monitor) {
-                state.page = page
-                state.pageNum = newPosition
-            }
+            val readingState = ReadingState(page, newPosition, pages.size)
             _state.postValue(readingState)
         }
     }
@@ -98,15 +93,12 @@ class ArticlePageViewModel(
     @MainThread
     fun onClickPrev() {
         logger.debug("onClickPrev()")
-        val state = readingState
+        val state = _state.value
         val currentPosition = state?.pageNum ?: 0
         if (state != null && pages.isNotEmpty() && currentPosition > 0) {
             val newPosition = currentPosition - 1
             val page = pages[newPosition]
-            synchronized(monitor) {
-                state.page = page
-                state.pageNum = newPosition
-            }
+            val readingState = ReadingState(page, newPosition, pages.size)
             _state.postValue(readingState)
         }
     }

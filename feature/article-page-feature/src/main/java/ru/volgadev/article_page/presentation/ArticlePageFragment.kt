@@ -1,4 +1,4 @@
-package ru.volgadev.article_page
+package ru.volgadev.article_page.presentation
 
 import android.os.Bundle
 import android.transition.Slide
@@ -7,11 +7,12 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import kotlinx.android.synthetic.main.layout_article_page.*
-import org.koin.androidx.viewmodel.ext.android.viewModel
+import ru.volgadev.article_page.ArticlePageViewModel
+import ru.volgadev.article_page.R
 import ru.volgadev.common.BackgroundMediaPlayer
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.runLevitateAnimation
@@ -24,16 +25,14 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
 
     private val logger = Logger.get("ArticlePageFragment")
 
-    private val viewModel: ArticlePageViewModel by viewModel()
-
     private var mediaPlayer: BackgroundMediaPlayer? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         logger.debug("On fragment created")
 
-        val musicOnDrawable = ContextCompat.getDrawable(view.context, R.drawable.ic_music)!!
-        val musicOffDrawable = ContextCompat.getDrawable(view.context, R.drawable.ic_music_off)!!
+        requireArguments()
+        val viewModel = ViewModelProvider(this, ArticlePageViewModelFactory).get(ArticlePageViewModel::class.java)
 
         val args = arguments
         if (args != null && args.containsKey(ITEM_ID_KEY)) {
@@ -60,7 +59,10 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
             viewModel.onClickNext()
         }
 
-        viewModel.isMute.observe(viewLifecycleOwner, Observer { isMute ->
+        val musicOnDrawable = ContextCompat.getDrawable(view.context, R.drawable.ic_music)!!
+        val musicOffDrawable = ContextCompat.getDrawable(view.context, R.drawable.ic_music_off)!!
+
+        viewModel.isMute.observe(viewLifecycleOwner, { isMute ->
             toggleButtonMute.setImageDrawable(if (isMute) musicOnDrawable else musicOffDrawable)
             mediaPlayer?.setMute(isMute)
         })
@@ -70,7 +72,7 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
         val controls = listOf(prevButton, nextButton)
         controls.forEach { btn -> btn.isVisible = false }
 
-        viewModel.state.observe(viewLifecycleOwner, Observer { readingState ->
+        viewModel.state.observe(viewLifecycleOwner, { readingState ->
             val articlePage = readingState.page
             logger.debug("Set new ${articlePage.articleId} article page")
 
@@ -99,7 +101,7 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
             }
         })
 
-        viewModel.tracks.observe(viewLifecycleOwner, Observer { tracks ->
+        viewModel.tracks.observe(viewLifecycleOwner, { tracks ->
             logger.debug("On new ${tracks.size} tracks")
             val downloadedTracks = tracks.filter { track -> track.filePath != null }
             val trackUrl = if (downloadedTracks.isNotEmpty()) {
@@ -109,7 +111,7 @@ class ArticlePageFragment : Fragment(R.layout.layout_article_page) {
                 logger.debug("Play from streaming")
                 tracks.random().url
             }
-            mediaPlayer?.playAudio(context!!, File(trackUrl))
+            mediaPlayer?.playAudio(requireContext(), File(trackUrl))
         })
 
         mediaPlayer = BackgroundMediaPlayer()

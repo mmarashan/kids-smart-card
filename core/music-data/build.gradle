@@ -34,4 +34,5 @@ dependencies {
 
     implementation project(':common')
     implementation project(':core:downloader')
+    implementation project(':core:module-injector')
 }

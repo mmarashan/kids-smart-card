@@ -1,29 +1,15 @@
-package ru.volgadev.article_data.storage
+package ru.volgadev.article_data.data
 
 import android.content.Context
-import androidx.annotation.WorkerThread
-import androidx.room.*
+import androidx.room.Database
+import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import ru.volgadev.article_data.domain.Article
+import ru.volgadev.article_data.domain.ArticleDao
 import ru.volgadev.article_data.domain.ArticleDatabase
-
-@Dao
-@WorkerThread
-internal interface ArticleDao {
-    @Query("SELECT * FROM article")
-    fun getAll(): List<Article>
-
-    @Query("SELECT * FROM article WHERE id IN (:userIds)")
-    fun loadAllByIds(userIds: IntArray): List<Article>
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(vararg users: Article)
-
-    @Delete
-    fun delete(user: Article)
-
-    @Query("SELECT EXISTS(SELECT * FROM article WHERE id = :id)")
-    fun isRowIsExist(id: Int): Boolean
-}
+import ru.volgadev.article_data.storage.ArticleTypeConverter
+import ru.volgadev.article_data.storage.ListStringConverter
 
 @Database(entities = [Article::class], version = 3)
 @TypeConverters(ListStringConverter::class, ArticleTypeConverter::class)

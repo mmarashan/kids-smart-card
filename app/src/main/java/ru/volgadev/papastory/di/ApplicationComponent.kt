@@ -10,7 +10,9 @@ import ru.volgadev.papastory.ui.FragmentProvider
         ArticleRepositoryModule::class,
         MusicRepositoryModule::class,
         PaymentManagerModule::class,
-        ArticleGalleryFeatureModule::class
+        ArticleGalleryFeatureModule::class,
+        CabinetFeatureModule::class,
+        ArticlePageFeatureModule::class
     ]
 )
 interface ApplicationComponent {

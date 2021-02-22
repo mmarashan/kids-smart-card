@@ -1,9 +1,8 @@
-package ru.volgadev.music_data.api
+package ru.volgadev.music_data.domain
 
 import androidx.annotation.WorkerThread
-import ru.volgadev.music_data.model.MusicTrack
 
 @WorkerThread
-interface MusicBackendApi {
+internal interface MusicBackendApi {
     fun getTracks(): List<MusicTrack>
 }

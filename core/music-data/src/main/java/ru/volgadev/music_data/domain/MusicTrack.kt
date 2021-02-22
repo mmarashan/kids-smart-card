@@ -1,4 +1,4 @@
-package ru.volgadev.music_data.model
+package ru.volgadev.music_data.domain
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

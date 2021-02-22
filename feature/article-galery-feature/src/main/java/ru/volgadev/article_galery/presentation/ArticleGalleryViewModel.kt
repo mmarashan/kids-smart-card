@@ -1,7 +1,12 @@
 package ru.volgadev.article_galery.presentation
 
 import androidx.annotation.MainThread
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.distinctUntilChanged
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.FlowCollector
@@ -12,9 +17,9 @@ import ru.volgadev.article_data.domain.ArticleRepository
 import ru.volgadev.common.ENABLE_BACKGROUND_MUSIC
 import ru.volgadev.common.LiveEvent
 import ru.volgadev.common.log.Logger
-import ru.volgadev.music_data.model.MusicTrack
-import ru.volgadev.music_data.model.MusicTrackType
-import ru.volgadev.music_data.repository.MusicRepository
+import ru.volgadev.music_data.domain.MusicRepository
+import ru.volgadev.music_data.domain.MusicTrack
+import ru.volgadev.music_data.domain.MusicTrackType
 
 @OptIn(InternalCoroutinesApi::class)
 class ArticleGalleryViewModel(
@@ -56,7 +61,6 @@ class ArticleGalleryViewModel(
             })
         }
     }
-
 
     @MainThread
     fun onClickCategory(category: ArticleCategory) {

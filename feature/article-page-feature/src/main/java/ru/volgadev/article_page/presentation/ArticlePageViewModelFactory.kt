@@ -1,11 +1,12 @@
-package ru.volgadev.article_galery.presentation
+package ru.volgadev.article_page.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import ru.volgadev.article_data.domain.ArticleRepository
+import ru.volgadev.article_page.ArticlePageViewModel
 import ru.volgadev.music_data.domain.MusicRepository
 
-internal object ArticleGalleryViewModelFactory : ViewModelProvider.Factory {
+internal object ArticlePageViewModelFactory : ViewModelProvider.Factory {
 
     private var articleRepository: ArticleRepository? = null
     private var musicRepository: MusicRepository? = null
@@ -20,7 +21,7 @@ internal object ArticleGalleryViewModelFactory : ViewModelProvider.Factory {
         val musicRepository = musicRepository
         checkNotNull(articleRepository) { "articleRepository was not initialized!" }
         checkNotNull(musicRepository) { "musicRepository was not initialized!" }
-        return ArticleGalleryViewModel(articleRepository, musicRepository) as T
+        return ArticlePageViewModel(articleRepository, musicRepository) as T
     }
 
     fun clear() {
