@@ -4,6 +4,7 @@ import android.content.Context
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
+import dagger.Reusable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.InternalCoroutinesApi
 import ru.volgadev.article_data.api.ArticleBackendApi
@@ -29,8 +30,10 @@ interface ArticleRepositoryModule {
     @ExperimentalCoroutinesApi
     @InternalCoroutinesApi
     @Binds
+    @Reusable
     fun bindsArticleRepository(impl: ArticleRepositoryImpl): ArticleRepository
 
     @Binds
+    @Reusable
     fun bindsArticleBackendApi(impl: ArticleBackendApiImpl): ArticleBackendApi
 }

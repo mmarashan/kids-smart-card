@@ -1,4 +1,4 @@
-package ru.volgadev.article_galery.ui
+package ru.volgadev.article_galery.presentation
 
 import android.content.res.Configuration
 import android.net.Uri
@@ -11,12 +11,12 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
 import kotlinx.android.synthetic.main.main_fragment.*
-import org.koin.androidx.viewmodel.ext.android.getViewModel
 import ru.volgadev.article_data.model.Article
 import ru.volgadev.article_data.model.ArticleType
 import ru.volgadev.article_galery.R
@@ -24,7 +24,6 @@ import ru.volgadev.common.BackgroundMediaPlayer
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.scaleToFitAnimatedAndBack
 import ru.volgadev.common.view.scrollToItemToCenter
-
 
 class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
 
@@ -49,7 +48,8 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
         super.onViewCreated(view, savedInstanceState)
         logger.debug("On fragment created; savedInstanceState=$savedInstanceState")
 
-        val viewModel = getViewModel<ArticleGalleryViewModel>()
+        val viewModel =
+            ViewModelProvider(this, ArticleGalleryViewModelFactory).get(ArticleGalleryViewModel::class.java)
 
         val articlesAdapter = ArticleCardAdapter(view.context)
 

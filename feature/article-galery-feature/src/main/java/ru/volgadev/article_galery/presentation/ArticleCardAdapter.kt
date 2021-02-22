@@ -1,4 +1,4 @@
-package ru.volgadev.article_galery.ui
+package ru.volgadev.article_galery.presentation
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -16,12 +16,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import jp.wasabeef.recyclerview.animators.OvershootInLeftAnimator
 import ru.volgadev.article_data.model.Article
 import ru.volgadev.article_galery.R
 import ru.volgadev.common.log.Logger
-import ru.volgadev.common.runLevitateAnimation
-
 
 class ArticleCardAdapter(context: Context) :
     RecyclerView.Adapter<ArticleCardAdapter.ViewHolder>() {

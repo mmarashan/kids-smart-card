@@ -1,4 +1,4 @@
-package ru.volgadev.article_galery.ui
+package ru.volgadev.article_galery.presentation
 
 import android.content.Context
 import android.view.LayoutInflater

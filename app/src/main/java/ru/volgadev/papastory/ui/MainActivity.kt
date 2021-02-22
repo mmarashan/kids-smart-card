@@ -17,7 +17,7 @@ import kotlinx.android.synthetic.main.main_activity.*
 import kotlinx.coroutines.InternalCoroutinesApi
 import ru.volgadev.article_data.model.Article
 import ru.volgadev.article_data.model.ArticleType
-import ru.volgadev.article_galery.ui.ArticleGalleryFragment
+import ru.volgadev.article_galery.presentation.ArticleGalleryFragment
 import ru.volgadev.article_page.ArticlePageFragment
 import ru.volgadev.article_page.ITEM_ID_KEY
 import ru.volgadev.common.hideNavBar
@@ -49,6 +49,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
 
+        val fragmentProvider = FragmentProvider(this)
+
         val needRequestPermission =
             NEEDED_PERMISSIONS.map { permission -> this.isPermissionGranted(permission) }
                 .contains(false)
@@ -63,7 +65,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         val galleryFragment: ArticleGalleryFragment =
-            FragmentProvider.get(AppFragment.GALLERY_FRAGMENT) as ArticleGalleryFragment
+            fragmentProvider.get(AppFragment.GALLERY_FRAGMENT) as ArticleGalleryFragment
         galleryFragment.run {
             enterTransition = Slide(Gravity.END).apply {
                 duration = ENTER_FRAGMENT_TRANSITION_DURATION_MS
@@ -75,7 +77,7 @@ class MainActivity : AppCompatActivity() {
                 override fun onClick(article: Article, clickedView: View) {
                     logger.debug("Choose ${article.title} to show")
                     val itemPageFragment =
-                        FragmentProvider.get(AppFragment.ARTICLE_PAGE_FRAGMENT) as ArticlePageFragment
+                        fragmentProvider.get(AppFragment.ARTICLE_PAGE_FRAGMENT) as ArticlePageFragment
                     itemPageFragment.exitTransition = Fade().apply {
                         duration = EXIT_FRAGMENT_TRANSITION_DURATION_MS
                     }
@@ -91,7 +93,7 @@ class MainActivity : AppCompatActivity() {
             })
         }
 
-        val cabinetFragment = FragmentProvider.get(AppFragment.CABINET_FRAGMENT).apply {
+        val cabinetFragment = fragmentProvider.get(AppFragment.CABINET_FRAGMENT).apply {
             enterTransition = Slide(Gravity.START).apply {
                 duration = ENTER_FRAGMENT_TRANSITION_DURATION_MS
             }

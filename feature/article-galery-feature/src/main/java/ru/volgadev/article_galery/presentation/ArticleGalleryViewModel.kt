@@ -1,4 +1,4 @@
-package ru.volgadev.article_galery.ui
+package ru.volgadev.article_galery.presentation
 
 import androidx.annotation.MainThread
 import androidx.lifecycle.*
