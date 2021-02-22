@@ -1,10 +1,8 @@
 package ru.volgadev.article_data.repository
 
-import android.content.Context
 import androidx.annotation.WorkerThread
 import com.android.billingclient.api.Purchase
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.*
 import ru.volgadev.article_data.api.ArticleBackendApi
@@ -24,24 +22,18 @@ import java.net.ConnectException
 @ExperimentalCoroutinesApi
 @InternalCoroutinesApi
 class ArticleRepositoryImpl(
-    private val context: Context,
     private val articleBackendApi: ArticleBackendApi,
-    private val paymentManager: PaymentManager
+    private val paymentManager: PaymentManager,
+    private val articlesDatabase: ArticleDatabase,
+    private val categoriesDatabase: ArticleCategoriesDatabase
 ) : ArticleRepository {
 
     private val logger = Logger.get("ArticleRepositoryImpl")
 
-    private val articleChannel = MutableStateFlow<ArrayList<Article>>(value = ArrayList())
+    private val articleChannel = MutableStateFlow<List<Article>>(value = emptyList())
+
+    // TODO: migrate to StateFlow
     private val categoriesFlow = ConflatedBroadcastChannel<List<ArticleCategory>>()
-
-    private val articlesDb: ArticleDatabase by lazy {
-        ArticleDatabase.getInstance(context)
-    }
-
-    private val categoriesDb: ArticleCategoriesDatabase by lazy {
-        ArticleCategoriesDatabase.getInstance(context)
-    }
-
     override fun categories(): Flow<List<ArticleCategory>> = categoriesFlow.asFlow()
 
     @Volatile
@@ -49,6 +41,7 @@ class ArticleRepositoryImpl(
 
     @Volatile
     private var productIds: List<String> = ArrayList()
+
     @Volatile
     private var categories = ArrayList<ArticleCategory>()
 
@@ -81,7 +74,7 @@ class ArticleRepositoryImpl(
     override suspend fun getArticle(id: Long): Article? = withContext(Dispatchers.Default) {
         logger.debug("Get article with id $id")
         updateIfNotUpdated()
-        return@withContext articleChannel.value.first { article -> article.id == id }
+        return@withContext articleChannel.value.firstOrNull { article -> article.id == id }
     }
 
     override suspend fun getCategoryArticles(category: ArticleCategory): List<Article> =
@@ -99,7 +92,7 @@ class ArticleRepositoryImpl(
     private suspend fun updateCategoriesFromApi(): List<ArticleCategory> =
         withContext(Dispatchers.IO) {
             val categories = articleBackendApi.getCategories()
-            categoriesDb.dao().insertAll(*categories.toTypedArray())
+            categoriesDatabase.dao().insertAll(*categories.toTypedArray())
             return@withContext categories
         }
 
@@ -111,7 +104,7 @@ class ArticleRepositoryImpl(
             categories.forEach { category ->
                 val categoryArticles = articleBackendApi.getArticles(category)
                 logger.debug("Load ${categoryArticles.size} articles from category ${category.name}")
-                articlesDb.dao().insertAll(*categoryArticles.toTypedArray())
+                articlesDatabase.dao().insertAll(*categoryArticles.toTypedArray())
                 articles.addAll(categoryArticles)
             }
             return@withContext articles
@@ -141,8 +134,8 @@ class ArticleRepositoryImpl(
     }
 
     private suspend fun loadFromDB() = withContext(Dispatchers.Default) {
-        val articles = articlesDb.dao().getAll()
-        val dbCategories = categoriesDb.dao().getAll()
+        val articles = articlesDatabase.dao().getAll()
+        val dbCategories = categoriesDatabase.dao().getAll()
         logger.debug("Load ${dbCategories.size} categories and ${articles.size} articles from Db")
         articleChannel.value = ArrayList(articles)
         categories = ArrayList(dbCategories)
@@ -176,7 +169,7 @@ class ArticleRepositoryImpl(
             val isPaid = payedIds.singleOrNull { id -> id == category.marketItemId } != null
             if (isPaid != category.isPaid) {
                 category.isPaid = isPaid
-                categoriesDb.dao().updateIsPaid(category.id, isPaid)
+                categoriesDatabase.dao().updateIsPaid(category.id, isPaid)
             }
         }
         logger.debug("categories = ${categories.joinToString(",")}")

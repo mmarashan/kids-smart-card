@@ -21,6 +21,7 @@ import ru.volgadev.music_data.api.MusicBackendApi
 import ru.volgadev.music_data.api.MusicBackendApiImpl
 import ru.volgadev.music_data.repository.MusicRepository
 import ru.volgadev.music_data.repository.MusicRepositoryImpl
+import ru.volgadev.papastory.di.ApplicationComponent
 import ru.volgadev.papastory.di.DaggerApplicationComponent
 import ru.volgadev.pay_lib.PaymentManager
 import ru.volgadev.pay_lib.PaymentManagerFactory
@@ -37,9 +38,10 @@ class PapaStoryApplication : Application() {
     private val sampleModule = module {
         single<ArticleRepository> {
             ArticleRepositoryImpl(
-                context = get(),
                 articleBackendApi = get(),
-                paymentManager = get()
+                paymentManager = get(),
+                articlesDatabase = get(),
+                categoriesDatabase = get()
             )
         }
         single<ArticleBackendApi> { ArticleBackendApiImpl() }
@@ -67,6 +69,11 @@ class PapaStoryApplication : Application() {
         }
     }
 
+    // Instance of the AppComponent that will be used by all the Activities in the project
+    val appComponent: ApplicationComponent by lazy {
+        DaggerApplicationComponent.factory().create(applicationContext)
+    }
+
     override fun onCreate() {
         super.onCreate()
         logger.debug("on create")
@@ -76,7 +83,5 @@ class PapaStoryApplication : Application() {
             androidContext(this@PapaStoryApplication)
             modules(listOf(sampleModule, paymentModule))
         }.koin
-
-        val appComponent = DaggerApplicationComponent.create()
     }
 }

@@ -7,6 +7,10 @@ import ru.volgadev.article_data.model.Article
 import ru.volgadev.article_data.model.ArticleType
 import java.util.stream.Collectors
 
+interface ArticleDatabase {
+    fun dao(): ArticleDao
+}
+
 @Dao
 @WorkerThread
 interface ArticleDao {
@@ -28,9 +32,9 @@ interface ArticleDao {
 
 @Database(entities = [Article::class], version = 3)
 @TypeConverters(ListStringConverter::class, ArticleTypeConverter::class)
-abstract class ArticleDatabase : RoomDatabase() {
+abstract class ArticleDatabaseImpl : ArticleDatabase, RoomDatabase() {
 
-    abstract fun dao(): ArticleDao
+    abstract override fun dao(): ArticleDao
 
     companion object {
         @Volatile
@@ -46,35 +50,7 @@ abstract class ArticleDatabase : RoomDatabase() {
         private fun buildDatabase(context: Context) =
             Room.databaseBuilder(
                 context.applicationContext,
-                ArticleDatabase::class.java, DATABASE_NAME
+                ArticleDatabaseImpl::class.java, DATABASE_NAME
             ).fallbackToDestructiveMigration().build()
-    }
-}
-
-private class ListStringConverter {
-
-    private val DELIMITER = ","
-
-    @TypeConverter
-    fun from(hobbies: List<String>): String {
-        return hobbies.stream().collect(Collectors.joining(DELIMITER))
-    }
-
-    @TypeConverter
-    fun to(data: String): List<String> {
-        return if (data.isEmpty()) listOf() else data.split(DELIMITER)
-    }
-}
-
-private class ArticleTypeConverter {
-
-    @TypeConverter
-    fun from(type: ArticleType): String {
-        return type.name
-    }
-
-    @TypeConverter
-    fun to(data: String): ArticleType {
-        return ArticleType.valueOf(data)
     }
 }

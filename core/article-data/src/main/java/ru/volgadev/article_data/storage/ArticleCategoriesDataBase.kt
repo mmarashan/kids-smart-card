@@ -5,6 +5,10 @@ import androidx.annotation.WorkerThread
 import androidx.room.*
 import ru.volgadev.article_data.model.ArticleCategory
 
+interface ArticleCategoriesDatabase {
+    fun dao(): ArticleChannelsDao
+}
+
 @Dao
 @WorkerThread
 interface ArticleChannelsDao {
@@ -22,9 +26,9 @@ interface ArticleChannelsDao {
 }
 
 @Database(entities = [ArticleCategory::class], version = 2)
-abstract class ArticleCategoriesDatabase : RoomDatabase() {
+internal abstract class ArticleCategoriesDatabaseImpl : ArticleCategoriesDatabase, RoomDatabase() {
 
-    abstract fun dao(): ArticleChannelsDao
+    abstract override fun dao(): ArticleChannelsDao
 
     companion object {
         @Volatile
@@ -40,7 +44,7 @@ abstract class ArticleCategoriesDatabase : RoomDatabase() {
         private fun buildDatabase(context: Context) =
             Room.databaseBuilder(
                 context.applicationContext,
-                ArticleCategoriesDatabase::class.java, DATABASE_NAME
+                ArticleCategoriesDatabaseImpl::class.java, DATABASE_NAME
             ).build()
     }
 }
