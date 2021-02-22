@@ -1,4 +1,4 @@
-package ru.volgadev.music_data.repository
+package ru.volgadev.music_data.api
 
 import androidx.annotation.WorkerThread
 import kotlinx.coroutines.flow.Flow
