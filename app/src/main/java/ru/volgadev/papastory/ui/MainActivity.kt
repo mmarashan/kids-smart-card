@@ -8,11 +8,9 @@ import android.transition.Slide
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import androidx.annotation.MainThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.android.synthetic.main.main_activity.*
@@ -25,10 +23,8 @@ import ru.volgadev.article_page.ITEM_ID_KEY
 import ru.volgadev.common.hideNavBar
 import ru.volgadev.common.isPermissionGranted
 import ru.volgadev.common.log.Logger
-import ru.volgadev.common.observeOnce
 import ru.volgadev.common.setVisibleWithTransition
 import ru.volgadev.papastory.R
-import ru.volgadev.pincode_bubble.PinCodeBubbleAlertDialog
 
 const val HOME_ITEM_ID = R.id.action_home
 const val GALLERY_ITEM_ID = R.id.action_galery
@@ -40,6 +36,9 @@ private val NEEDED_PERMISSIONS = arrayOf(
 )
 private const val REQUEST_CODE = 123
 
+private const val ENTER_FRAGMENT_TRANSITION_DURATION_MS = 600L
+private const val EXIT_FRAGMENT_TRANSITION_DURATION_MS = 600L
+
 class MainActivity : AppCompatActivity() {
 
     private val logger = Logger.get("MainActivity")
@@ -47,16 +46,13 @@ class MainActivity : AppCompatActivity() {
     @InternalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         logger.debug("onCreate($savedInstanceState)")
-        setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
-        this.hideNavBar()
 
         val needRequestPermission =
             NEEDED_PERMISSIONS.map { permission -> this.isPermissionGranted(permission) }
                 .contains(false)
         if (needRequestPermission) {
-
             showPermissionAlertDialog {
                 ActivityCompat.requestPermissions(
                     this,
@@ -67,13 +63,13 @@ class MainActivity : AppCompatActivity() {
         }
 
         val galleryFragment: ArticleGalleryFragment =
-            FragmentProvider.get(AppFragment.GALERY_FRAGMENT) as ArticleGalleryFragment
+            FragmentProvider.get(AppFragment.GALLERY_FRAGMENT) as ArticleGalleryFragment
         galleryFragment.run {
             enterTransition = Slide(Gravity.END).apply {
-                duration = 1000
+                duration = ENTER_FRAGMENT_TRANSITION_DURATION_MS
             }
             exitTransition = Slide(Gravity.START).apply {
-                duration = 1000
+                duration = EXIT_FRAGMENT_TRANSITION_DURATION_MS
             }
             setOnItemClickListener(object : ArticleGalleryFragment.OnItemClickListener {
                 override fun onClick(article: Article, clickedView: View) {
@@ -81,7 +77,7 @@ class MainActivity : AppCompatActivity() {
                     val itemPageFragment =
                         FragmentProvider.get(AppFragment.ARTICLE_PAGE_FRAGMENT) as ArticlePageFragment
                     itemPageFragment.exitTransition = Fade().apply {
-                        duration = 1000
+                        duration = EXIT_FRAGMENT_TRANSITION_DURATION_MS
                     }
                     if (article.type != ArticleType.NO_PAGES) {
                         showFragment(
@@ -97,10 +93,10 @@ class MainActivity : AppCompatActivity() {
 
         val cabinetFragment = FragmentProvider.get(AppFragment.CABINET_FRAGMENT).apply {
             enterTransition = Slide(Gravity.START).apply {
-                duration = 1000
+                duration = ENTER_FRAGMENT_TRANSITION_DURATION_MS
             }
             exitTransition = Slide(Gravity.END).apply {
-                duration = 1000
+                duration = EXIT_FRAGMENT_TRANSITION_DURATION_MS
             }
         }
 
@@ -132,13 +128,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onResume() {
-        super.onResume()
         logger.debug("onResume()")
         hideNavBar()
-        bottomNavigation.isVisible = false
-        bottomNavigation.postDelayed({
-            showBottomNavigationPanel()
-        }, 500L)
+        super.onResume()
     }
 
     override fun onPause() {
@@ -173,7 +165,7 @@ class MainActivity : AppCompatActivity() {
         logger.debug("showBottomNavigationPanel()")
         bottomNavigation.setVisibleWithTransition(
             View.VISIBLE,
-            Slide(Gravity.BOTTOM), 600, mainActivityLayout
+            Slide(Gravity.BOTTOM), ENTER_FRAGMENT_TRANSITION_DURATION_MS, mainActivityLayout
         )
     }
 
@@ -181,7 +173,7 @@ class MainActivity : AppCompatActivity() {
         logger.debug("hideBottomNavigationPanel()")
         bottomNavigation.setVisibleWithTransition(
             View.GONE,
-            Slide(Gravity.BOTTOM), 600, mainActivityLayout
+            Slide(Gravity.BOTTOM), EXIT_FRAGMENT_TRANSITION_DURATION_MS, mainActivityLayout
         )
     }
 

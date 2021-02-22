@@ -14,6 +14,9 @@ interface ArticleChannelsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg users: ArticleCategory)
 
+    @Query("UPDATE articlecategory SET isPaid = :isPaid WHERE id == :id")
+    fun updateIsPaid(id: String, isPaid: Boolean)
+
     @Delete
     fun delete(user: ArticleCategory)
 }

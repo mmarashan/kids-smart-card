@@ -9,8 +9,8 @@ android {
         applicationId "ru.volgadev.appsample"
         minSdkVersion versions.minSdkVersion
         targetSdkVersion versions.targetSdkVersion
-        versionCode 6
-        versionName "0.6"
+        versionCode 9
+        versionName "0.9"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

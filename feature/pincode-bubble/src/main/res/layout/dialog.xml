@@ -22,6 +22,8 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:textColor="@color/colorDarkText"
+        android:backgroundTint="@color/colorDarkText"
+        android:textCursorDrawable="@color/colorDarkText"
         android:textSize="22sp"
         tools:text="1951" />
 

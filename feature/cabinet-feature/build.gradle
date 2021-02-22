@@ -35,6 +35,7 @@ dependencies {
     implementation "androidx.constraintlayout:constraintlayout:${versions.constraintlayout}"
     implementation "com.google.android.material:material:${versions.material}"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:${versions.androidxlifecycleruntime}"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:${versions.coroutines}"
 
     implementation "org.koin:koin-android:${versions.koin}"
     implementation "org.koin:koin-androidx-viewmodel:${versions.koin}"
@@ -44,7 +45,6 @@ dependencies {
     implementation "androidx.cardview:cardview:${versions.cardview}"
     implementation "com.github.bumptech.glide:glide:${versions.glide}"
     implementation "jp.wasabeef:recyclerview-animators:${versions.recyclerviewanimators}"
-    implementation "com.anjlab.android.iab.v3:library:${versions.anjlabandroidiappbilling}"
 
     implementation project(':common')
     implementation project(':core:article-data')

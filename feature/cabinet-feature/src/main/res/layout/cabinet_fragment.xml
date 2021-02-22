@@ -11,10 +11,11 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/categories"
+        android:text="@string/collections"
         android:textSize="32sp"
-        android:gravity="center"
-        android:layout_marginBottom="4dp"
+        android:gravity="start"
+        android:padding="4dp"
+        android:layout_marginBottom="8dp"
         android:textColor="@color/colorLightText"/>
 
     <androidx.recyclerview.widget.RecyclerView

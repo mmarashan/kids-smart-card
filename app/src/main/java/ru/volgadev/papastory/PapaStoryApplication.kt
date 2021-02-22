@@ -15,7 +15,6 @@ import ru.volgadev.article_data.repository.ArticleRepositoryImpl
 import ru.volgadev.article_galery.ui.ArticleGalleryViewModel
 import ru.volgadev.article_page.ArticlePageViewModel
 import ru.volgadev.cabinet_feature.CabinetViewModel
-import ru.volgadev.common.GOOGLE_PLAY_LICENSE_KEY
 import ru.volgadev.common.log.AndroidLoggerDelegate
 import ru.volgadev.common.log.Logger
 import ru.volgadev.music_data.api.MusicBackendApi
@@ -63,7 +62,7 @@ class PapaStoryApplication : Application() {
 
     private val paymentModule = module {
         factory<PaymentManager> {
-            PaymentManagerFactory.createPaymentManager(get(), GOOGLE_PLAY_LICENSE_KEY)
+            PaymentManagerFactory.createPaymentManager(get())
         }
     }
 

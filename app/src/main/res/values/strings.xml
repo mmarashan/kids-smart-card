@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name" translatable="false">PapaStory</string>
+    <string name="app_name" translatable="false">Kids Smart Card</string>
     <string name="request_storage_permission_text">This application can working offline. You should give permission for storage</string>
 </resources>

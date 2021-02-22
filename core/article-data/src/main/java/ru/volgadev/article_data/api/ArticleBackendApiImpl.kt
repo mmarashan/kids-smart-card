@@ -61,6 +61,8 @@ class ArticleBackendApiImpl : ArticleBackendApi {
                 val iconUrl = articleJson.optString("iconUrl")
                 val averageTimeReadingMin = articleJson.optInt("averageTimeReadingMin")
                 val timestamp = articleJson.optLong("timestamp")
+                val openPhrase =
+                    if (!articleJson.isNull("openPhrase")) articleJson.optString("openPhrase") else null
                 result.add(
                     Article(
                         id = id,
@@ -73,7 +75,8 @@ class ArticleBackendApiImpl : ArticleBackendApi {
                         iconUrl = iconUrl,
                         onClickSounds = onClickSounds,
                         averageTimeReadingMin = averageTimeReadingMin,
-                        timestamp = timestamp
+                        timestamp = timestamp,
+                        openPhrase = openPhrase
                     )
                 )
             }

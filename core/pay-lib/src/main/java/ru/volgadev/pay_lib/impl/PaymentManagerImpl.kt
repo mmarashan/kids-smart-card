@@ -1,151 +1,173 @@
 package ru.volgadev.pay_lib.impl
 
 import android.content.Context
-import com.anjlab.android.iab.v3.BillingProcessor
-import com.anjlab.android.iab.v3.BillingProcessor.IBillingHandler
-import com.anjlab.android.iab.v3.Constants
-import com.anjlab.android.iab.v3.SkuDetails
-import com.anjlab.android.iab.v3.TransactionDetails
-import kotlinx.coroutines.channels.ConflatedBroadcastChannel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
+import com.android.billingclient.api.*
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import ru.volgadev.common.log.Logger
 import ru.volgadev.pay_lib.*
 
 
+@ExperimentalCoroutinesApi
 internal class PaymentManagerImpl(
-    private val context: Context,
-    private val googlePlayLicenseKey: String
+    private val context: Context
 ) : PaymentManager {
 
     private val logger = Logger.get("PaymentManagerImpl")
 
-    private val ownedProductsChannel = ConflatedBroadcastChannel<ArrayList<SkuDetails>>()
-    private val ownedSubscriptionChannel = ConflatedBroadcastChannel<ArrayList<SkuDetails>>()
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
-    private val billingHandler = object : IBillingHandler {
+    private val ownedProductsStateFlow = MutableStateFlow<List<MarketItem>>(listOf())
+    private val ownedSubscriptionStateFlow = MutableStateFlow<List<MarketItem>>(listOf())
 
-        override fun onProductPurchased(productId: String, details: TransactionDetails?) {
-            logger.debug("onProductPurchased($productId)")
-            resultListener?.onResult(RequestPaymentResult.SUCCESS_PAYMENT)
-            resultListener = null
-            updateOwnedItems()
-        }
+    private val itemsMap = HashMap<String, MarketItem>()
 
-        override fun onPurchaseHistoryRestored() {
-            logger.debug("onPurchaseHistoryRestored()")
-            updateOwnedItems()
-        }
+    private val skuIds = ArrayList<String>()// listOf("numbers_pro_ru")
 
-        override fun onBillingError(errorCode: Int, error: Throwable?) {
-            logger.warn("onBillingError()")
-            if (errorCode == Constants.BILLING_RESPONSE_RESULT_USER_CANCELED) {
-                logger.warn("User canceled the payment dialog")
-                updateOwnedItems()
-                resultListener?.onResult(RequestPaymentResult.USER_CANCELED)
+    private val billingClient =
+        BillingClient.newBuilder(context).setListener(object : PurchasesUpdatedListener {
+
+            /**
+             * Listener interface for purchase updates which happen when,
+             * for example, the user buys something within the app or by initiating a purchase
+             * from Google Play Store.
+             */
+            override fun onPurchasesUpdated(
+                billingResult: BillingResult,
+                purchases: MutableList<Purchase>?
+            ) {
+                logger.debug("onPurchasesUpdated($billingResult, $purchases)")
+                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && purchases != null) {
+                    //здесь мы можем запросить информацию о товарах и покупках
+                    updateState()
+                }
             }
-            resultListener?.onResult(RequestPaymentResult.PAYMENT_ERROR)
-            resultListener = null
-        }
+        }).enablePendingPurchases().build()
 
-        override fun onBillingInitialized() {
-            logger.debug("onBillingInitialized()")
-            loadOwnedItems()
-        }
+    init {
+        billingClient.startConnection(object : BillingClientStateListener {
+
+            /**
+             * Callback for setup process. This listener's onBillingSetupFinished(BillingResult)
+             * method is called when the setup process is complete.
+             */
+            override fun onBillingSetupFinished(billingResult: BillingResult) {
+                logger.debug("onBillingSetupFinished($billingResult)")
+                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                    //здесь мы можем запросить информацию о товарах и покупках
+                    updateState()
+                }
+            }
+
+            override fun onBillingServiceDisconnected() {
+                //сюда мы попадем если что-то пойдет не так
+                logger.debug("onBillingServiceDisconnected()")
+            }
+        })
     }
 
-    private val billingProcessor = BillingProcessor(
-        context,
-        googlePlayLicenseKey,
-        billingHandler
-    ).apply {
-        initialize()
+    private fun updateState() {
+        logger.debug("updateState() skuIds = ${skuIds.joinToString(",")}")
+
+        if (skuIds.isEmpty()) return
+
+        val param = SkuDetailsParams.newBuilder().setSkusList(skuIds)
+            .setType(BillingClient.SkuType.INAPP).build()
+        scope.launch {
+            billingClient.querySkuDetailsAsync(
+                param
+            ) { billingResult, skuDetails ->
+                logger.debug("SKU detail response ${billingResult.responseCode} ${billingResult.debugMessage}")
+                if (billingResult.responseCode == 0 && skuDetails != null) {
+                    skuDetails.forEach { skuDetails ->
+                        itemsMap.put(skuDetails.sku, MarketItem(skuDetails))
+                    }
+
+                    val purchasesResult = billingClient.queryPurchases(BillingClient.SkuType.INAPP)
+                    val purchasesList = purchasesResult.purchasesList ?: listOf()
+
+                    for (i in purchasesList.indices) {
+                        val purchase = purchasesList[i]
+                        itemsMap.get(purchase.sku)?.purchase = purchase
+
+                        if (!purchase.isAcknowledged) {
+                            logger.debug("Try to acknowledgePurchase")
+                            val acknowledgePurchaseParams = AcknowledgePurchaseParams.newBuilder()
+                                .setPurchaseToken(purchase.purchaseToken)
+                                .build()
+                            billingClient.acknowledgePurchase(acknowledgePurchaseParams) { result ->
+                                logger.debug("acknowledgePurchase result=${result.responseCode}")
+                                updateState()
+                            }
+                        }
+                    }
+
+                    logger.debug("itemsMap=$itemsMap")
+
+                    ownedProductsStateFlow.value = itemsMap.values.toList()
+                }
+            }
+        }
     }
 
     private var resultListener: PaymentResultListener? = null
 
-    private fun loadOwnedItems() {
-        logger.debug("loadOwnedItems()")
-        val loadResult = billingProcessor.loadOwnedPurchasesFromGoogle()
-        if (loadResult) {
-            updateOwnedItems()
-        }
-    }
-
-    private fun updateOwnedItems() {
-        logger.debug("Update owned items")
-        val ownedProductIds = billingProcessor.listOwnedProducts() as ArrayList<String>
-        val ownedSubscriptionIds = billingProcessor.listOwnedSubscriptions() as ArrayList<String>
-
-        val ownedProducts =
-            billingProcessor.getPurchaseListingDetails(ownedProductIds) as ArrayList<SkuDetails>?
-                ?: ArrayList()
-        val ownedSubscriptions =
-            billingProcessor.getSubscriptionListingDetails(ownedSubscriptionIds) as ArrayList<SkuDetails>?
-                ?: ArrayList()
-
-        logger.debug("ownedProducts = ${ownedProducts.joinToString(",")}")
-        logger.debug("ownedSubscription = ${ownedSubscriptions.joinToString(",")}")
-        ownedProductsChannel.offer(ownedProducts)
-        ownedSubscriptionChannel.offer(ownedSubscriptions)
-    }
-
-    override fun isAvailable(): Boolean {
-        logger.debug("isAvailable()")
-        val isAvailable = BillingProcessor.isIabServiceAvailable(context)
-        logger.debug("BillingProcessor.isAvailable = $isAvailable")
-        return isAvailable
+    override fun setSkuIds(ids: List<String>) {
+        logger.debug("setSkuIds()")
+        skuIds.clear()
+        skuIds.addAll(ids)
+        updateState()
     }
 
     override fun requestPayment(
         paymentRequest: PaymentRequest,
-        activityClass: Class<out BillingProcessorActivity>,
+        activityClass: Class<out BillingClientActivity>,
         resultListener: PaymentResultListener
     ) {
         this.resultListener = resultListener
-        val isOneTimePurchaseSupported = billingProcessor.isOneTimePurchaseSupported
-        val isSubsUpdateSupported = billingProcessor.isSubscriptionUpdateSupported
-
-        // TODO: find out why not supported
-//        if (
-//            (isOneTimePurchaseSupported && paymentRequest.type == PaymentType.PURCHASE)
-//            || (isSubsUpdateSupported && paymentRequest.type == PaymentType.SUBSCRIPTION)
-//        ) {
-//            logger.error("Payment not supported type = ${paymentRequest.type} ")
-//            resultListener.onResult(RequestPaymentResult.NOT_ALLOWED_PAYMENT_TYPE)
-//            return
-//        }
-
-        if (paymentRequest.type == PaymentType.PURCHASE) {
-            val transactionDetails =
-                billingProcessor.getPurchaseTransactionDetails(paymentRequest.itemId)
-            if (transactionDetails != null) {
-                logger.warn("Payment already payed ${paymentRequest.type} ")
-                resultListener.onResult(RequestPaymentResult.ALREADY_PAYED)
-                return
-            }
+        val item = itemsMap.get(paymentRequest.itemId)
+        if (item == null) {
+            logger.error("Call paymentRequest() for not exist item")
+            resultListener.onResult(RequestPaymentResult.PAYMENT_ERROR)
+            return
         }
 
-        BillingProcessorServiceLocator.register(billingProcessor)
-        BillingProcessorActivity.startActivity(context, paymentRequest, activityClass)
+        val billingFlowParams = BillingFlowParams.newBuilder()
+            .setSkuDetails(item.skuDetails)
+            .build()
+        BillingProcessorServiceLocator.register(billingClient, billingFlowParams)
+
+        BillingClientActivity.startActivity(context, paymentRequest, activityClass)
     }
 
     override fun consumePurchase(itemId: String): Boolean {
         logger.debug("consumePurchase($itemId)")
-        val consumptionResult = billingProcessor.consumePurchase(itemId)
-        logger.debug("consumptionResult=$consumptionResult")
-        if (consumptionResult) updateOwnedItems()
-        return consumptionResult
+        val item = itemsMap.get(itemId)
+
+        if (item != null) {
+            val token = item.purchase?.purchaseToken ?: ""
+            val consumeParams = ConsumeParams.newBuilder().setPurchaseToken(token).build()
+            billingClient.consumeAsync(
+                consumeParams
+            ) { billingResult, purchaseToken ->
+                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                    logger.debug("consumePurchase($itemId) OK")
+                    updateState()
+                }
+            }
+        }
+        return false
     }
 
-    override fun ownedProductsFlow(): Flow<ArrayList<SkuDetails>> = ownedProductsChannel.asFlow()
+    override fun productsFlow(): StateFlow<List<MarketItem>> = ownedProductsStateFlow
 
-    override fun ownedSubscriptionsFlow(): Flow<ArrayList<SkuDetails>> =
-        ownedSubscriptionChannel.asFlow()
+//    override fun ownedSubscriptionsFlow(): StateFlow<List<MarketItem>> =
+//        ownedSubscriptionStateFlow
 
     override fun dispose() {
         logger.debug("dispose()")
+        BillingProcessorServiceLocator.clear()
         resultListener = null
-        billingProcessor.release()
     }
 }

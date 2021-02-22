@@ -26,7 +26,7 @@ interface ArticleDao {
     fun isRowIsExist(id: Int): Boolean
 }
 
-@Database(entities = [Article::class], version = 2)
+@Database(entities = [Article::class], version = 3)
 @TypeConverters(ListStringConverter::class, ArticleTypeConverter::class)
 abstract class ArticleDatabase : RoomDatabase() {
 

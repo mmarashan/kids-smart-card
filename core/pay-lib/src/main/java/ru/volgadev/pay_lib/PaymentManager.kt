@@ -2,27 +2,28 @@ package ru.volgadev.pay_lib
 
 import android.os.Parcelable
 import androidx.annotation.WorkerThread
-import com.anjlab.android.iab.v3.SkuDetails
+import com.android.billingclient.api.Purchase
+import com.android.billingclient.api.SkuDetails
 import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.flow.Flow
-import ru.volgadev.pay_lib.impl.BillingProcessorActivity
+import ru.volgadev.pay_lib.impl.BillingClientActivity
 
 @WorkerThread
 interface PaymentManager {
 
-    fun isAvailable(): Boolean
+    fun setSkuIds(ids: List<String>)
 
     fun requestPayment(
         paymentRequest: PaymentRequest,
-        activityClass: Class<out BillingProcessorActivity>,
+        activityClass: Class<out BillingClientActivity>,
         resultListener: PaymentResultListener
     )
 
     fun consumePurchase(itemId: String): Boolean
 
-    fun ownedProductsFlow(): Flow<ArrayList<SkuDetails>>
+    fun productsFlow(): Flow<List<MarketItem>>
 
-    fun ownedSubscriptionsFlow(): Flow<ArrayList<SkuDetails>>
+    // fun ownedSubscriptionsFlow(): Flow<List<MarketItem>>
 
     fun dispose()
 }
@@ -47,3 +48,9 @@ data class PaymentRequest(
     val description: String?,
     val imageUrl: String?
 ) : Parcelable
+
+
+data class MarketItem(
+    val skuDetails: SkuDetails,
+    var purchase: Purchase? = null
+)

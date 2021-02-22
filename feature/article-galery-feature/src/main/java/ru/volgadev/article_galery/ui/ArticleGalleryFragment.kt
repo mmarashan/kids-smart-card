@@ -1,37 +1,34 @@
 package ru.volgadev.article_galery.ui
 
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import android.view.animation.OvershootInterpolator
+import android.view.View.OVER_SCROLL_NEVER
 import androidx.annotation.AnyThread
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import jp.wasabeef.recyclerview.animators.LandingAnimator
-import jp.wasabeef.recyclerview.animators.SlideInDownAnimator
+import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
 import kotlinx.android.synthetic.main.main_fragment.*
-import org.koin.androidx.viewmodel.ext.android.sharedViewModel
+import org.koin.androidx.viewmodel.ext.android.getViewModel
 import ru.volgadev.article_data.model.Article
 import ru.volgadev.article_data.model.ArticleType
 import ru.volgadev.article_galery.R
 import ru.volgadev.common.BackgroundMediaPlayer
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.scaleToFitAnimatedAndBack
+import ru.volgadev.common.view.scrollToItemToCenter
+
 
 class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
 
     private val logger = Logger.get("ArticleGalleryFragment")
-
-    companion object {
-        fun newInstance() = ArticleGalleryFragment()
-    }
-
-    private val viewModel: ArticleGalleryViewModel by sharedViewModel()
 
     private val musicMediaPlayer by lazy { BackgroundMediaPlayer() }
     private val cardsMediaPlayer by lazy { BackgroundMediaPlayer() }
@@ -52,30 +49,9 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
         super.onViewCreated(view, savedInstanceState)
         logger.debug("On fragment created; savedInstanceState=$savedInstanceState")
 
-        val articlesAdapter = ArticleCardAdapter().apply {
-            setOnItemClickListener(object : ArticleCardAdapter.OnItemClickListener {
-                override fun onClick(itemId: Long, clickedView: View) {
-                    val clickedArticle =
-                        viewModel.currentArticles.value?.first { article -> article.id == itemId }
-                    clickedArticle?.let { article ->
-                        logger.debug("On click article ${article.id}")
-                        viewModel.onClickArticle(article)
-                        val startElevation = clickedView.elevation
-                        clickedView.elevation = startElevation + 1
-                        if (article.type == ArticleType.NO_PAGES) {
-                            clickedView.scaleToFitAnimatedAndBack(
-                                1000L,
-                                1000L,
-                                1000L
-                            ) {
-                                clickedView.elevation = startElevation
-                            }
-                        }
-                        onItemClickListener?.onClick(article, clickedView)
-                    }
-                }
-            })
-        }
+        val viewModel = getViewModel<ArticleGalleryViewModel>()
+
+        val articlesAdapter = ArticleCardAdapter(view.context)
 
         viewModel.audioToPlay.observe(viewLifecycleOwner, Observer { track ->
             val audioPath = track.filePath ?: track.url
@@ -92,27 +68,65 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
             )
         })
 
+        val isPortraitOrientation =
+            requireActivity().resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+        val spanCount = if (isPortraitOrientation) 2 else 3
+
         contentRecyclerView.run {
-            layoutManager = StaggeredGridLayoutManager(2, LinearLayoutManager.VERTICAL)
+            layoutManager = StaggeredGridLayoutManager(spanCount, LinearLayoutManager.VERTICAL)
             adapter = articlesAdapter
-            itemAnimator = LandingAnimator(OvershootInterpolator(1f)).apply {
-                addDuration = 700
-                removeDuration = 100
-                moveDuration = 700
-                changeDuration = 100
+            overScrollMode = OVER_SCROLL_NEVER
+            itemAnimator = SlideInUpAnimator().apply {
+                addDuration = 248
+                removeDuration = 200
+                moveDuration = 200
+                changeDuration = 0
             }
         }
+
+        var canClick = true
+
+        articlesAdapter.setOnItemClickListener(object : ArticleCardAdapter.OnItemClickListener {
+
+            override fun onClick(itemId: Long, clickedView: View, position: Int) {
+                if (!canClick) return
+                val clickedArticle =
+                    viewModel.currentArticles.value?.first { article -> article.id == itemId }
+                clickedArticle?.let { article ->
+                    logger.debug("On click article ${article.id}")
+                    viewModel.onClickArticle(article)
+                    val startElevation = clickedView.elevation
+                    clickedView.elevation = startElevation + 1
+                    if (article.type == ArticleType.NO_PAGES) {
+                        canClick = false
+                        clickedView.scaleToFitAnimatedAndBack(
+                            1000L,
+                            1000L,
+                            1000L,
+                            0.75f
+                        ) {
+                            canClick = true
+                            clickedView.elevation = startElevation
+                        }
+                    }
+                    onItemClickListener?.onClick(article, clickedView)
+                }
+            }
+        })
 
         viewModel.currentArticles.observe(viewLifecycleOwner, Observer { articles ->
             logger.debug("Set new ${articles.size} articles")
             articlesAdapter.setData(articles)
+            canClick = true
         })
 
-        val categoryTagsAdapter = TagsAdapter(R.layout.category_tag).apply {
+        val categoryTagsAdapter = TagsAdapter(view.context, R.layout.category_tag).apply {
             setOnItemClickListener(object : TagsAdapter.OnItemClickListener {
-                override fun onClick(item: String, clickedView: CardView) {
+                override fun onClick(item: String, clickedView: CardView, position: Int) {
                     logger.debug("on click $item")
-                    val category = viewModel.availableCategories.value?.first { c -> c.name == item }
+                    categoryRecyclerView.scrollToItemToCenter(position)
+                    val category =
+                        viewModel.availableCategories.value?.first { c -> c.name == item }
                     category?.let { cat ->
                         viewModel.onClickCategory(cat)
                     }
@@ -132,6 +146,7 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
                 LinearLayoutManager.HORIZONTAL,
                 false
             )
+            overScrollMode = OVER_SCROLL_NEVER
             adapter = categoryTagsAdapter
             val dividerDrawable =
                 ContextCompat.getDrawable(context, R.drawable.empty_divider_4)!!
@@ -140,15 +155,17 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
                     setDrawable(dividerDrawable)
                 }
             addItemDecoration(dividerDecorator)
-            itemAnimator = SlideInDownAnimator()
+            itemAnimator = null
         }
 
-        viewModel.availableCategories.observe(viewLifecycleOwner, Observer { categories ->
+        viewModel.availableCategories.observe(viewLifecycleOwner, { categories ->
             logger.debug("On load categories: ${categories.size}")
             val categoryNames = categories.map { category -> category.name }
             categoryTagsAdapter.setData(categoryNames)
-            categories.firstOrNull()?.let { firstCategory ->
-                viewModel.onClickCategory(firstCategory)
+            if (categoryTagsAdapter.getChosenTag() == null) {
+                categories.firstOrNull()?.let { firstCategory ->
+                    viewModel.onClickCategory(firstCategory)
+                }
             }
         })
 
@@ -169,11 +186,23 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
             trackUrl?.let { url ->
                 try {
                     musicMediaPlayer.playAudio(requireContext(), Uri.parse(url))
+                    backgroundMusicToggleButton.isChecked = true
+                    backgroundMusicToggleButton.isVisible = true
                 } catch (e: Exception) {
                     logger.error("Exception when playing: ${e.message}")
                 }
             }
         })
+
+        backgroundMusicToggleButton.isVisible = false
+        backgroundMusicToggleButton.setOnCheckedChangeListener { buttonView, isChecked ->
+            logger.debug("on click backgroundMusicToggleButton")
+            if (isChecked) {
+                musicMediaPlayer.start()
+            } else {
+                musicMediaPlayer.pause()
+            }
+        }
     }
 
     override fun onResume() {

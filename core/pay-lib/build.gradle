@@ -36,9 +36,8 @@ dependencies {
     implementation "androidx.core:core-ktx:${versions.corektx}"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:${versions.androidxlifecycle}"
     implementation "androidx.lifecycle:lifecycle-extensions:${versions.androidxlifecycle}"
-
-    implementation "com.anjlab.android.iab.v3:library:${versions.anjlabandroidiappbilling}"
     implementation "io.coil-kt:coil:${versions.coil}"
+    implementation "com.android.billingclient:billing:${versions.billingclient}"
 
     implementation project(':common')
 }

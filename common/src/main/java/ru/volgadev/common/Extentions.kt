@@ -25,8 +25,11 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import java.io.File
+import java.lang.ref.WeakReference
 import java.net.MalformedURLException
+import java.net.URL
 import kotlin.math.min
+import kotlin.math.roundToInt
 
 
 fun Context.applicationDataDir(): String {
@@ -90,35 +93,59 @@ fun View.setVisibleWithTransition(
 }
 
 
-fun View.runLevitateAnimation(amplitudeY: Float, duration: Long) {
+fun View.runLevitateAnimation(amplitudeY: Float, period: Long) {
+    val viewRef = WeakReference<View>(this)
     val interpolator: TimeInterpolator = DecelerateInterpolator()
-    this.animate().translationYBy(amplitudeY).setDuration(duration)
-        .setInterpolator(interpolator).setListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
-                super.onAnimationEnd(animation)
-                runLevitateAnimation(-amplitudeY, duration)
-            }
-        })
+    val animator = this.animate().apply {
+        setInterpolator(interpolator)
+        setDuration(period / 2)
+    }
+    animator.translationYBy(amplitudeY).setListener(object : AnimatorListenerAdapter() {
+        override fun onAnimationEnd(animation: Animator?) {
+            super.onAnimationEnd(animation)
+            viewRef.get()?.runLevitateAnimation(-amplitudeY, period)
+        }
+    })
+}
+
+fun View.runSwingAnimation(amplitudeZ: Float, period: Long) {
+    val viewRef = WeakReference<View>(this)
+    val interpolator: TimeInterpolator = DecelerateInterpolator()
+    val animator = this.animate().apply {
+        setInterpolator(interpolator)
+        duration = period / 2
+    }
+    animator.rotationBy(amplitudeZ).setListener(object : AnimatorListenerAdapter() {
+        override fun onAnimationEnd(animation: Animator?) {
+            super.onAnimationEnd(animation)
+            viewRef.get()?.runSwingAnimation(-amplitudeZ, period)
+        }
+    })
 }
 
 fun View.scaleToFitAnimatedAndBack(
     timeUp: Long,
     timeDelay: Long,
     timeDown: Long,
+    scaleRate: Float = 1f,
     onEnd: () -> Unit = {}
 ) {
-    val animPair = scaleToFitParentAnimation(this)
+    val animPair = scaleToFitParentAnimation(this, scaleRate)
     val animScaleUp = animPair.first
-    val animScaleDown = animPair.second
+    val animScaleDown = animPair.second.apply {
+        duration = timeDown
+    }
     val view = this
     animScaleUp.duration = timeUp
     animScaleUp.fillAfter = true
     animScaleUp.setAnimationListener(object : Animation.AnimationListener {
-        override fun onAnimationStart(animation: Animation?) {}
+        override fun onAnimationStart(animation: Animation?) {
+        }
 
         override fun onAnimationEnd(animation: Animation?) {
             animScaleDown.setAnimationListener(object : Animation.AnimationListener {
-                override fun onAnimationStart(animation: Animation?) {}
+                override fun onAnimationStart(animation: Animation?) {
+                }
 
                 override fun onAnimationEnd(animation: Animation?) {
                     onEnd.invoke()
@@ -126,10 +153,14 @@ fun View.scaleToFitAnimatedAndBack(
 
                 override fun onAnimationRepeat(animation: Animation?) {}
             })
-            animScaleDown.duration = timeDown
-            view.postDelayed({
-                view.startAnimation(animScaleDown)
-            }, timeDelay)
+            if (view.isShown) {
+                view.postDelayed({
+                    view.startAnimation(animScaleDown)
+                }, timeDelay)
+            } else {
+                view.animation?.cancel()
+                onEnd.invoke()
+            }
         }
 
         override fun onAnimationRepeat(animation: Animation?) {}
@@ -137,15 +168,18 @@ fun View.scaleToFitAnimatedAndBack(
     this.startAnimation(animScaleUp)
 }
 
-private fun scaleToFitParentAnimation(view: View): Pair<ScaleAnimation, ScaleAnimation> {
-    val screenSize = getScreenSize(view.context)
-    val screenW = screenSize.first
-    val screenH = screenSize.second
+private fun scaleToFitParentAnimation(
+    view: View,
+    scaleRate: Float = 0f
+): Pair<ScaleAnimation, ScaleAnimation> {
+    val parent = (view.parent as View)
+    val screenW = parent.width
+    val screenH = parent.height
     val yBelowCenter = view.bottom - view.height / 2 - screenH / 2
     val xBelowCenter = view.right - view.width / 2 - screenW / 2
     val scaleX = screenW.toFloat() / view.width
     val scaleY = screenH.toFloat() / view.height
-    val scaleFactor = min(scaleX, scaleY)
+    val scaleFactor = min(scaleX, scaleY) * scaleRate
     val pivotY = 0.5f + yBelowCenter.toFloat() / (screenH / 2)
     val pivotX = 0.5f + xBelowCenter.toFloat() / (screenW / 2)
     val scaleUpAnimation = ScaleAnimation(
@@ -163,8 +197,8 @@ private fun scaleToFitParentAnimation(view: View): Pair<ScaleAnimation, ScaleAni
     return Pair(scaleUpAnimation, scaleDownAnimation)
 }
 
-fun getScreenSize(context: Context): Pair<Int, Int> {
-    val displayMetrics = context.resources.displayMetrics
+fun Context.getScreenSize(): Pair<Int, Int> {
+    val displayMetrics = resources.displayMetrics
     return Pair(displayMetrics.widthPixels, displayMetrics.heightPixels)
 }
 
@@ -179,13 +213,32 @@ fun <T> LiveData<T>.observeOnce(observer: Observer<T>) {
 
 fun String.isValidUrlString(): Boolean {
     try {
-        return this.isNotEmpty() && URLUtil.isValidUrl(this) && Patterns.WEB_URL.matcher(this)
+        URL(this)
+        return URLUtil.isValidUrl(this) && Patterns.WEB_URL.matcher(this)
             .matches()
-    } catch (e: MalformedURLException) {
+    } catch (e: Exception) {
     }
     return false
 }
 
 fun File.isExistsNonEmptyFile(): Boolean {
     return isFile && exists() && length() > 0
+}
+
+fun Context.dpToPx(dp: Float): Int {
+    val metrics = resources.displayMetrics
+    return (dp * metrics.density).roundToInt()
+}
+
+fun Context.pxToDp(px: Int): Float {
+    val metrics = resources.displayMetrics
+    return px / metrics.density
+}
+
+fun Context.getNavigationBarHeight(): Int {
+    val resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
+    if (resourceId > 0) {
+        return resources.getDimensionPixelSize(resourceId)
+    }
+    return 0
 }

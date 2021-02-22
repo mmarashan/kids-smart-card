@@ -7,5 +7,9 @@
         <activity
             android:name="ru.volgadev.pay_lib.impl.DefaultPaymentActivity"
             android:screenOrientation="portrait" />
+
+        <activity
+            android:name="ru.volgadev.pay_lib.impl.BillingClientActivity"
+            android:screenOrientation="portrait" />
     </application>
 </manifest>

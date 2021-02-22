@@ -69,6 +69,7 @@ class PinCodeBubbleAlertDialog private constructor(
             hide()
             dismiss()
         }
+        answerEditText.requestFocus()
         show()
         return resultLiveData
     }

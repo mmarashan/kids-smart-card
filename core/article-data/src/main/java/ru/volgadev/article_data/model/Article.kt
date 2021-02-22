@@ -15,7 +15,8 @@ data class Article(
     val iconUrl: String? = null,
     val onClickSounds: List<String> = listOf(),
     val averageTimeReadingMin: Int? = 0,
-    val timestamp: Long
+    val timestamp: Long,
+    val openPhrase: String?
 )
 
 enum class ArticleType {
@@ -48,7 +49,7 @@ data class ArticleCategory(
     val iconUrl: String? = null,
     val fileUrl: String,
     val marketItemId: String? = null,
-    var isPaid: Boolean = false
+    var isPaid: Boolean = true
 ) {
     @Ignore
     val isFree = marketItemId == null

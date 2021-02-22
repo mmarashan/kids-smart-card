@@ -32,6 +32,7 @@
             android:layout_marginBottom="4dp"
             android:textSize="24sp"
             android:textStyle="bold"
+            android:textColor="@color/colorDarkText"
             tools:text="Super item" />
 
         <TextView
@@ -40,7 +41,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
-            android:textSize="18sp"
+            android:textSize="22sp"
+            android:textColor="@color/colorDarkText"
             tools:text="Very good item for your life" />
 
         <TextView
@@ -49,7 +51,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
-            android:textSize="18sp"
+            android:textSize="22sp"
+            android:textColor="@color/colorDarkText"
             tools:text="1$" />
 
         <androidx.appcompat.widget.AppCompatButton
