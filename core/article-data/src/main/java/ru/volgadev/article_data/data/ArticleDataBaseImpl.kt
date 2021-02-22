@@ -3,17 +3,12 @@ package ru.volgadev.article_data.storage
 import android.content.Context
 import androidx.annotation.WorkerThread
 import androidx.room.*
-import ru.volgadev.article_data.model.Article
-import ru.volgadev.article_data.model.ArticleType
-import java.util.stream.Collectors
-
-interface ArticleDatabase {
-    fun dao(): ArticleDao
-}
+import ru.volgadev.article_data.domain.Article
+import ru.volgadev.article_data.domain.ArticleDatabase
 
 @Dao
 @WorkerThread
-interface ArticleDao {
+internal interface ArticleDao {
     @Query("SELECT * FROM article")
     fun getAll(): List<Article>
 
@@ -32,7 +27,7 @@ interface ArticleDao {
 
 @Database(entities = [Article::class], version = 3)
 @TypeConverters(ListStringConverter::class, ArticleTypeConverter::class)
-abstract class ArticleDatabaseImpl : ArticleDatabase, RoomDatabase() {
+internal abstract class ArticleDatabaseImpl : ArticleDatabase, RoomDatabase() {
 
     abstract override fun dao(): ArticleDao
 

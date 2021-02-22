@@ -1,16 +1,17 @@
-package ru.volgadev.article_data.repository
+package ru.volgadev.article_data.domain
 
 import androidx.annotation.WorkerThread
 import com.android.billingclient.api.Purchase
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.*
-import ru.volgadev.article_data.api.ArticleBackendApi
-import ru.volgadev.article_data.model.Article
-import ru.volgadev.article_data.model.ArticleCategory
-import ru.volgadev.article_data.model.ArticlePage
-import ru.volgadev.article_data.storage.ArticleCategoriesDatabase
-import ru.volgadev.article_data.storage.ArticleDatabase
+import ru.volgadev.article_data.domain.Article
+import ru.volgadev.article_data.domain.ArticleBackendApi
+import ru.volgadev.article_data.domain.ArticleCategoriesDatabase
+import ru.volgadev.article_data.domain.ArticleCategory
+import ru.volgadev.article_data.domain.ArticleDatabase
+import ru.volgadev.article_data.domain.ArticlePage
+import ru.volgadev.article_data.domain.ArticleRepository
 import ru.volgadev.common.DataResult
 import ru.volgadev.common.ErrorResult
 import ru.volgadev.common.SuccessResult
@@ -21,7 +22,7 @@ import java.net.ConnectException
 
 @ExperimentalCoroutinesApi
 @InternalCoroutinesApi
-class ArticleRepositoryImpl(
+internal class ArticleRepositoryImpl(
     private val articleBackendApi: ArticleBackendApi,
     private val paymentManager: PaymentManager,
     private val articlesDatabase: ArticleDatabase,

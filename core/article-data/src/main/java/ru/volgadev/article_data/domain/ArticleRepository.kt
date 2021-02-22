@@ -1,10 +1,7 @@
-package ru.volgadev.article_data.repository
+package ru.volgadev.article_data.domain
 
 import androidx.annotation.WorkerThread
 import kotlinx.coroutines.flow.Flow
-import ru.volgadev.article_data.model.Article
-import ru.volgadev.article_data.model.ArticleCategory
-import ru.volgadev.article_data.model.ArticlePage
 import ru.volgadev.common.DataResult
 import ru.volgadev.pay_lib.PaymentRequest
 

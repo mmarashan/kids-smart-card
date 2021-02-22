@@ -17,8 +17,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
 import kotlinx.android.synthetic.main.main_fragment.*
-import ru.volgadev.article_data.model.Article
-import ru.volgadev.article_data.model.ArticleType
+import ru.volgadev.article_data.domain.Article
+import ru.volgadev.article_data.domain.ArticleType
 import ru.volgadev.article_galery.R
 import ru.volgadev.common.BackgroundMediaPlayer
 import ru.volgadev.common.log.Logger

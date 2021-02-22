@@ -1,7 +1,7 @@
 package ru.volgadev.article_data.storage
 
 import androidx.room.TypeConverter
-import ru.volgadev.article_data.model.ArticleType
+import ru.volgadev.article_data.domain.ArticleType
 import java.util.stream.Collectors
 
 internal class ListStringConverter {

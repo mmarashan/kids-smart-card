@@ -6,9 +6,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.launch
-import ru.volgadev.article_data.model.Article
-import ru.volgadev.article_data.model.ArticleCategory
-import ru.volgadev.article_data.repository.ArticleRepository
+import ru.volgadev.article_data.domain.Article
+import ru.volgadev.article_data.domain.ArticleCategory
+import ru.volgadev.article_data.domain.ArticleRepository
 import ru.volgadev.common.ENABLE_BACKGROUND_MUSIC
 import ru.volgadev.common.LiveEvent
 import ru.volgadev.common.log.Logger

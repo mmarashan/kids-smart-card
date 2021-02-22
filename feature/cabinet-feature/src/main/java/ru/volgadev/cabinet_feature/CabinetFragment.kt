@@ -7,9 +7,8 @@ import androidx.annotation.MainThread
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.cabinet_fragment.*
-import org.koin.androidx.viewmodel.ext.android.getViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import ru.volgadev.article_data.model.ArticleCategory
+import ru.volgadev.article_data.domain.ArticleCategory
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.observeOnce
 import ru.volgadev.pincode_bubble.PinCodeBubbleAlertDialog

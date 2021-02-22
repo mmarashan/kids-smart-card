@@ -2,7 +2,7 @@ package ru.volgadev.papastory.di
 
 import dagger.Module
 import dagger.Provides
-import ru.volgadev.article_data.repository.ArticleRepository
+import ru.volgadev.article_data.api.ArticleRepositoryApi
 import ru.volgadev.article_galery.api.ArticleGalleryFeatureComponentHolder
 import ru.volgadev.article_galery.api.ArticleGalleryFeatureDependencies
 import ru.volgadev.music_data.repository.MusicRepository
@@ -15,9 +15,10 @@ interface ArticleGalleryFeatureModule {
     companion object {
         @Provides
         fun providesArticleGalleryFeatureDependencies(
-            articleRepository: ArticleRepository,
+            articleRepositoryApi: ArticleRepositoryApi,
             musicRepository: MusicRepository
-        ): ArticleGalleryFeatureDependencies = ArticleGalleryFeatureDependencies(articleRepository, musicRepository)
+        ): ArticleGalleryFeatureDependencies =
+            ArticleGalleryFeatureDependencies(articleRepositoryApi.getArticleRepository(), musicRepository)
 
         @Provides
         fun providesArticleGalleryFeatureComponentHolder(dependencies: ArticleGalleryFeatureDependencies): ArticleGalleryFeatureComponentHolder =

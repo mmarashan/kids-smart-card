@@ -2,7 +2,7 @@ package ru.volgadev.article_galery.api
 
 import ru.sberdevices.module_injector.BaseDependencies
 import ru.sberdevices.module_injector.ComponentHolder
-import ru.volgadev.article_data.repository.ArticleRepository
+import ru.volgadev.article_data.domain.ArticleRepository
 import ru.volgadev.article_galery.presentation.ArticleGalleryViewModelFactory
 import ru.volgadev.music_data.repository.MusicRepository
 

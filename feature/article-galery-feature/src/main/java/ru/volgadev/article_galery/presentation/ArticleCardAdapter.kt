@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import ru.volgadev.article_data.model.Article
+import ru.volgadev.article_data.domain.Article
 import ru.volgadev.article_galery.R
 import ru.volgadev.common.log.Logger
 

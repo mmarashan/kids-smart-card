@@ -1,39 +1,34 @@
 package ru.volgadev.papastory.di
 
 import android.content.Context
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
-import dagger.Reusable
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.InternalCoroutinesApi
-import ru.volgadev.article_data.api.ArticleBackendApi
-import ru.volgadev.article_data.api.ArticleBackendApiImpl
-import ru.volgadev.article_data.repository.ArticleRepository
-import ru.volgadev.article_data.repository.ArticleRepositoryImpl
-import ru.volgadev.article_data.storage.ArticleCategoriesDatabase
-import ru.volgadev.article_data.storage.ArticleDatabase
-import ru.volgadev.article_data.storage.LocalStorageProvider
+import ru.volgadev.article_data.api.ArticleRepositoryApi
+import ru.volgadev.article_data.api.ArticleRepositoryComponentHolder
+import ru.volgadev.article_data.api.ArticleRepositoryDependencies
+import ru.volgadev.pay_lib.PaymentManager
 
-@Module
+@Module(
+    includes = [PaymentManagerModule::class]
+)
 interface ArticleRepositoryModule {
 
     companion object {
         @Provides
-        fun getArticleDatabase(context: Context): ArticleDatabase = LocalStorageProvider.getArticleDatabase(context)
+        fun providesArticleRepositoryDependencies(
+            context: Context,
+            paymentManager: PaymentManager
+        ): ArticleRepositoryDependencies = ArticleRepositoryDependencies(context, paymentManager)
 
         @Provides
-        fun getArticleCategoriesDatabase(context: Context): ArticleCategoriesDatabase =
-            LocalStorageProvider.getArticleCategoriesDatabase(context)
+        fun providesArticleRepositoryComponentHolder(
+            articleRepositoryDependencies: ArticleRepositoryDependencies
+        ): ArticleRepositoryComponentHolder = ArticleRepositoryComponentHolder().apply {
+            init(articleRepositoryDependencies)
+        }
+
+        @Provides
+        fun providesArticleRepositoryApi(articleRepositoryComponentHolder: ArticleRepositoryComponentHolder): ArticleRepositoryApi =
+            articleRepositoryComponentHolder.get()
     }
-
-    @ExperimentalCoroutinesApi
-    @InternalCoroutinesApi
-    @Binds
-    @Reusable
-    fun bindsArticleRepository(impl: ArticleRepositoryImpl): ArticleRepository
-
-    @Binds
-    @Reusable
-    fun bindsArticleBackendApi(impl: ArticleBackendApiImpl): ArticleBackendApi
 }

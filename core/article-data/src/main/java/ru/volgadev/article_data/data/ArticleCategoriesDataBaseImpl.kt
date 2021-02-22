@@ -3,11 +3,8 @@ package ru.volgadev.article_data.storage
 import android.content.Context
 import androidx.annotation.WorkerThread
 import androidx.room.*
-import ru.volgadev.article_data.model.ArticleCategory
-
-interface ArticleCategoriesDatabase {
-    fun dao(): ArticleChannelsDao
-}
+import ru.volgadev.article_data.domain.ArticleCategoriesDatabase
+import ru.volgadev.article_data.domain.ArticleCategory
 
 @Dao
 @WorkerThread

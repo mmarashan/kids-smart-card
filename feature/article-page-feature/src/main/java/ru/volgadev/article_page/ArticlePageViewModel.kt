@@ -5,8 +5,8 @@ import androidx.annotation.GuardedBy
 import androidx.annotation.MainThread
 import androidx.lifecycle.*
 import kotlinx.coroutines.launch
-import ru.volgadev.article_data.model.ArticlePage
-import ru.volgadev.article_data.repository.ArticleRepository
+import ru.volgadev.article_data.domain.ArticlePage
+import ru.volgadev.article_data.domain.ArticleRepository
 import ru.volgadev.common.ErrorResult
 import ru.volgadev.common.SuccessResult
 import ru.volgadev.common.log.Logger
