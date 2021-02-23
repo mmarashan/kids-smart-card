@@ -1,4 +1,4 @@
-package ru.volgadev.papastory.di
+package ru.volgadev.papastory.di.core
 
 import android.content.Context
 import dagger.Module

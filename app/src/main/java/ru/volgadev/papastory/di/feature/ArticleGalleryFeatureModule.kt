@@ -1,4 +1,4 @@
-package ru.volgadev.papastory.di
+package ru.volgadev.papastory.di.feature
 
 import dagger.Module
 import dagger.Provides
@@ -6,6 +6,8 @@ import ru.volgadev.article_data.api.ArticleRepositoryApi
 import ru.volgadev.music_data.api.MusicRepositoryApi
 import ru.volgadev.article_galery.api.ArticleGalleryFeatureComponentHolder
 import ru.volgadev.article_galery.api.ArticleGalleryFeatureDependencies
+import ru.volgadev.papastory.di.core.ArticleRepositoryModule
+import ru.volgadev.papastory.di.core.MusicRepositoryModule
 
 @Module(
     includes = [ArticleRepositoryModule::class, MusicRepositoryModule::class]

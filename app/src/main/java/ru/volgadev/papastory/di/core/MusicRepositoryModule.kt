@@ -1,8 +1,9 @@
-package ru.volgadev.papastory.di
+package ru.volgadev.papastory.di.core
 
 import android.content.Context
 import dagger.Module
 import dagger.Provides
+import dagger.Reusable
 import ru.volgadev.music_data.api.MusicRepositoryComponentHolder
 import ru.volgadev.music_data.api.MusicRepositoryDependencies
 import ru.volgadev.music_data.api.MusicRepositoryApi
@@ -22,6 +23,7 @@ interface MusicRepositoryModule {
             init(musicRepositoryDependencies)
         }
 
+        @Reusable
         @Provides
         fun providesMusicRepositoryApi(musicRepositoryComponentHolder: MusicRepositoryComponentHolder): MusicRepositoryApi =
             musicRepositoryComponentHolder.get()

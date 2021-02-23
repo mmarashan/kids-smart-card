@@ -1,8 +1,9 @@
-package ru.volgadev.papastory.di
+package ru.volgadev.papastory.di.core
 
 import android.content.Context
 import dagger.Module
 import dagger.Provides
+import dagger.Reusable
 import ru.volgadev.article_data.api.ArticleRepositoryApi
 import ru.volgadev.article_data.api.ArticleRepositoryComponentHolder
 import ru.volgadev.article_data.api.ArticleRepositoryDependencies
@@ -27,6 +28,7 @@ interface ArticleRepositoryModule {
             init(articleRepositoryDependencies)
         }
 
+        @Reusable
         @Provides
         fun providesArticleRepositoryApi(articleRepositoryComponentHolder: ArticleRepositoryComponentHolder): ArticleRepositoryApi =
             articleRepositoryComponentHolder.get()

@@ -3,6 +3,12 @@ package ru.volgadev.papastory.di
 import android.content.Context
 import dagger.BindsInstance
 import dagger.Component
+import ru.volgadev.papastory.di.core.ArticleRepositoryModule
+import ru.volgadev.papastory.di.core.MusicRepositoryModule
+import ru.volgadev.papastory.di.core.PaymentManagerModule
+import ru.volgadev.papastory.di.feature.ArticleGalleryFeatureModule
+import ru.volgadev.papastory.di.feature.ArticlePageFeatureModule
+import ru.volgadev.papastory.di.feature.CabinetFeatureModule
 import ru.volgadev.papastory.ui.FragmentProvider
 
 @Component(

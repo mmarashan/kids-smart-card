@@ -11,7 +11,7 @@ App based on:
 
 - MVVM (AndroidX ViewModel, LiveData)
 - Repository based on Coroutines Flow and suspend functions
-- Koin DI
+- Dagger DI
 - Common module with logger and custom util
 - Dependency versions in versions.gradle
 - RecyclerView with CardView and item animator in gallery feature
