@@ -19,11 +19,10 @@ interface ArticlePageFeatureModule {
         fun providesArticlePageFeatureDependencies(
             articleRepository: ArticleRepository,
             musicRepository: MusicRepository
-        ): ArticlePageFeatureDependencies =
-            ArticlePageFeatureDependencies(
-                articleRepository = articleRepository,
-                musicRepository = musicRepository
-            )
+        ): ArticlePageFeatureDependencies = ArticlePageFeatureDependencies(
+            articleRepository = articleRepository,
+            musicRepository = musicRepository
+        )
 
         @Provides
         fun providesArticlePageFeatureComponentHolder(dependencies: ArticlePageFeatureDependencies): ArticlePageFeatureComponentHolder =

@@ -8,6 +8,7 @@ import ru.volgadev.article_page.presentation.ArticlePageFragment
 import ru.volgadev.cabinet_feature.api.CabinetFeatureApi
 import ru.volgadev.papastory.KidsCardApplication
 import javax.inject.Inject
+import dagger.Lazy
 
 enum class AppFragment {
     GALLERY_FRAGMENT, ARTICLE_PAGE_FRAGMENT, CABINET_FRAGMENT
@@ -16,22 +17,22 @@ enum class AppFragment {
 class FragmentProvider(activity: Activity) {
 
     @Inject
-    lateinit var articleGalleryFeatureApi: ArticleGalleryFeatureApi
+    lateinit var articleGalleryFeatureApi: Lazy<ArticleGalleryFeatureApi>
 
     @Inject
-    lateinit var articlePageFeatureApi: ArticlePageFeatureApi
+    lateinit var articlePageFeatureApi: Lazy<ArticlePageFeatureApi>
 
     @Inject
-    lateinit var cabinetFeatureApi: CabinetFeatureApi
+    lateinit var cabinetFeatureApi: Lazy<CabinetFeatureApi>
 
     init {
         ((activity.application) as KidsCardApplication).appComponent.inject(this)
     }
 
     fun get(code: AppFragment): Fragment = when (code) {
-        AppFragment.GALLERY_FRAGMENT -> articleGalleryFeatureApi.getFragment()
-        AppFragment.ARTICLE_PAGE_FRAGMENT -> articlePageFeatureApi.getFragment()
-        AppFragment.CABINET_FRAGMENT -> cabinetFeatureApi.getFragment()
+        AppFragment.GALLERY_FRAGMENT -> articleGalleryFeatureApi.get().getFragment()
+        AppFragment.ARTICLE_PAGE_FRAGMENT -> articlePageFeatureApi.get().getFragment()
+        AppFragment.CABINET_FRAGMENT -> cabinetFeatureApi.get().getFragment()
     }
 
     companion object {

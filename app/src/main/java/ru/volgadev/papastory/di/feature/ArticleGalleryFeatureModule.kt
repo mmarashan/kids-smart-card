@@ -19,11 +19,10 @@ interface ArticleGalleryFeatureModule {
         fun providesArticleGalleryFeatureDependencies(
             articleRepository: ArticleRepository,
             musicRepository: MusicRepository
-        ): ArticleGalleryFeatureDependencies =
-            ArticleGalleryFeatureDependencies(
-                articleRepository = articleRepository,
-                musicRepository = musicRepository
-            )
+        ): ArticleGalleryFeatureDependencies = ArticleGalleryFeatureDependencies(
+            articleRepository = articleRepository,
+            musicRepository = musicRepository
+        )
 
         @Provides
         fun providesArticleGalleryFeatureComponentHolder(dependencies: ArticleGalleryFeatureDependencies): ArticleGalleryFeatureComponentHolder =

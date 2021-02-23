@@ -16,10 +16,9 @@ interface CabinetFeatureModule {
         @Provides
         fun providesCabinetFeatureDependencies(
             articleRepository: ArticleRepository
-        ): CabinetFeatureDependencies =
-            CabinetFeatureDependencies(
-                articleRepository = articleRepository
-            )
+        ): CabinetFeatureDependencies = CabinetFeatureDependencies(
+            articleRepository = articleRepository
+        )
 
         @Provides
         fun providesCabinetFeatureComponentHolder(dependencies: CabinetFeatureDependencies): CabinetFeatureComponentHolder =
