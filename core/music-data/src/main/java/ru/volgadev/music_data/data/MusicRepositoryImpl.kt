@@ -16,8 +16,9 @@ import ru.volgadev.music_data.domain.MusicTrackDatabase
 import ru.volgadev.music_data.domain.MusicTrackType
 import java.io.File
 import java.net.ConnectException
+import javax.inject.Inject
 
-internal class MusicRepositoryImpl(
+class MusicRepositoryImpl @Inject constructor(
     private val context: Context,
     private val musicBackendApi: MusicBackendApi,
     private val musicTrackDatabase: MusicTrackDatabase

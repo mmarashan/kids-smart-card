@@ -2,10 +2,10 @@ package ru.volgadev.papastory.di.feature
 
 import dagger.Module
 import dagger.Provides
-import ru.volgadev.article_data.api.ArticleRepositoryApi
+import ru.volgadev.article_data.domain.ArticleRepository
 import ru.volgadev.article_page.api.ArticlePageFeatureComponentHolder
 import ru.volgadev.article_page.api.ArticlePageFeatureDependencies
-import ru.volgadev.music_data.api.MusicRepositoryApi
+import ru.volgadev.music_data.domain.MusicRepository
 import ru.volgadev.papastory.di.core.ArticleRepositoryModule
 import ru.volgadev.papastory.di.core.MusicRepositoryModule
 
@@ -17,12 +17,12 @@ interface ArticlePageFeatureModule {
     companion object {
         @Provides
         fun providesArticlePageFeatureDependencies(
-            articleRepositoryApi: ArticleRepositoryApi,
-            musicRepositoryApi: MusicRepositoryApi
+            articleRepository: ArticleRepository,
+            musicRepository: MusicRepository
         ): ArticlePageFeatureDependencies =
             ArticlePageFeatureDependencies(
-                articleRepository = articleRepositoryApi.getArticleRepository(),
-                musicRepository = musicRepositoryApi.getMusicRepository()
+                articleRepository = articleRepository,
+                musicRepository = musicRepository
             )
 
         @Provides

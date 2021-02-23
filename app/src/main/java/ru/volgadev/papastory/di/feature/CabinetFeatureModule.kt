@@ -2,7 +2,7 @@ package ru.volgadev.papastory.di.feature
 
 import dagger.Module
 import dagger.Provides
-import ru.volgadev.article_data.api.ArticleRepositoryApi
+import ru.volgadev.article_data.domain.ArticleRepository
 import ru.volgadev.cabinet_feature.api.CabinetFeatureComponentHolder
 import ru.volgadev.cabinet_feature.api.CabinetFeatureDependencies
 import ru.volgadev.papastory.di.core.ArticleRepositoryModule
@@ -15,10 +15,10 @@ interface CabinetFeatureModule {
     companion object {
         @Provides
         fun providesCabinetFeatureDependencies(
-            articleRepositoryApi: ArticleRepositoryApi
+            articleRepository: ArticleRepository
         ): CabinetFeatureDependencies =
             CabinetFeatureDependencies(
-                articleRepository = articleRepositoryApi.getArticleRepository()
+                articleRepository = articleRepository
             )
 
         @Provides

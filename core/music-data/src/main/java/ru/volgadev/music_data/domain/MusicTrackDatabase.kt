@@ -7,13 +7,13 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 
-internal interface MusicTrackDatabase {
+interface MusicTrackDatabase {
     fun dao(): MusicTrackDao
 }
 
 @Dao
 @WorkerThread
-internal interface MusicTrackDao {
+interface MusicTrackDao {
     @Query("SELECT * FROM musictrack")
     fun getAll(): List<MusicTrack>
 

@@ -25,6 +25,7 @@ dependencies {
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
     implementation "androidx.core:core-ktx:${versions.corektx}"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:${versions.androidxlifecycle}"
+    implementation "javax.inject:javax.inject:${versions.javaxinject}"
 
     implementation "androidx.room:room-runtime:${versions.room}"
     implementation "androidx.room:room-ktx:${versions.room}"
@@ -34,6 +35,5 @@ dependencies {
     implementation "com.android.billingclient:billing:${versions.billingclient}"
 
     implementation project(':common')
-    implementation project(':core:module-injector')
     implementation project(':core:pay-lib')
 }

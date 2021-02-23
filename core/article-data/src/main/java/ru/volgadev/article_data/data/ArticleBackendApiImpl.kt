@@ -14,10 +14,10 @@ import ru.volgadev.article_data.domain.PageType
 import ru.volgadev.common.BACKEND_URL
 import ru.volgadev.common.log.Logger
 import java.net.ConnectException
-
+import javax.inject.Inject
 
 @WorkerThread
-internal class ArticleBackendApiImpl : ArticleBackendApi {
+class ArticleBackendApiImpl @Inject constructor() : ArticleBackendApi {
 
     private val client by lazy { OkHttpClient() }
     private val logger = Logger.get("ArticleBackendApiImpl")

@@ -1,13 +1,17 @@
 package ru.volgadev.papastory.di.core
 
 import android.content.Context
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
-import dagger.Reusable
-import ru.volgadev.article_data.api.ArticleRepositoryApi
-import ru.volgadev.article_data.api.ArticleRepositoryComponentHolder
-import ru.volgadev.article_data.api.ArticleRepositoryDependencies
-import ru.volgadev.pay_lib.PaymentManager
+import kotlinx.coroutines.InternalCoroutinesApi
+import ru.volgadev.article_data.data.ArticleBackendApiImpl
+import ru.volgadev.article_data.data.ArticleDatabaseProvider
+import ru.volgadev.article_data.domain.ArticleBackendApi
+import ru.volgadev.article_data.domain.ArticleCategoriesDatabase
+import ru.volgadev.article_data.domain.ArticleDatabase
+import ru.volgadev.article_data.domain.ArticleRepository
+import ru.volgadev.article_data.domain.ArticleRepositoryImpl
 
 @Module(
     includes = [PaymentManagerModule::class]
@@ -16,21 +20,18 @@ interface ArticleRepositoryModule {
 
     companion object {
         @Provides
-        fun providesArticleRepositoryDependencies(
-            context: Context,
-            paymentManager: PaymentManager
-        ): ArticleRepositoryDependencies = ArticleRepositoryDependencies(context, paymentManager)
+        fun providesArticleDatabase(context: Context): ArticleDatabase =
+            ArticleDatabaseProvider.createArticleDatabase(context)
 
         @Provides
-        fun providesArticleRepositoryComponentHolder(
-            articleRepositoryDependencies: ArticleRepositoryDependencies
-        ): ArticleRepositoryComponentHolder = ArticleRepositoryComponentHolder().apply {
-            init(articleRepositoryDependencies)
-        }
-
-        @Reusable
-        @Provides
-        fun providesArticleRepositoryApi(articleRepositoryComponentHolder: ArticleRepositoryComponentHolder): ArticleRepositoryApi =
-            articleRepositoryComponentHolder.get()
+        fun providesArticleCategoriesDatabase(context: Context): ArticleCategoriesDatabase =
+            ArticleDatabaseProvider.createArticleCategoriesDatabase(context)
     }
+
+    @Binds
+    fun bindsArticleBackendApi(api: ArticleBackendApiImpl): ArticleBackendApi
+
+    @InternalCoroutinesApi
+    @Binds
+    fun bindsArticleRepository(articleRepository: ArticleRepositoryImpl): ArticleRepository
 }

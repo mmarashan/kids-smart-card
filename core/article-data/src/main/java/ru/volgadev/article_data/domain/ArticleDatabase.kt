@@ -7,17 +7,17 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 
-internal interface ArticleDatabase {
+interface ArticleDatabase {
     fun dao(): ArticleDao
 }
 
-internal interface ArticleCategoriesDatabase {
+interface ArticleCategoriesDatabase {
     fun dao(): ArticleChannelsDao
 }
 
 @Dao
 @WorkerThread
-internal interface ArticleDao {
+interface ArticleDao {
     @Query("SELECT * FROM article")
     fun getAll(): List<Article>
 

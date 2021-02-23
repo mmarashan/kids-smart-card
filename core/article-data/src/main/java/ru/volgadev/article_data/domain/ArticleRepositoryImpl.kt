@@ -2,27 +2,33 @@ package ru.volgadev.article_data.domain
 
 import androidx.annotation.WorkerThread
 import com.android.billingclient.api.Purchase
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
-import kotlinx.coroutines.flow.*
-import ru.volgadev.article_data.domain.Article
-import ru.volgadev.article_data.domain.ArticleBackendApi
-import ru.volgadev.article_data.domain.ArticleCategoriesDatabase
-import ru.volgadev.article_data.domain.ArticleCategory
-import ru.volgadev.article_data.domain.ArticleDatabase
-import ru.volgadev.article_data.domain.ArticlePage
-import ru.volgadev.article_data.domain.ArticleRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import ru.volgadev.common.DataResult
 import ru.volgadev.common.ErrorResult
 import ru.volgadev.common.SuccessResult
 import ru.volgadev.common.log.Logger
-import ru.volgadev.pay_lib.*
+import ru.volgadev.pay_lib.MarketItem
+import ru.volgadev.pay_lib.PaymentManager
+import ru.volgadev.pay_lib.PaymentRequest
+import ru.volgadev.pay_lib.PaymentResultListener
+import ru.volgadev.pay_lib.RequestPaymentResult
 import ru.volgadev.pay_lib.impl.DefaultPaymentActivity
 import java.net.ConnectException
+import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
 @InternalCoroutinesApi
-internal class ArticleRepositoryImpl(
+class ArticleRepositoryImpl @Inject constructor(
     private val articleBackendApi: ArticleBackendApi,
     private val paymentManager: PaymentManager,
     private val articlesDatabase: ArticleDatabase,

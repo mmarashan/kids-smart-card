@@ -1,31 +1,29 @@
 package ru.volgadev.papastory.di.core
 
 import android.content.Context
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
-import dagger.Reusable
-import ru.volgadev.music_data.api.MusicRepositoryComponentHolder
-import ru.volgadev.music_data.api.MusicRepositoryDependencies
-import ru.volgadev.music_data.api.MusicRepositoryApi
+import kotlinx.coroutines.InternalCoroutinesApi
+import ru.volgadev.music_data.data.MusicBackendApiImpl
+import ru.volgadev.music_data.data.MusicDatabaseProvider
+import ru.volgadev.music_data.data.MusicRepositoryImpl
+import ru.volgadev.music_data.domain.MusicBackendApi
+import ru.volgadev.music_data.domain.MusicRepository
+import ru.volgadev.music_data.domain.MusicTrackDatabase
 
 @Module
 interface MusicRepositoryModule {
     companion object {
         @Provides
-        fun providesMusicRepositoryDependencies(
-            context: Context
-        ): MusicRepositoryDependencies = MusicRepositoryDependencies(context)
-
-        @Provides
-        fun providesMusicRepositoryComponentHolder(
-            musicRepositoryDependencies: MusicRepositoryDependencies
-        ): MusicRepositoryComponentHolder = MusicRepositoryComponentHolder().apply {
-            init(musicRepositoryDependencies)
-        }
-
-        @Reusable
-        @Provides
-        fun providesMusicRepositoryApi(musicRepositoryComponentHolder: MusicRepositoryComponentHolder): MusicRepositoryApi =
-            musicRepositoryComponentHolder.get()
+        fun providesMusicTrackDatabase(context: Context): MusicTrackDatabase =
+            MusicDatabaseProvider.createDatabase(context)
     }
+
+    @Binds
+    fun bindsMusicBackendApi(api: MusicBackendApiImpl): MusicBackendApi
+
+    @InternalCoroutinesApi
+    @Binds
+    fun bindsMusicRepository(MusicRepository: MusicRepositoryImpl): MusicRepository
 }
