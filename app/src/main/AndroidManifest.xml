@@ -12,7 +12,7 @@
         android:theme="@style/AppTheme.Launcher">
 
         <activity
-            android:name="ru.volgadev.papastory.ui.SplashScreenActivity"
+            android:name="ru.volgadev.papastory.ui.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.Launcher">
             <intent-filter>
@@ -20,10 +20,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity
-            android:name="ru.volgadev.papastory.ui.MainActivity"
-            android:theme="@style/AppTheme" />
     </application>
 
 </manifest>
