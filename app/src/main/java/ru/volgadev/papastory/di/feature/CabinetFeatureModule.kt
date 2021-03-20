@@ -10,23 +10,21 @@ import ru.volgadev.papastory.di.core.ArticleRepositoryModule
 @Module(
     includes = [ArticleRepositoryModule::class]
 )
-interface CabinetFeatureModule {
+object CabinetFeatureModule {
 
-    companion object {
-        @Provides
-        fun providesCabinetFeatureDependencies(
-            articleRepository: ArticleRepository
-        ): CabinetFeatureDependencies = CabinetFeatureDependencies(
-            articleRepository = articleRepository
-        )
+    @Provides
+    fun providesCabinetFeatureDependencies(
+        articleRepository: ArticleRepository
+    ): CabinetFeatureDependencies = CabinetFeatureDependencies(
+        articleRepository = articleRepository
+    )
 
-        @Provides
-        fun providesCabinetFeatureComponentHolder(dependencies: CabinetFeatureDependencies): CabinetFeatureComponentHolder =
-            CabinetFeatureComponentHolder().apply {
-                init(dependencies)
-            }
+    @Provides
+    fun providesCabinetFeatureComponentHolder(dependencies: CabinetFeatureDependencies): CabinetFeatureComponentHolder =
+        CabinetFeatureComponentHolder().apply {
+            init(dependencies)
+        }
 
-        @Provides
-        fun providesCabinetFeatureApi(holder: CabinetFeatureComponentHolder) = holder.get()
-    }
+    @Provides
+    fun providesCabinetFeatureApi(holder: CabinetFeatureComponentHolder) = holder.get()
 }

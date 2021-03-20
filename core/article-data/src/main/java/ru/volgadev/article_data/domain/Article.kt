@@ -23,7 +23,8 @@ enum class ArticleType {
     NO_PAGES
 }
 
-@Entity(indices = [Index(value = ["article_id"])])
+// TODO: come back when restart using articles with page
+// @Entity(indices = [Index(value = ["article_id"])])
 data class ArticlePage(
     @ColumnInfo(name = "article_id")
     val articleId: Long,

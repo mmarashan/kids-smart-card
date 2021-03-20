@@ -7,11 +7,9 @@ import ru.volgadev.pay_lib.PaymentManager
 import ru.volgadev.pay_lib.PaymentManagerFactory
 
 @Module
-class PaymentManagerModule {
-    companion object {
-        @Provides
-        fun getPaymentManager(context: Context): PaymentManager {
-            return PaymentManagerFactory.createPaymentManager(context = context)
-        }
+object PaymentManagerModule {
+    @Provides
+    fun getPaymentManager(context: Context): PaymentManager {
+        return PaymentManagerFactory.createPaymentManager(context = context)
     }
 }

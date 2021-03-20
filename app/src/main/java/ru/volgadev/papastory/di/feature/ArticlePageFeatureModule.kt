@@ -12,25 +12,23 @@ import ru.volgadev.papastory.di.core.MusicRepositoryModule
 @Module(
     includes = [ArticleRepositoryModule::class, MusicRepositoryModule::class]
 )
-interface ArticlePageFeatureModule {
+object ArticlePageFeatureModule {
 
-    companion object {
-        @Provides
-        fun providesArticlePageFeatureDependencies(
-            articleRepository: ArticleRepository,
-            musicRepository: MusicRepository
-        ): ArticlePageFeatureDependencies = ArticlePageFeatureDependencies(
-            articleRepository = articleRepository,
-            musicRepository = musicRepository
-        )
+    @Provides
+    fun providesArticlePageFeatureDependencies(
+        articleRepository: ArticleRepository,
+        musicRepository: MusicRepository
+    ): ArticlePageFeatureDependencies = ArticlePageFeatureDependencies(
+        articleRepository = articleRepository,
+        musicRepository = musicRepository
+    )
 
-        @Provides
-        fun providesArticlePageFeatureComponentHolder(dependencies: ArticlePageFeatureDependencies): ArticlePageFeatureComponentHolder =
-            ArticlePageFeatureComponentHolder().apply {
-                init(dependencies)
-            }
+    @Provides
+    fun providesArticlePageFeatureComponentHolder(dependencies: ArticlePageFeatureDependencies): ArticlePageFeatureComponentHolder =
+        ArticlePageFeatureComponentHolder().apply {
+            init(dependencies)
+        }
 
-        @Provides
-        fun providesArticlePageFeatureApi(holder: ArticlePageFeatureComponentHolder) = holder.get()
-    }
+    @Provides
+    fun providesArticlePageFeatureApi(holder: ArticlePageFeatureComponentHolder) = holder.get()
 }

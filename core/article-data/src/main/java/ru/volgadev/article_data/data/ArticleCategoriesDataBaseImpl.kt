@@ -1,4 +1,4 @@
-package ru.volgadev.article_data.storage
+package ru.volgadev.article_data.data
 
 import android.content.Context
 import androidx.room.Database
