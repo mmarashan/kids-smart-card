@@ -36,9 +36,10 @@ class ArticleGalleryFeatureComponentHolder :
         return articleGalleryFeatureApiImpl!!
     }
 
-    override fun reset() {
+    override fun clear() {
         articleRepository = null
         musicRepository = null
+        articleGalleryFeatureApiImpl = null
         ArticleGalleryViewModelFactory.clear()
     }
 }

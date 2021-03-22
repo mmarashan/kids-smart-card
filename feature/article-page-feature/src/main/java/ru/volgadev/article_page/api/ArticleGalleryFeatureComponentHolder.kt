@@ -36,7 +36,7 @@ class ArticlePageFeatureComponentHolder :
         return articlePageFeatureApiImpl!!
     }
 
-    override fun reset() {
+    override fun clear() {
         articleRepository = null
         musicRepository = null
         ArticlePageViewModelFactory.clear()

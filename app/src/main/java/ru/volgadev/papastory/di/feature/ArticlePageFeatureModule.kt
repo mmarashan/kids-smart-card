@@ -1,5 +1,6 @@
 package ru.volgadev.papastory.di.feature
 
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import ru.volgadev.article_data.domain.ArticleRepository
@@ -24,11 +25,6 @@ object ArticlePageFeatureModule {
     )
 
     @Provides
-    fun providesArticlePageFeatureComponentHolder(dependencies: ArticlePageFeatureDependencies): ArticlePageFeatureComponentHolder =
-        ArticlePageFeatureComponentHolder().apply {
-            init(dependencies)
-        }
-
-    @Provides
-    fun providesArticlePageFeatureApi(holder: ArticlePageFeatureComponentHolder) = holder.get()
+    fun providesArticlePageFeatureComponentHolder() =
+        ArticlePageFeatureComponentHolder()
 }

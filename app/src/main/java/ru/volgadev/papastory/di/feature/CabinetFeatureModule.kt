@@ -1,5 +1,6 @@
 package ru.volgadev.papastory.di.feature
 
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import ru.volgadev.article_data.domain.ArticleRepository
@@ -20,11 +21,5 @@ object CabinetFeatureModule {
     )
 
     @Provides
-    fun providesCabinetFeatureComponentHolder(dependencies: CabinetFeatureDependencies): CabinetFeatureComponentHolder =
-        CabinetFeatureComponentHolder().apply {
-            init(dependencies)
-        }
-
-    @Provides
-    fun providesCabinetFeatureApi(holder: CabinetFeatureComponentHolder) = holder.get()
+    fun providesCabinetFeatureComponentHolder() = CabinetFeatureComponentHolder()
 }

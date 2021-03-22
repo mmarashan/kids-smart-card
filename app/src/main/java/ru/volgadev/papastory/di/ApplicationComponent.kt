@@ -9,7 +9,7 @@ import ru.volgadev.papastory.di.core.PaymentManagerModule
 import ru.volgadev.papastory.di.feature.ArticleGalleryFeatureModule
 import ru.volgadev.papastory.di.feature.ArticlePageFeatureModule
 import ru.volgadev.papastory.di.feature.CabinetFeatureModule
-import ru.volgadev.papastory.ui.FragmentProvider
+import ru.volgadev.papastory.ui.FragmentFeatureProvider
 
 @Component(
     modules = [
@@ -29,5 +29,5 @@ interface ApplicationComponent {
         fun create(@BindsInstance context: Context): ApplicationComponent
     }
 
-    fun inject(fragmentProvider: FragmentProvider)
+    fun inject(fragmentFeatureProvider: FragmentFeatureProvider)
 }

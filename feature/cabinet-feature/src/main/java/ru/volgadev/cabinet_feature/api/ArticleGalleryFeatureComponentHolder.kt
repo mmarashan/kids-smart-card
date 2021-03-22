@@ -30,8 +30,9 @@ class CabinetFeatureComponentHolder :
         return cabinetFeatureApi!!
     }
 
-    override fun reset() {
+    override fun clear() {
         articleRepository = null
+        cabinetFeatureApi = null
         CabinetViewModelFactory.clear()
     }
 }
