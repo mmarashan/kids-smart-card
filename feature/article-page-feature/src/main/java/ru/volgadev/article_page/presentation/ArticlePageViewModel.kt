@@ -9,8 +9,8 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import ru.volgadev.article_data.domain.ArticlePage
-import ru.volgadev.article_data.domain.ArticleRepository
+import ru.volgadev.article_repository.domain.ArticlePage
+import ru.volgadev.article_repository.domain.ArticleRepository
 import ru.volgadev.common.ErrorResult
 import ru.volgadev.common.SuccessResult
 import ru.volgadev.common.log.Logger

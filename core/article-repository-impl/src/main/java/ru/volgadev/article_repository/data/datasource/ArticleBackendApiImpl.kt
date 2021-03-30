@@ -1,16 +1,12 @@
-package ru.volgadev.article_data.data
+package ru.volgadev.article_repository.data.datasource
 
 import androidx.annotation.WorkerThread
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONObject
-import ru.volgadev.article_data.domain.Article
-import ru.volgadev.article_data.domain.ArticleBackendApi
-import ru.volgadev.article_data.domain.ArticleCategory
-import ru.volgadev.article_data.domain.ArticlePage
-import ru.volgadev.article_data.domain.ArticleType
-import ru.volgadev.article_data.domain.PageType
+import ru.volgadev.article_repository.domain.datasource.ArticleBackendApi
+import ru.volgadev.article_repository.domain.model.*
 import ru.volgadev.common.BACKEND_URL
 import ru.volgadev.common.log.Logger
 import java.net.ConnectException

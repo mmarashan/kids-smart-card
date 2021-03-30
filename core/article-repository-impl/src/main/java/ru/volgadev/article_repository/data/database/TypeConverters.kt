@@ -1,7 +1,7 @@
-package ru.volgadev.article_data.storage
+package ru.volgadev.article_repository.data.database
 
 import androidx.room.TypeConverter
-import ru.volgadev.article_data.domain.ArticleType
+import ru.volgadev.article_repository.domain.model.ArticleType
 import java.util.stream.Collectors
 
 internal class ListStringConverter {
@@ -9,8 +9,8 @@ internal class ListStringConverter {
     private val DELIMITER = ","
 
     @TypeConverter
-    fun from(hobbies: List<String>): String {
-        return hobbies.stream().collect(Collectors.joining(DELIMITER))
+    fun from(items: List<String>): String {
+        return items.stream().collect(Collectors.joining(DELIMITER))
     }
 
     @TypeConverter
@@ -22,8 +22,8 @@ internal class ListStringConverter {
 internal class ArticleTypeConverter {
 
     @TypeConverter
-    fun from(type: ArticleType): String {
-        return type.name
+    fun from(item: ArticleType): String {
+        return item.name
     }
 
     @TypeConverter

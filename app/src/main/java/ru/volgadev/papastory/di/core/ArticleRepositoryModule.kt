@@ -5,13 +5,13 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.InternalCoroutinesApi
-import ru.volgadev.article_data.data.ArticleBackendApiImpl
-import ru.volgadev.article_data.data.ArticleDatabaseProvider
-import ru.volgadev.article_data.domain.ArticleBackendApi
-import ru.volgadev.article_data.domain.ArticleCategoriesDatabase
-import ru.volgadev.article_data.domain.ArticleDatabase
-import ru.volgadev.article_data.domain.ArticleRepository
-import ru.volgadev.article_data.domain.ArticleRepositoryImpl
+import ru.volgadev.article_repository.data.datasource.ArticleBackendApiImpl
+import ru.volgadev.article_repository.data.database.ArticleDatabaseProvider
+import ru.volgadev.article_repository.domain.datasource.ArticleBackendApi
+import ru.volgadev.article_repository.domain.database.ArticleCategoriesDatabase
+import ru.volgadev.article_repository.domain.database.ArticleDatabase
+import ru.volgadev.article_repository.domain.ArticleRepository
+import ru.volgadev.article_repository.domain.ArticleRepositoryImpl
 
 @Module(
     includes = [PaymentManagerModule::class]

@@ -1,25 +1,22 @@
-package ru.volgadev.article_data.data
+package ru.volgadev.article_repository.data.database
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import ru.volgadev.article_data.domain.Article
-import ru.volgadev.article_data.domain.ArticleDao
-import ru.volgadev.article_data.domain.ArticleDatabase
-import ru.volgadev.article_data.storage.ArticleTypeConverter
-import ru.volgadev.article_data.storage.ListStringConverter
+import ru.volgadev.article_repository.domain.database.ArticleDatabase
+import ru.volgadev.article_repository.domain.model.Article
 
 @Database(entities = [Article::class], version = 3)
 @TypeConverters(ListStringConverter::class, ArticleTypeConverter::class)
-internal abstract class ArticleDatabaseImpl : ArticleDatabase, RoomDatabase() {
+internal abstract class ArticleDatabaseImpl : ArticleDatabaseInterface, RoomDatabase() {
 
-    abstract override fun dao(): ArticleDao
+    abstract override fun dao(): ArticleDaoImpl
 
     companion object {
         @Volatile
-        private var INSTANCE: ArticleDatabase? = null
+        private var INSTANCE: ArticleDatabaseInterface? = null
 
         private const val DATABASE_NAME = "article-database.db"
 

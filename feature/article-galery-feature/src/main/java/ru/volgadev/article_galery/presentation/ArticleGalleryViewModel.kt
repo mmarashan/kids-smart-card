@@ -1,20 +1,15 @@
 package ru.volgadev.article_galery.presentation
 
 import androidx.annotation.MainThread
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.distinctUntilChanged
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.launch
-import ru.volgadev.article_data.domain.Article
-import ru.volgadev.article_data.domain.ArticleCategory
-import ru.volgadev.article_data.domain.ArticleRepository
-import ru.volgadev.common.ENABLE_BACKGROUND_MUSIC
+import ru.volgadev.article_repository.domain.Article
+import ru.volgadev.article_repository.domain.ArticleCategory
+import ru.volgadev.article_repository.domain.ArticleRepository
+import ru.volgadev.common.FeatureToggles
 import ru.volgadev.common.LiveEvent
 import ru.volgadev.common.log.Logger
 import ru.volgadev.music_data.domain.MusicRepository
@@ -35,7 +30,7 @@ class ArticleGalleryViewModel(
     private val _articles = MutableLiveData<List<Article>>()
     val currentArticles: LiveData<List<Article>> = _articles
 
-    val tracks = if (ENABLE_BACKGROUND_MUSIC) {
+    val tracks = if (FeatureToggles.ENABLE_BACKGROUND_MUSIC) {
         musicRepository.musicTracks().asLiveData()
     } else {
         MutableLiveData<List<MusicTrack>>()
@@ -91,10 +86,5 @@ class ArticleGalleryViewModel(
                 }
             }
         }
-    }
-
-    override fun onCleared() {
-        logger.debug("onCleared()")
-        super.onCleared()
     }
 }

@@ -2,8 +2,7 @@ package ru.volgadev.cabinet_feature.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import ru.volgadev.article_data.domain.ArticleRepository
-import ru.volgadev.music_data.domain.MusicRepository
+import ru.volgadev.article_repository.domain.ArticleRepository
 
 internal object CabinetViewModelFactory : ViewModelProvider.Factory {
 

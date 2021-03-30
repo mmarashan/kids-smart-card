@@ -35,5 +35,6 @@ dependencies {
     implementation "com.android.billingclient:billing:${versions.billingclient}"
 
     implementation project(':common')
+    implementation project(':core:article-repository-api')
     implementation project(':core:pay-lib')
 }

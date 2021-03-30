@@ -44,6 +44,6 @@ dependencies {
 
     implementation project(':common')
     implementation project(':core:module-injector')
-    implementation project(':core:article-data')
+    implementation project(':core:article-repository-api')
     implementation project(':core:music-data')
 }

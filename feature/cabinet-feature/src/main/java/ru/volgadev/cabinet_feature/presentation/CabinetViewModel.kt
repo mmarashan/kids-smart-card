@@ -10,8 +10,8 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.launch
-import ru.volgadev.article_data.domain.ArticleCategory
-import ru.volgadev.article_data.domain.ArticleRepository
+import ru.volgadev.article_repository.domain.ArticleCategory
+import ru.volgadev.article_repository.domain.ArticleRepository
 import ru.volgadev.common.log.Logger
 import ru.volgadev.pay_lib.BuildConfig
 import ru.volgadev.pay_lib.PaymentRequest

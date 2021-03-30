@@ -1,21 +1,20 @@
-package ru.volgadev.article_data.data
+package ru.volgadev.article_repository.data.database
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import ru.volgadev.article_data.domain.ArticleCategoriesDatabase
-import ru.volgadev.article_data.domain.ArticleCategory
-import ru.volgadev.article_data.domain.ArticleChannelsDao
+import ru.volgadev.article_repository.domain.database.ArticleCategoriesDatabase
+import ru.volgadev.article_repository.domain.model.ArticleCategory
 
 @Database(entities = [ArticleCategory::class], version = 2)
-internal abstract class ArticleCategoriesDatabaseImpl : ArticleCategoriesDatabase, RoomDatabase() {
+internal abstract class ArticleCategoriesDatabaseImpl : ArticleCategoriesDatabaseInterface, RoomDatabase() {
 
-    abstract override fun dao(): ArticleChannelsDao
+    abstract override fun dao(): ArticleCategoriesDaoImpl
 
     companion object {
         @Volatile
-        private var INSTANCE: ArticleCategoriesDatabase? = null
+        private var INSTANCE: ArticleCategoriesDatabaseInterface? = null
 
         private const val DATABASE_NAME = "article-categories-database.db"
 

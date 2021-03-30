@@ -1,4 +1,4 @@
-package ru.volgadev.article_data.domain
+package ru.volgadev.article_repository.domain.model
 
 import androidx.room.*
 

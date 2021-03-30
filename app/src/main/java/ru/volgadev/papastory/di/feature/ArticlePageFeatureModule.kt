@@ -1,9 +1,8 @@
 package ru.volgadev.papastory.di.feature
 
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
-import ru.volgadev.article_data.domain.ArticleRepository
+import ru.volgadev.article_repository.domain.ArticleRepository
 import ru.volgadev.article_page.api.ArticlePageFeatureComponentHolder
 import ru.volgadev.article_page.api.ArticlePageFeatureDependencies
 import ru.volgadev.music_data.domain.MusicRepository
