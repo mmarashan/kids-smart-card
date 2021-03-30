@@ -15,11 +15,10 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.android.synthetic.main.main_activity.*
 import kotlinx.coroutines.InternalCoroutinesApi
-import ru.volgadev.article_data.model.Article
-import ru.volgadev.article_data.model.ArticleType
-import ru.volgadev.article_galery.ui.ArticleGalleryFragment
-import ru.volgadev.article_page.ArticlePageFragment
-import ru.volgadev.article_page.ITEM_ID_KEY
+import ru.volgadev.article_data.domain.Article
+import ru.volgadev.article_data.domain.ArticleType
+import ru.volgadev.article_galery.presentation.ArticleGalleryFragment
+import ru.volgadev.article_page.presentation.ITEM_ID_KEY
 import ru.volgadev.common.hideNavBar
 import ru.volgadev.common.isPermissionGranted
 import ru.volgadev.common.log.Logger
@@ -43,6 +42,10 @@ class MainActivity : AppCompatActivity() {
 
     private val logger = Logger.get("MainActivity")
 
+    private val fragmentProvider by lazy {
+        FragmentFeatureProvider(this)
+    }
+
     @InternalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         logger.debug("onCreate($savedInstanceState)")
@@ -62,56 +65,18 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        val galleryFragment: ArticleGalleryFragment =
-            FragmentProvider.get(AppFragment.GALLERY_FRAGMENT) as ArticleGalleryFragment
-        galleryFragment.run {
-            enterTransition = Slide(Gravity.END).apply {
-                duration = ENTER_FRAGMENT_TRANSITION_DURATION_MS
-            }
-            exitTransition = Slide(Gravity.START).apply {
-                duration = EXIT_FRAGMENT_TRANSITION_DURATION_MS
-            }
-            setOnItemClickListener(object : ArticleGalleryFragment.OnItemClickListener {
-                override fun onClick(article: Article, clickedView: View) {
-                    logger.debug("Choose ${article.title} to show")
-                    val itemPageFragment =
-                        FragmentProvider.get(AppFragment.ARTICLE_PAGE_FRAGMENT) as ArticlePageFragment
-                    itemPageFragment.exitTransition = Fade().apply {
-                        duration = EXIT_FRAGMENT_TRANSITION_DURATION_MS
-                    }
-                    if (article.type != ArticleType.NO_PAGES) {
-                        showFragment(
-                            itemPageFragment,
-                            Bundle().apply { putLong(ITEM_ID_KEY, article.id) },
-                            true,
-                            clickedView
-                        )
-                    }
-                }
-            })
-        }
-
-        val cabinetFragment = FragmentProvider.get(AppFragment.CABINET_FRAGMENT).apply {
-            enterTransition = Slide(Gravity.START).apply {
-                duration = ENTER_FRAGMENT_TRANSITION_DURATION_MS
-            }
-            exitTransition = Slide(Gravity.END).apply {
-                duration = EXIT_FRAGMENT_TRANSITION_DURATION_MS
-            }
-        }
-
         bottomNavigation.setOnNavigationItemSelectedListener(object :
             BottomNavigationView.OnNavigationItemSelectedListener {
             override fun onNavigationItemSelected(item: MenuItem): Boolean {
                 when (item.itemId) {
                     HOME_ITEM_ID -> {
                         logger.debug("Show gallery fragment")
-                        showFragment(cabinetFragment)
+                        showCabinet()
                         return true
                     }
                     GALLERY_ITEM_ID -> {
                         logger.debug("galleryFragment selected")
-                        showFragment(galleryFragment)
+                        showGallery()
                         return true
                     }
                 }
@@ -125,6 +90,54 @@ class MainActivity : AppCompatActivity() {
                 R.id.contentContainer
             )?.let { provideNavigationPanelVisibility(it) }
         }
+    }
+
+    private fun showCabinet() {
+        logger.debug("showCabinet()")
+        val cabinetFragment =
+            fragmentProvider.getNextFragmentFeature(AppFragment.CABINET_FRAGMENT).apply {
+                enterTransition = Slide(Gravity.START).apply {
+                    duration = ENTER_FRAGMENT_TRANSITION_DURATION_MS
+                }
+                exitTransition = Slide(Gravity.END).apply {
+                    duration = EXIT_FRAGMENT_TRANSITION_DURATION_MS
+                }
+            }
+        showFragment(cabinetFragment)
+    }
+
+    private fun showGallery() {
+        logger.debug("showGallery()")
+        val galleryFragment =
+            (fragmentProvider.getNextFragmentFeature(AppFragment.GALLERY_FRAGMENT) as ArticleGalleryFragment).apply {
+                enterTransition = Slide(Gravity.END).apply {
+                    duration = ENTER_FRAGMENT_TRANSITION_DURATION_MS
+                }
+                exitTransition = Slide(Gravity.START).apply {
+                    duration = EXIT_FRAGMENT_TRANSITION_DURATION_MS
+                }
+
+                setOnItemClickListener(object : ArticleGalleryFragment.OnItemClickListener {
+                    override fun onClick(article: Article, clickedView: View) {
+                        logger.debug("Choose ${article.title} to show")
+                        val itemPageFragment =
+                            fragmentProvider.getNextFragmentFeature(AppFragment.ARTICLE_PAGE_FRAGMENT)
+                        itemPageFragment.exitTransition = Fade().apply {
+                            duration = EXIT_FRAGMENT_TRANSITION_DURATION_MS
+                        }
+                        if (article.type != ArticleType.NO_PAGES) {
+                            showFragment(
+                                itemPageFragment,
+                                Bundle().apply { putLong(ITEM_ID_KEY, article.id) },
+                                true,
+                                clickedView
+                            )
+                        }
+                    }
+                })
+            }
+
+        showFragment(galleryFragment)
     }
 
     override fun onResume() {
@@ -154,7 +167,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun provideNavigationPanelVisibility(fragment: Fragment) {
-        if (FragmentProvider.isFullscreen(fragment)) {
+        if (FragmentFeatureProvider.isFullscreen(fragment)) {
             hideBottomNavigationPanel()
         } else {
             showBottomNavigationPanel()

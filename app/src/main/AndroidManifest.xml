@@ -3,7 +3,7 @@
     package="ru.volgadev.papastory">
 
     <application
-        android:name="ru.volgadev.papastory.PapaStoryApplication"
+        android:name="ru.volgadev.papastory.KidsCardApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"

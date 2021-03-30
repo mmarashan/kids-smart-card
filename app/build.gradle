@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion versions.compileSdkVersion
@@ -38,14 +39,15 @@ dependencies {
     implementation "androidx.core:core-ktx:${versions.corektx}"
     implementation "androidx.constraintlayout:constraintlayout:${versions.constraintlayout}"
 
-    implementation "org.koin:koin-android:${versions.koin}"
-    implementation "org.koin:koin-androidx-viewmodel:${versions.koin}"
+    implementation "com.google.dagger:dagger:${versions.dagger}"
+    kapt "com.google.dagger:dagger-compiler:${versions.dagger}"
     implementation "androidx.lifecycle:lifecycle-extensions:${versions.androidxlifecycle}"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${versions.androidxlifecycle}"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:${versions.androidxlifecycle}"
     implementation "com.google.android.material:material:${versions.material}"
 
     implementation project(':common')
+    implementation project(':core:module-injector')
     implementation project(':feature:article-galery-feature')
     implementation project(':feature:article-page-feature')
     implementation project(':feature:cabinet-feature')
