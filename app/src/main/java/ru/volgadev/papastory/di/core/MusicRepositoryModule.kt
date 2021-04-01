@@ -7,7 +7,7 @@ import dagger.Provides
 import kotlinx.coroutines.InternalCoroutinesApi
 import ru.volgadev.music_data.data.MusicBackendApiImpl
 import ru.volgadev.music_data.data.MusicDatabaseProvider
-import ru.volgadev.music_data.data.MusicRepositoryImpl
+import ru.volgadev.music_data.domain.MusicRepositoryImpl
 import ru.volgadev.music_data.domain.MusicBackendApi
 import ru.volgadev.music_data.domain.MusicRepository
 import ru.volgadev.music_data.domain.MusicTrackDatabase

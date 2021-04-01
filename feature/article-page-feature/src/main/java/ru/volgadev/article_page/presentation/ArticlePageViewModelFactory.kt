@@ -2,7 +2,7 @@ package ru.volgadev.article_page.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import ru.volgadev.article_data.domain.ArticleRepository
+import ru.volgadev.article_repository.domain.ArticleRepository
 import ru.volgadev.article_page.ArticlePageViewModel
 import ru.volgadev.music_data.domain.MusicRepository
 

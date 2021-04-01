@@ -6,6 +6,8 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import ru.volgadev.music_data.domain.model.MusicTrack
+import ru.volgadev.music_data.domain.model.MusicTrackType
 
 interface MusicTrackDatabase {
     fun dao(): MusicTrackDao

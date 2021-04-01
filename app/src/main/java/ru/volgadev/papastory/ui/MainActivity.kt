@@ -15,8 +15,8 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.android.synthetic.main.main_activity.*
 import kotlinx.coroutines.InternalCoroutinesApi
-import ru.volgadev.article_data.domain.Article
-import ru.volgadev.article_data.domain.ArticleType
+import ru.volgadev.article_repository.domain.model.Article
+import ru.volgadev.article_repository.domain.model.ArticleType
 import ru.volgadev.article_galery.presentation.ArticleGalleryFragment
 import ru.volgadev.article_page.presentation.ITEM_ID_KEY
 import ru.volgadev.common.hideNavBar

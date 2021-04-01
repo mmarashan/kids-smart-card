@@ -6,10 +6,10 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import ru.volgadev.music_data.domain.MusicTrack
+import ru.volgadev.music_data.domain.model.MusicTrack
 import ru.volgadev.music_data.domain.MusicTrackDao
 import ru.volgadev.music_data.domain.MusicTrackDatabase
-import ru.volgadev.music_data.domain.MusicTrackType
+import ru.volgadev.music_data.domain.model.MusicTrackType
 
 @Database(entities = [MusicTrack::class], version = 1)
 @TypeConverters(MusicTrackTypeConverter::class)
