@@ -13,8 +13,8 @@ import ru.volgadev.common.FeatureToggles
 import ru.volgadev.common.LiveEvent
 import ru.volgadev.common.log.Logger
 import ru.volgadev.music_data.domain.MusicRepository
-import ru.volgadev.music_data.domain.MusicTrack
-import ru.volgadev.music_data.domain.MusicTrackType
+import ru.volgadev.music_data.domain.model.MusicTrack
+import ru.volgadev.music_data.domain.model.MusicTrackType
 
 @OptIn(InternalCoroutinesApi::class)
 class ArticleGalleryViewModel(

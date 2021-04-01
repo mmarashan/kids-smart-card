@@ -8,7 +8,7 @@ import org.json.JSONObject
 import ru.volgadev.common.BACKEND_URL
 import ru.volgadev.common.log.Logger
 import ru.volgadev.music_data.domain.MusicBackendApi
-import ru.volgadev.music_data.domain.MusicTrack
+import ru.volgadev.music_data.domain.model.MusicTrack
 import java.net.ConnectException
 import javax.inject.Inject
 
