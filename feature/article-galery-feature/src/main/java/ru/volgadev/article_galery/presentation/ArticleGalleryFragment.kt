@@ -197,22 +197,19 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
             }
         })
 
-        val SCALE_AMPLITUDE = 0.2f
-        val SCALE_DURATION_MS = 800L
-
         backgroundMusicToggleButton.isVisible = false
         backgroundMusicToggleButton.setOnCheckedChangeListener { buttonView, isChecked ->
             logger.debug("on click backgroundMusicToggleButton")
             if (isChecked) {
                 musicMediaPlayer.start()
                 backgroundMusicToggleButton.animateScaledVibration(
-                    scaleAmplitude = SCALE_AMPLITUDE,
-                    durationMs = SCALE_DURATION_MS
+                    scaleAmplitude = MUSIC_BUTTON_SCALE_AMPLITUDE,
+                    durationMs = MUSIC_BUTTON_SCALE_DURATION_MS
                 )
             } else {
                 backgroundMusicToggleButton.animateScaledVibration(
-                    scaleAmplitude = -SCALE_AMPLITUDE,
-                    durationMs = SCALE_DURATION_MS
+                    scaleAmplitude = -MUSIC_BUTTON_SCALE_AMPLITUDE,
+                    durationMs = MUSIC_BUTTON_SCALE_DURATION_MS
                 )
                 musicMediaPlayer.pause()
             }
@@ -232,5 +229,10 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
         logger.debug("onPause()")
         musicMediaPlayer.pause()
         super.onPause()
+    }
+
+    private companion object {
+        const val MUSIC_BUTTON_SCALE_AMPLITUDE = 0.2f
+        const val MUSIC_BUTTON_SCALE_DURATION_MS = 800L
     }
 }
