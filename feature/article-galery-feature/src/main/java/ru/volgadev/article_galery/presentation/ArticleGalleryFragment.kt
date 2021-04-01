@@ -20,6 +20,7 @@ import ru.volgadev.article_galery.R
 import ru.volgadev.article_repository.domain.model.Article
 import ru.volgadev.article_repository.domain.model.ArticleType
 import ru.volgadev.common.BackgroundMediaPlayer
+import ru.volgadev.common.animateScaledVibration
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.scaleToFitAnimatedAndBack
 import ru.volgadev.common.view.scrollToItemToCenter
@@ -48,7 +49,10 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
         logger.debug("On fragment created; savedInstanceState=$savedInstanceState")
 
         val viewModel =
-            ViewModelProvider(this, ArticleGalleryViewModelFactory).get(ArticleGalleryViewModel::class.java)
+            ViewModelProvider(
+                this,
+                ArticleGalleryViewModelFactory
+            ).get(ArticleGalleryViewModel::class.java)
 
         val articlesAdapter = ArticleCardAdapter(view.context)
 
@@ -193,12 +197,23 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
             }
         })
 
+        val SCALE_AMPLITUDE = 0.2f
+        val SCALE_DURATION_MS = 800L
+
         backgroundMusicToggleButton.isVisible = false
         backgroundMusicToggleButton.setOnCheckedChangeListener { buttonView, isChecked ->
             logger.debug("on click backgroundMusicToggleButton")
             if (isChecked) {
                 musicMediaPlayer.start()
+                backgroundMusicToggleButton.animateScaledVibration(
+                    scaleAmplitude = SCALE_AMPLITUDE,
+                    durationMs = SCALE_DURATION_MS
+                )
             } else {
+                backgroundMusicToggleButton.animateScaledVibration(
+                    scaleAmplitude = -SCALE_AMPLITUDE,
+                    durationMs = SCALE_DURATION_MS
+                )
                 musicMediaPlayer.pause()
             }
         }
