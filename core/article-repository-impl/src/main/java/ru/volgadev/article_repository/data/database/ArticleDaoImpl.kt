@@ -5,12 +5,12 @@ import ru.volgadev.article_repository.domain.database.ArticleDao
 import ru.volgadev.article_repository.domain.database.ArticleDatabase
 import ru.volgadev.article_repository.domain.model.Article
 
-interface ArticleDatabaseInterface: ArticleDatabase {
+internal interface ArticleDatabaseInterface: ArticleDatabase {
     override fun dao(): ArticleDaoImpl
 }
 
 @Dao
-interface ArticleDaoImpl : ArticleDao {
+internal interface ArticleDaoImpl : ArticleDao {
     @Query("SELECT * FROM article")
     override fun getAll(): List<Article>
 

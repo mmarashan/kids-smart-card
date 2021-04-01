@@ -6,9 +6,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.launch
-import ru.volgadev.article_repository.domain.Article
-import ru.volgadev.article_repository.domain.ArticleCategory
 import ru.volgadev.article_repository.domain.ArticleRepository
+import ru.volgadev.article_repository.domain.model.Article
+import ru.volgadev.article_repository.domain.model.ArticleCategory
 import ru.volgadev.common.FeatureToggles
 import ru.volgadev.common.LiveEvent
 import ru.volgadev.common.log.Logger
