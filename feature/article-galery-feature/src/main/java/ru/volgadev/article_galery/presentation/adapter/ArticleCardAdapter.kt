@@ -5,7 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.annotation.AnyThread
 import androidx.cardview.widget.CardView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
@@ -19,24 +18,13 @@ internal class ArticleCardAdapter :
     RecyclerView.Adapter<ViewHolder>() {
 
     interface OnItemClickListener {
-        fun onClick(item: Article, clickedView: View)
+        fun onClick(item: Article, clickedView: View, position: Int)
     }
 
     @Volatile
     private var onItemClickListener: OnItemClickListener? = null
 
     private var articleList = ArrayList<Article>()
-
-    @AnyThread
-    fun setData(dataset: Collection<Article>) {
-        if (articleList.isNotEmpty()) {
-            val length = articleList.size
-            articleList.clear()
-            notifyItemRangeRemoved(0, length);
-        }
-        articleList = ArrayList(dataset)
-        notifyItemRangeInserted(0, articleList.size)
-    }
 
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -47,14 +35,24 @@ internal class ArticleCardAdapter :
         return ViewHolder(card)
     }
 
-    fun setOnItemClickListener(listener: OnItemClickListener) {
-        onItemClickListener = listener
-    }
-
     override fun onBindViewHolder(holder: ViewHolder, position: Int) =
         holder.bind(position, articleList[position], onItemClickListener)
 
     override fun getItemCount() = articleList.size
+
+    fun setData(dataset: Collection<Article>) {
+        if (articleList.isNotEmpty()) {
+            val length = articleList.size
+            articleList.clear()
+            notifyItemRangeRemoved(0, length)
+        }
+        articleList = ArrayList(dataset)
+        notifyItemRangeInserted(0, articleList.size)
+    }
+
+    fun setOnItemClickListener(listener: OnItemClickListener) {
+        onItemClickListener = listener
+    }
 }
 
 internal class ViewHolder(val card: CardView) : RecyclerView.ViewHolder(card) {
@@ -63,31 +61,26 @@ internal class ViewHolder(val card: CardView) : RecyclerView.ViewHolder(card) {
     private val title = card.findViewById<TextView>(R.id.cardTitle)
     private val image = card.findViewById<ImageView>(R.id.cardImage)
 
-    private var currentPosition = 0
 
     fun bind(
         position: Int,
         article: Article,
         onItemClickListener: ArticleCardAdapter.OnItemClickListener?
     ) {
-        val holder = this
-        holder.currentPosition = position
-        card.tag = article.id
-        val image = holder.image
-        holder.title.text = article.title
+        title.text = article.title
 
         if (article.title.isNotEmpty()) {
-            holder.title.isVisible = true
-            holder.title.text = article.title
+            title.isVisible = true
+            title.text = article.title
         } else {
-            holder.title.isVisible = false
+            title.isVisible = false
         }
 
         if (article.author.isNotEmpty()) {
-            holder.author.isVisible = true
-            holder.author.text = article.author
+            author.isVisible = true
+            author.text = article.author
         } else {
-            holder.author.isVisible = false
+            author.isVisible = false
         }
 
         article.iconUrl?.let { url ->
@@ -97,8 +90,8 @@ internal class ViewHolder(val card: CardView) : RecyclerView.ViewHolder(card) {
                 .into(image)
         }
 
-        holder.card.setOnClickListener {
-            onItemClickListener?.onClick(article, it)
+        card.setOnClickListener { view ->
+            onItemClickListener?.onClick(article, view, position)
         }
     }
 }

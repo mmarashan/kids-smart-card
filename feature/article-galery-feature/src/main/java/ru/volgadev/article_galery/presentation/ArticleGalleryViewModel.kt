@@ -9,7 +9,6 @@ import kotlinx.coroutines.launch
 import ru.volgadev.article_galery.domain.ArticleGalleryInteractor
 import ru.volgadev.article_repository.domain.model.Article
 import ru.volgadev.article_repository.domain.model.ArticleCategory
-import ru.volgadev.common.FeatureToggles
 import ru.volgadev.common.LiveEvent
 import ru.volgadev.common.log.Logger
 import ru.volgadev.music_data.domain.model.MusicTrack
@@ -30,7 +29,7 @@ internal class ArticleGalleryViewModel(
 
     val tracks = interactor.musicTracks().asLiveData()
 
-    val articleToHighlight = LiveEvent<MusicTrack>()
+    val trackToPlaying = LiveEvent<MusicTrack>()
 
     private val _categories = MutableLiveData<List<ArticleCategory>>()
     val availableCategories = _categories
@@ -70,9 +69,11 @@ internal class ArticleGalleryViewModel(
             viewModelScope.launch {
                 val loadedAudio = interactor.getTrackFromStorage(audioUrl)
                 if (loadedAudio != null) {
-                    articleToHighlight.postValue(loadedAudio)
+                    trackToPlaying.postValue(loadedAudio)
                 } else {
-                    articleToHighlight.postValue(MusicTrack(audioUrl, null, MusicTrackType.ARTICLE_AUDIO))
+                    trackToPlaying.postValue(
+                        MusicTrack(audioUrl, filePath = null, type = MusicTrackType.ARTICLE_AUDIO)
+                    )
                     interactor.loadArticleAudio(audioUrl)
                 }
             }

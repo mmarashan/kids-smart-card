@@ -19,23 +19,22 @@ import ru.volgadev.article_galery.R
 import ru.volgadev.article_galery.presentation.adapter.ArticleCardAdapter
 import ru.volgadev.article_galery.presentation.adapter.TagsAdapter
 import ru.volgadev.article_repository.domain.model.Article
-import ru.volgadev.article_repository.domain.model.ArticleType
 import ru.volgadev.common.BackgroundMediaPlayer
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.scaleToFitAnimatedAndBack
 import ru.volgadev.common.view.scrollToItemToCenter
-import ru.volgadev.music_data.domain.model.MusicTrack
 
+// TODO: вынести константы
 class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
 
     private val logger = Logger.get("ArticleGalleryFragment")
 
+    // TODO: рефакторить работу с плеерами (мб в свой интерактор их)
     private val musicMediaPlayer by lazy { BackgroundMediaPlayer() }
     private val cardsMediaPlayer by lazy { BackgroundMediaPlayer() }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        logger.debug("On fragment created; savedInstanceState=$savedInstanceState")
 
         val viewModel =
             ViewModelProvider(
@@ -45,7 +44,7 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
 
         val articlesAdapter = ArticleCardAdapter()
 
-        viewModel.articleToHighlight.observe(viewLifecycleOwner, { track ->
+        viewModel.trackToPlaying.observe(viewLifecycleOwner, { track ->
             val audioPath = track.filePath ?: track.url
             logger.debug("Play $audioPath")
             cardsMediaPlayer.setOnCompletionListener {
@@ -80,26 +79,15 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
 
         articlesAdapter.setOnItemClickListener(object : ArticleCardAdapter.OnItemClickListener {
 
-            override fun onClick(item: Article, clickedView: View) {
+            override fun onClick(item: Article, clickedView: View, position: Int) {
                 if (!canClick) return
                 logger.debug("On click article ${item.id}")
                 viewModel.onClickArticle(item)
 
-                if (item.type == ArticleType.NO_PAGES) {
-
-                    val startElevation = clickedView.elevation
-                    clickedView.elevation = startElevation + 1
-                    canClick = false
-                    clickedView.scaleToFitAnimatedAndBack(
-                        1000L,
-                        1000L,
-                        1000L,
-                        0.75f
-                    ) {
-                        canClick = true
-                        clickedView.elevation = startElevation
-                    }
-                }
+                canClick = false
+                highlightView(view = clickedView, onEnd = {
+                    canClick = true
+                })
             }
         })
 
@@ -108,7 +96,7 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
             canClick = true
         })
 
-        val categoryTagsAdapter = TagsAdapter(view.context, R.layout.category_tag).apply {
+        val categoryTagsAdapter = TagsAdapter(R.layout.category_tag).apply {
             setOnItemClickListener(object : TagsAdapter.OnItemClickListener {
                 override fun onClick(item: String, clickedView: CardView, position: Int) {
                     categoryRecyclerView.scrollToItemToCenter(position)
@@ -176,23 +164,16 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
         })
 
         backgroundMusicToggleButton.isVisible = false
-        backgroundMusicToggleButton.setOnCheckedChangeListener { buttonView, isChecked ->
-            logger.debug("on click backgroundMusicToggleButton")
-            if (isChecked) {
-                musicMediaPlayer.start()
-            } else {
-                musicMediaPlayer.pause()
-            }
+        backgroundMusicToggleButton.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) musicMediaPlayer.start() else musicMediaPlayer.pause()
         }
     }
 
     override fun onResume() {
         super.onResume()
         logger.debug("onResume()")
-        if (musicMediaPlayer.isPaused()) {
-            logger.debug("Start paused playing")
-            musicMediaPlayer.start()
-        }
+        if (musicMediaPlayer.isPaused()) musicMediaPlayer.start()
+
     }
 
     override fun onPause() {
@@ -201,7 +182,17 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
         super.onPause()
     }
 
-    private fun highlightArticle(article: Article, track: MusicTrack){
-
+    private fun highlightView(view: View, onEnd: () -> Unit) {
+        val startElevation = view.elevation
+        view.elevation = startElevation + 1
+        view.scaleToFitAnimatedAndBack(
+            1000L,
+            1000L,
+            1000L,
+            0.75f
+        ) {
+            view.elevation = startElevation
+            onEnd.invoke()
+        }
     }
 }
