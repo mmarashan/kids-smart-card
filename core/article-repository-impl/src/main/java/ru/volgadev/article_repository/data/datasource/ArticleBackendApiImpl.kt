@@ -15,6 +15,7 @@ import javax.inject.Inject
 @WorkerThread
 class ArticleBackendApiImpl @Inject constructor() : ArticleBackendApi {
 
+    // TODO: from DI
     private val client by lazy { OkHttpClient() }
     private val logger = Logger.get("ArticleBackendApiImpl")
 

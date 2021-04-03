@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asFlow
 import ru.volgadev.article_repository.domain.*
-import ru.volgadev.article_repository.domain.database.ArticleCategoriesDatabase
 import ru.volgadev.article_repository.domain.database.ArticleDatabase
 import ru.volgadev.article_repository.domain.datasource.ArticleBackendApi
 import ru.volgadev.article_repository.domain.model.Article
@@ -27,10 +26,9 @@ import javax.inject.Inject
 @ExperimentalCoroutinesApi
 @InternalCoroutinesApi
 class ArticleRepositoryImpl @Inject constructor(
-    private val articleBackendApi: ArticleBackendApi,
+    private val backendApi: ArticleBackendApi,
     private val paymentManager: PaymentManager,
-    private val articlesDatabase: ArticleDatabase,
-    private val categoriesDatabase: ArticleCategoriesDatabase
+    private val database: ArticleDatabase
 ) : ArticleRepository {
 
     private val logger = Logger.get("ArticleRepositoryImpl")
@@ -53,7 +51,6 @@ class ArticleRepositoryImpl @Inject constructor(
     init {
         logger.debug("init")
         CoroutineScope(Dispatchers.Default).launch {
-            logger.debug("loadData..")
             try {
                 loadFromServer()
             } catch (e: ConnectException) {
@@ -96,8 +93,8 @@ class ArticleRepositoryImpl @Inject constructor(
     @Throws(ConnectException::class)
     private suspend fun updateCategoriesFromApi(): List<ArticleCategory> =
         withContext(Dispatchers.IO) {
-            val categories = articleBackendApi.getCategories()
-            categoriesDatabase.dao().insertAll(*categories.toTypedArray())
+            val categories = backendApi.getCategories()
+            database.dao().insertAllCategories(*categories.toTypedArray())
             return@withContext categories
         }
 
@@ -107,9 +104,9 @@ class ArticleRepositoryImpl @Inject constructor(
             logger.debug("updateArticlesFromApi()")
             val articles = ArrayList<Article>()
             categories.forEach { category ->
-                val categoryArticles = articleBackendApi.getArticles(category)
+                val categoryArticles = backendApi.getArticles(category)
                 logger.debug("Load ${categoryArticles.size} articles from category ${category.name}")
-                articlesDatabase.dao().insertAll(*categoryArticles.toTypedArray())
+                database.dao().insertAllArticles(*categoryArticles.toTypedArray())
                 articles.addAll(categoryArticles)
             }
             return@withContext articles
@@ -130,7 +127,6 @@ class ArticleRepositoryImpl @Inject constructor(
         val categories = updateCategoriesFromApi()
         val articles = updateArticlesFromApi(categories)
         isUpdated = true
-        logger.debug("loadFromServer() OK")
         this.categories = ArrayList(categories)
         val categoriesSkuIds = categories.mapNotNull { category -> category.marketItemId }
         paymentManager.setSkuIds(categoriesSkuIds)
@@ -139,8 +135,8 @@ class ArticleRepositoryImpl @Inject constructor(
     }
 
     private suspend fun loadFromDB() = withContext(Dispatchers.Default) {
-        val articles = articlesDatabase.dao().getAll()
-        val dbCategories = categoriesDatabase.dao().getAll()
+        val articles = database.dao().getAllArticles()
+        val dbCategories = database.dao().getAllCategories()
         logger.debug("Load ${dbCategories.size} categories and ${articles.size} articles from Db")
         articleChannel.value = ArrayList(articles)
         categories = ArrayList(dbCategories)
@@ -154,8 +150,7 @@ class ArticleRepositoryImpl @Inject constructor(
         withContext(Dispatchers.IO) {
             try {
                 logger.debug("getArticlePages(${article.id})")
-                val newArticles = articleBackendApi.getArticlePages(article)
-                logger.debug("${newArticles.size} pages")
+                val newArticles = backendApi.getArticlePages(article)
                 return@withContext SuccessResult(newArticles)
             } catch (e: Exception) {
                 return@withContext ErrorResult(e)
@@ -174,17 +169,14 @@ class ArticleRepositoryImpl @Inject constructor(
             val isPaid = payedIds.singleOrNull { id -> id == category.marketItemId } != null
             if (isPaid != category.isPaid) {
                 category.isPaid = isPaid
-                categoriesDatabase.dao().updateIsPaid(category.id, isPaid)
+                database.dao().updateCategoryIsPaid(category.id, isPaid)
             }
         }
-        logger.debug("categories = ${categories.joinToString(",")}")
-        logger.debug("payedIds = ${payedIds.joinToString(",")}")
         categoriesFlow.offer(copyCategories)
     }
 
     override suspend fun requestPaymentForCategory(paymentRequest: PaymentRequest) =
         withContext(Dispatchers.Default) {
-            logger.debug("requestPaymentForCategory($paymentRequest)")
             paymentManager.requestPayment(paymentRequest,
                 DefaultPaymentActivity::class.java,
                 object : PaymentResultListener {

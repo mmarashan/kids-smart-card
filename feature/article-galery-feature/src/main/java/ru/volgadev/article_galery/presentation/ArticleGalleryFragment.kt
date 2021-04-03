@@ -53,10 +53,7 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
                 }, 700L)
             }
             musicMediaPlayer.setVolume(0.4f, 0.4f)
-            cardsMediaPlayer.playAudio(
-                view.context,
-                Uri.parse(audioPath)
-            )
+            cardsMediaPlayer.playAudio(view.context, Uri.parse(audioPath))
         })
 
         val isPortraitOrientation =

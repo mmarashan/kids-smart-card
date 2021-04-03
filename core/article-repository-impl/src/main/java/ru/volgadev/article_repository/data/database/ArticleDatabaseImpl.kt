@@ -7,8 +7,9 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import ru.volgadev.article_repository.domain.database.ArticleDatabase
 import ru.volgadev.article_repository.domain.model.Article
+import ru.volgadev.article_repository.domain.model.ArticleCategory
 
-@Database(entities = [Article::class], version = 3)
+@Database(entities = [Article::class, ArticleCategory::class], version = 3)
 @TypeConverters(ListStringConverter::class, ArticleTypeConverter::class)
 internal abstract class ArticleDatabaseImpl : ArticleDatabaseInterface, RoomDatabase() {
 
@@ -18,7 +19,7 @@ internal abstract class ArticleDatabaseImpl : ArticleDatabaseInterface, RoomData
         @Volatile
         private var INSTANCE: ArticleDatabaseInterface? = null
 
-        private const val DATABASE_NAME = "article-database.db"
+        private const val DATABASE_NAME = "article-database-1.db"
 
         fun getInstance(context: Context): ArticleDatabase =
             INSTANCE ?: synchronized(this) {
