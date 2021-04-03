@@ -5,7 +5,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.view.View.OVER_SCROLL_NEVER
-import androidx.annotation.AnyThread
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -17,12 +16,15 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
 import kotlinx.android.synthetic.main.main_fragment.*
 import ru.volgadev.article_galery.R
+import ru.volgadev.article_galery.presentation.adapter.ArticleCardAdapter
+import ru.volgadev.article_galery.presentation.adapter.TagsAdapter
 import ru.volgadev.article_repository.domain.model.Article
 import ru.volgadev.article_repository.domain.model.ArticleType
 import ru.volgadev.common.BackgroundMediaPlayer
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.scaleToFitAnimatedAndBack
 import ru.volgadev.common.view.scrollToItemToCenter
+import ru.volgadev.music_data.domain.model.MusicTrack
 
 class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
 
@@ -31,28 +33,19 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
     private val musicMediaPlayer by lazy { BackgroundMediaPlayer() }
     private val cardsMediaPlayer by lazy { BackgroundMediaPlayer() }
 
-    interface OnItemClickListener {
-        fun onClick(article: Article, clickedView: View)
-    }
-
-    @Volatile
-    private var onItemClickListener: OnItemClickListener? = null
-
-    @AnyThread
-    fun setOnItemClickListener(listener: OnItemClickListener) {
-        onItemClickListener = listener
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         logger.debug("On fragment created; savedInstanceState=$savedInstanceState")
 
         val viewModel =
-            ViewModelProvider(this, ArticleGalleryViewModelFactory).get(ArticleGalleryViewModel::class.java)
+            ViewModelProvider(
+                this,
+                ArticleGalleryViewModelFactory
+            ).get(ArticleGalleryViewModel::class.java)
 
-        val articlesAdapter = ArticleCardAdapter(view.context)
+        val articlesAdapter = ArticleCardAdapter()
 
-        viewModel.audioToPlay.observe(viewLifecycleOwner, { track ->
+        viewModel.articleToHighlight.observe(viewLifecycleOwner, { track ->
             val audioPath = track.filePath ?: track.url
             logger.debug("Play $audioPath")
             cardsMediaPlayer.setOnCompletionListener {
@@ -87,34 +80,30 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
 
         articlesAdapter.setOnItemClickListener(object : ArticleCardAdapter.OnItemClickListener {
 
-            override fun onClick(itemId: Long, clickedView: View, position: Int) {
+            override fun onClick(item: Article, clickedView: View) {
                 if (!canClick) return
-                val clickedArticle =
-                    viewModel.currentArticles.value?.first { article -> article.id == itemId }
-                clickedArticle?.let { article ->
-                    logger.debug("On click article ${article.id}")
-                    viewModel.onClickArticle(article)
+                logger.debug("On click article ${item.id}")
+                viewModel.onClickArticle(item)
+
+                if (item.type == ArticleType.NO_PAGES) {
+
                     val startElevation = clickedView.elevation
                     clickedView.elevation = startElevation + 1
-                    if (article.type == ArticleType.NO_PAGES) {
-                        canClick = false
-                        clickedView.scaleToFitAnimatedAndBack(
-                            1000L,
-                            1000L,
-                            1000L,
-                            0.75f
-                        ) {
-                            canClick = true
-                            clickedView.elevation = startElevation
-                        }
+                    canClick = false
+                    clickedView.scaleToFitAnimatedAndBack(
+                        1000L,
+                        1000L,
+                        1000L,
+                        0.75f
+                    ) {
+                        canClick = true
+                        clickedView.elevation = startElevation
                     }
-                    onItemClickListener?.onClick(article, clickedView)
                 }
             }
         })
 
         viewModel.currentArticles.observe(viewLifecycleOwner, { articles ->
-            logger.debug("Set new ${articles.size} articles")
             articlesAdapter.setData(articles)
             canClick = true
         })
@@ -122,7 +111,6 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
         val categoryTagsAdapter = TagsAdapter(view.context, R.layout.category_tag).apply {
             setOnItemClickListener(object : TagsAdapter.OnItemClickListener {
                 override fun onClick(item: String, clickedView: CardView, position: Int) {
-                    logger.debug("on click $item")
                     categoryRecyclerView.scrollToItemToCenter(position)
                     val category =
                         viewModel.availableCategories.value?.first { c -> c.name == item }
@@ -134,17 +122,11 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
         }
 
         viewModel.currentCategory.observe(viewLifecycleOwner, { category ->
-            logger.debug("Set category ${category.id}")
             categoryTagsAdapter.onChose(category.name)
         })
 
         categoryRecyclerView.run {
             setHasFixedSize(true)
-            layoutManager = LinearLayoutManager(
-                context,
-                LinearLayoutManager.HORIZONTAL,
-                false
-            )
             overScrollMode = OVER_SCROLL_NEVER
             adapter = categoryTagsAdapter
             val dividerDrawable =
@@ -217,5 +199,9 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
         logger.debug("onPause()")
         musicMediaPlayer.pause()
         super.onPause()
+    }
+
+    private fun highlightArticle(article: Article, track: MusicTrack){
+
     }
 }

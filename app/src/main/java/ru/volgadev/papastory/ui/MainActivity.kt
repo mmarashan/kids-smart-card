@@ -116,25 +116,6 @@ class MainActivity : AppCompatActivity() {
                 exitTransition = Slide(Gravity.START).apply {
                     duration = EXIT_FRAGMENT_TRANSITION_DURATION_MS
                 }
-
-                setOnItemClickListener(object : ArticleGalleryFragment.OnItemClickListener {
-                    override fun onClick(article: Article, clickedView: View) {
-                        logger.debug("Choose ${article.title} to show")
-                        val itemPageFragment =
-                            fragmentProvider.getNextFragmentFeature(AppFragment.ARTICLE_PAGE_FRAGMENT)
-                        itemPageFragment.exitTransition = Fade().apply {
-                            duration = EXIT_FRAGMENT_TRANSITION_DURATION_MS
-                        }
-                        if (article.type != ArticleType.NO_PAGES) {
-                            showFragment(
-                                itemPageFragment,
-                                Bundle().apply { putLong(ITEM_ID_KEY, article.id) },
-                                true,
-                                clickedView
-                            )
-                        }
-                    }
-                })
             }
 
         showFragment(galleryFragment)
