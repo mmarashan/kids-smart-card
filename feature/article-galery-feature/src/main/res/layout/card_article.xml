@@ -20,19 +20,19 @@
             android:layout_width="match_parent"
             android:layout_height="164dp"
             android:scaleType="fitCenter"
-            tools:src="@drawable/app_icon"/>
+            tools:src="@drawable/app_icon" />
 
         <TextView
             android:id="@+id/cardTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="4dp"
             android:layout_marginBottom="4dp"
-            android:textSize="22sp"
+            android:gravity="center_horizontal"
             android:textAlignment="center"
+            android:textSize="22sp"
             tools:text="Три веселых гуся" />
 
         <TextView
@@ -46,20 +46,6 @@
             android:layout_marginBottom="4dp"
             android:textSize="16sp"
             tools:text="Русская народная" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/cardTagsRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="2dp"
-            android:layout_marginEnd="4dp"
-            android:layout_marginBottom="8dp"
-            android:clipToPadding="false"
-            android:orientation="horizontal"
-            android:padding="2dp"
-            tools:itemCount="1"
-            tools:listitem="@layout/card_tag" />
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>
