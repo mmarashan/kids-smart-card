@@ -3,7 +3,6 @@ package ru.volgadev.papastory.ui
 import android.Manifest
 import android.app.AlertDialog
 import android.os.Bundle
-import android.transition.Fade
 import android.transition.Slide
 import android.view.Gravity
 import android.view.MenuItem
@@ -15,10 +14,7 @@ import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.android.synthetic.main.main_activity.*
 import kotlinx.coroutines.InternalCoroutinesApi
-import ru.volgadev.article_repository.domain.model.Article
-import ru.volgadev.article_repository.domain.model.ArticleType
 import ru.volgadev.article_galery.presentation.ArticleGalleryFragment
-import ru.volgadev.article_page.presentation.ITEM_ID_KEY
 import ru.volgadev.common.hideNavBar
 import ru.volgadev.common.isPermissionGranted
 import ru.volgadev.common.log.Logger

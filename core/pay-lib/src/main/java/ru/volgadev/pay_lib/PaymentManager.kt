@@ -53,4 +53,6 @@ data class PaymentRequest(
 data class MarketItem(
     val skuDetails: SkuDetails,
     var purchase: Purchase? = null
-)
+) {
+    fun isPurchased(): Boolean = purchase?.purchaseState == Purchase.PurchaseState.PURCHASED
+}

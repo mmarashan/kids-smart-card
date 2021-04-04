@@ -10,7 +10,7 @@ import ru.volgadev.article_repository.domain.model.Article
 import ru.volgadev.article_repository.domain.model.ArticleCategory
 
 @Database(entities = [Article::class, ArticleCategory::class], version = 3)
-@TypeConverters(ListStringConverter::class, ArticleTypeConverter::class)
+@TypeConverters(ListStringConverter::class)
 internal abstract class ArticleDatabaseImpl : ArticleDatabaseInterface, RoomDatabase() {
 
     abstract override fun dao(): ArticleDaoImpl
@@ -19,7 +19,7 @@ internal abstract class ArticleDatabaseImpl : ArticleDatabaseInterface, RoomData
         @Volatile
         private var INSTANCE: ArticleDatabaseInterface? = null
 
-        private const val DATABASE_NAME = "article-database-1.db"
+        private const val DATABASE_NAME = "database.db"
 
         fun getInstance(context: Context): ArticleDatabase =
             INSTANCE ?: synchronized(this) {

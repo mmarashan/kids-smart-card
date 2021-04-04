@@ -6,17 +6,17 @@ import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONObject
 import ru.volgadev.article_repository.domain.datasource.ArticleBackendApi
-import ru.volgadev.article_repository.domain.model.*
+import ru.volgadev.article_repository.domain.model.Article
+import ru.volgadev.article_repository.domain.model.ArticleCategory
 import ru.volgadev.common.BACKEND_URL
 import ru.volgadev.common.log.Logger
 import java.net.ConnectException
 import javax.inject.Inject
 
 @WorkerThread
-class ArticleBackendApiImpl @Inject constructor() : ArticleBackendApi {
+class ArticleBackendApiImpl @Inject constructor(private val client: OkHttpClient) :
+    ArticleBackendApi {
 
-    // TODO: from DI
-    private val client by lazy { OkHttpClient() }
     private val logger = Logger.get("ArticleBackendApiImpl")
 
     private companion object {
@@ -57,12 +57,8 @@ class ArticleBackendApiImpl @Inject constructor() : ArticleBackendApi {
                 }
                 val author = articleJson.optString("author")
                 val title = articleJson.optString("title")
-                val type = articleJson.optString("type")
                 val categoryId = articleJson.optString("categoryId")
-                val pagesFile = articleJson.optString("pagesFile")
                 val iconUrl = articleJson.optString("iconUrl")
-                val averageTimeReadingMin = articleJson.optInt("averageTimeReadingMin")
-                val timestamp = articleJson.optLong("timestamp")
                 val openPhrase =
                     if (!articleJson.isNull("openPhrase")) articleJson.optString("openPhrase") else null
                 result.add(
@@ -72,59 +68,14 @@ class ArticleBackendApiImpl @Inject constructor() : ArticleBackendApi {
                         author = author,
                         title = title,
                         categoryId = categoryId,
-                        type = ArticleType.valueOf(type),
-                        pagesFile = pagesFile,
                         iconUrl = iconUrl,
                         onClickSounds = onClickSounds,
-                        averageTimeReadingMin = averageTimeReadingMin,
-                        timestamp = timestamp,
                         openPhrase = openPhrase
                     )
                 )
             }
         } catch (e: Exception) {
             throw ConnectException("Error when get new articles $e")
-        }
-        return result
-    }
-
-    @Throws(ConnectException::class)
-    override fun getArticlePages(article: Article): List<ArticlePage> {
-        val pagesFile = article.pagesFile
-        val request: Request = Request.Builder().apply {
-            url("$ARTICLE_PAGES_BACKEND_URL/$pagesFile")
-        }.build()
-
-        val result = arrayListOf<ArticlePage>()
-
-        try {
-            val response: Response = client.newCall(request).execute()
-            val stringResponse = response.body!!.string()
-            val json = JSONObject(stringResponse)
-            val articlesArray = json.getJSONArray("pages")
-            for (i in 0 until articlesArray.length()) {
-                val articleJson = articlesArray[i] as JSONObject
-                val type = articleJson.optString("type")
-                val title = articleJson.optString("title")
-                val text = articleJson.optString("text")
-                val imageUrl = articleJson.optString("imageUrl")
-                val soundUrl = articleJson.optString("soundUrl")
-                val allowBackgroundSound = articleJson.optBoolean("allowBackgroundSound")
-                result.add(
-                    ArticlePage(
-                        articleId = article.id,
-                        pageNum = i,
-                        type = PageType.valueOf(type),
-                        title = title,
-                        text = text,
-                        imageUrl = imageUrl,
-                        soundUrl = soundUrl,
-                        allowBackgroundSound = allowBackgroundSound
-                    )
-                )
-            }
-        } catch (e: Exception) {
-            throw ConnectException("Error when get new article pages $e")
         }
         return result
     }

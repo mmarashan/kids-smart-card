@@ -7,7 +7,6 @@ import ru.volgadev.papastory.di.core.ArticleRepositoryModule
 import ru.volgadev.papastory.di.core.MusicRepositoryModule
 import ru.volgadev.papastory.di.core.PaymentManagerModule
 import ru.volgadev.papastory.di.feature.ArticleGalleryFeatureModule
-import ru.volgadev.papastory.di.feature.ArticlePageFeatureModule
 import ru.volgadev.papastory.di.feature.CabinetFeatureModule
 import ru.volgadev.papastory.ui.FragmentFeatureProvider
 
@@ -17,8 +16,7 @@ import ru.volgadev.papastory.ui.FragmentFeatureProvider
         MusicRepositoryModule::class,
         PaymentManagerModule::class,
         ArticleGalleryFeatureModule::class,
-        CabinetFeatureModule::class,
-        ArticlePageFeatureModule::class
+        CabinetFeatureModule::class
     ]
 )
 interface ApplicationComponent {
