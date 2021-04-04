@@ -10,11 +10,14 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
 import kotlinx.android.synthetic.main.main_fragment.*
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.firstOrNull
 import ru.volgadev.article_galery.R
 import ru.volgadev.article_galery.presentation.adapter.ArticleCardAdapter
 import ru.volgadev.article_galery.presentation.adapter.TagsAdapter
@@ -44,17 +47,19 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
 
         val articlesAdapter = ArticleCardAdapter()
 
-        viewModel.trackToPlaying.observe(viewLifecycleOwner, { track ->
-            val audioPath = track.filePath ?: track.url
-            logger.debug("Play $audioPath")
-            cardsMediaPlayer.setOnCompletionListener {
-                view.postDelayed({
-                    musicMediaPlayer.setVolume(1f, 1f)
-                }, 700L)
+        lifecycleScope.launchWhenResumed {
+            viewModel.trackToPlaying.collect { track ->
+                val audioPath = track.filePath ?: track.url
+                logger.debug("Play $audioPath")
+                cardsMediaPlayer.setOnCompletionListener {
+                    view.postDelayed({
+                        musicMediaPlayer.setVolume(1f, 1f)
+                    }, 700L)
+                }
+                musicMediaPlayer.setVolume(0.4f, 0.4f)
+                cardsMediaPlayer.playAudio(view.context, Uri.parse(audioPath))
             }
-            musicMediaPlayer.setVolume(0.4f, 0.4f)
-            cardsMediaPlayer.playAudio(view.context, Uri.parse(audioPath))
-        })
+        }
 
         val isPortraitOrientation =
             requireActivity().resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
@@ -88,27 +93,33 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
             }
         })
 
-        viewModel.currentArticles.observe(viewLifecycleOwner, { articles ->
-            articlesAdapter.setData(articles)
-            canClick = true
-        })
+        lifecycleScope.launchWhenResumed {
+            viewModel.currentArticles.collect { articles ->
+                articlesAdapter.setData(articles)
+                canClick = true
+            }
+        }
 
         val categoryTagsAdapter = TagsAdapter(R.layout.category_tag).apply {
             setOnItemClickListener(object : TagsAdapter.OnItemClickListener {
                 override fun onClick(item: String, clickedView: CardView, position: Int) {
                     categoryRecyclerView.scrollToItemToCenter(position)
-                    val category =
-                        viewModel.availableCategories.value?.first { c -> c.name == item }
-                    category?.let { cat ->
-                        viewModel.onClickCategory(cat)
+                    lifecycleScope.launchWhenCreated {
+                        val category = viewModel.availableCategories.firstOrNull()
+                            ?.firstOrNull { it.name == item }
+                        category?.let { cat ->
+                            viewModel.onClickCategory(cat)
+                        }
                     }
                 }
             })
         }
 
-        viewModel.currentCategory.observe(viewLifecycleOwner, { category ->
-            categoryTagsAdapter.onChose(category.name)
-        })
+        lifecycleScope.launchWhenResumed {
+            viewModel.currentCategory.collect {
+                categoryTagsAdapter.onChose(it.name)
+            }
+        }
 
         categoryRecyclerView.run {
             setHasFixedSize(true)
@@ -124,41 +135,43 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
             itemAnimator = null
         }
 
-        viewModel.availableCategories.observe(viewLifecycleOwner, { categories ->
-            logger.debug("On load categories: ${categories.size}")
-            val categoryNames = categories.map { category -> category.name }
-            categoryTagsAdapter.setData(categoryNames)
-            if (categoryTagsAdapter.getChosenTag() == null) {
-                categories.firstOrNull()?.let { firstCategory ->
-                    viewModel.onClickCategory(firstCategory)
+        lifecycleScope.launchWhenResumed {
+            viewModel.availableCategories.collect { categories ->
+                logger.debug("On load categories: ${categories.size}")
+                val categoryNames = categories.map { it.name }
+                categoryTagsAdapter.setData(categoryNames)
+                if (categoryTagsAdapter.getChosenTag() == null) {
+                    categories.firstOrNull()?.let { firstCategory ->
+                        viewModel.onClickCategory(firstCategory)
+                    }
                 }
             }
-        })
+        }
 
-        viewModel.tracks.observe(viewLifecycleOwner, { tracks ->
-            logger.debug("On new ${tracks.size} tracks")
-            val downloadedTracks = tracks.filter { track -> track.filePath != null }
-            val trackUrl = if (downloadedTracks.isNotEmpty()) {
-                logger.debug("Play downloaded")
-                downloadedTracks.random().filePath!!
-            } else {
-                logger.debug("Play from streaming")
-                if (tracks.isNotEmpty()) {
-                    tracks.random().url
+        lifecycleScope.launchWhenResumed {
+            viewModel.tracks.collect { tracks ->
+                // TODO: refactor work with players. remove from view!
+                val downloadedTracks = tracks.filter { track -> track.filePath != null }
+                val trackUrl = if (downloadedTracks.isNotEmpty()) {
+                    downloadedTracks.random().filePath
                 } else {
-                    null
+                    if (tracks.isNotEmpty()) {
+                        tracks.random().url
+                    } else {
+                        null
+                    }
+                }
+                trackUrl?.let { url ->
+                    try {
+                        musicMediaPlayer.playAudio(requireContext(), Uri.parse(url))
+                        backgroundMusicToggleButton.isChecked = true
+                        backgroundMusicToggleButton.isVisible = true
+                    } catch (e: Exception) {
+                        logger.error("Exception when playing: ${e.message}")
+                    }
                 }
             }
-            trackUrl?.let { url ->
-                try {
-                    musicMediaPlayer.playAudio(requireContext(), Uri.parse(url))
-                    backgroundMusicToggleButton.isChecked = true
-                    backgroundMusicToggleButton.isVisible = true
-                } catch (e: Exception) {
-                    logger.error("Exception when playing: ${e.message}")
-                }
-            }
-        })
+        }
 
         backgroundMusicToggleButton.isVisible = false
         backgroundMusicToggleButton.setOnCheckedChangeListener { _, isChecked ->
