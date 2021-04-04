@@ -4,7 +4,10 @@ import android.content.Context
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.InternalCoroutinesApi
+import okhttp3.OkHttpClient
 import ru.volgadev.article_repository.data.database.ArticleDatabaseProvider
 import ru.volgadev.article_repository.data.datasource.ArticleBackendApiImpl
 import ru.volgadev.article_repository.domain.ArticleRepository
@@ -21,6 +24,12 @@ interface ArticleRepositoryModule {
         @Provides
         fun providesArticleDatabase(context: Context): ArticleDatabase =
             ArticleDatabaseProvider.createArticleDatabase(context)
+
+        @Provides
+        fun providesIoDispatcher(): CoroutineDispatcher = Dispatchers.IO
+
+        @Provides
+        fun providesOkHttpClient(): OkHttpClient = OkHttpClient()
     }
 
     @Binds

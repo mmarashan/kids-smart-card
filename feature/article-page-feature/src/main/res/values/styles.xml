@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <style name="ControlButton" parent="Widget.AppCompat.ImageButton">
-        <item name="elevation">6dp</item>
-        <item name="background">@drawable/round_button_shape</item>
-    </style>
-</resources>

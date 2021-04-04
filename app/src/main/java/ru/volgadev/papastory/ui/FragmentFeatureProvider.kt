@@ -8,16 +8,13 @@ import ru.sberdevices.module_injector.BaseDependencies
 import ru.sberdevices.module_injector.ComponentHolder
 import ru.volgadev.article_galery.api.ArticleGalleryFeatureComponentHolder
 import ru.volgadev.article_galery.api.ArticleGalleryFeatureDependencies
-import ru.volgadev.article_page.api.ArticlePageFeatureComponentHolder
-import ru.volgadev.article_page.api.ArticlePageFeatureDependencies
-import ru.volgadev.article_page.presentation.ArticlePageFragment
 import ru.volgadev.cabinet_feature.api.CabinetFeatureComponentHolder
 import ru.volgadev.cabinet_feature.api.CabinetFeatureDependencies
 import ru.volgadev.papastory.KidsCardApplication
 import javax.inject.Inject
 
 enum class AppFragment {
-    GALLERY_FRAGMENT, ARTICLE_PAGE_FRAGMENT, CABINET_FRAGMENT
+    GALLERY_FRAGMENT, CABINET_FRAGMENT
 }
 
 class FragmentFeatureProvider(activity: Activity) {
@@ -28,16 +25,10 @@ class FragmentFeatureProvider(activity: Activity) {
     lateinit var articleGalleryFeatureDependencies: Lazy<ArticleGalleryFeatureDependencies>
 
     @Inject
-    lateinit var articlePageFeatureDependencies: Lazy<ArticlePageFeatureDependencies>
-
-    @Inject
     lateinit var cabinetFeatureDependencies: Lazy<CabinetFeatureDependencies>
 
     @Inject
     lateinit var articleGalleryFeatureHolder: Lazy<ArticleGalleryFeatureComponentHolder>
-
-    @Inject
-    lateinit var articlePageFeatureHolder: Lazy<ArticlePageFeatureComponentHolder>
 
     @Inject
     lateinit var cabinetFeatureComponentHolder: Lazy<CabinetFeatureComponentHolder>
@@ -52,9 +43,6 @@ class FragmentFeatureProvider(activity: Activity) {
             AppFragment.GALLERY_FRAGMENT -> articleGalleryFeatureHolder.get().apply {
                 init(articleGalleryFeatureDependencies.get())
             }
-            AppFragment.ARTICLE_PAGE_FRAGMENT -> articlePageFeatureHolder.get().apply {
-                init(articlePageFeatureDependencies.get())
-            }
             AppFragment.CABINET_FRAGMENT -> cabinetFeatureComponentHolder.get().apply {
                 init(cabinetFeatureDependencies.get())
             }
@@ -63,14 +51,12 @@ class FragmentFeatureProvider(activity: Activity) {
 
         return when (code) {
             AppFragment.GALLERY_FRAGMENT -> articleGalleryFeatureHolder.get().get().getFragment()
-            AppFragment.ARTICLE_PAGE_FRAGMENT -> articlePageFeatureHolder.get().get().getFragment()
             AppFragment.CABINET_FRAGMENT -> cabinetFeatureComponentHolder.get().get().getFragment()
         }
     }
 
     companion object {
-        private val FULLSCREEN_FRAGMENTS_CLASS_NAMES =
-            setOf(ArticlePageFragment::class.java.canonicalName)
+        private val FULLSCREEN_FRAGMENTS_CLASS_NAMES = setOf<String>()
 
         fun isFullscreen(fragment: Fragment): Boolean {
             return fragment::class.java.canonicalName in FULLSCREEN_FRAGMENTS_CLASS_NAMES
