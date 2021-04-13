@@ -4,7 +4,6 @@ import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import android.view.View.OVER_SCROLL_NEVER
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
@@ -23,6 +22,7 @@ import ru.volgadev.article_galery.presentation.adapter.ArticleCardAdapter
 import ru.volgadev.article_galery.presentation.adapter.TagsAdapter
 import ru.volgadev.article_repository.domain.model.Article
 import ru.volgadev.common.BackgroundMediaPlayer
+import ru.volgadev.common.animateScaledVibration
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.scaleToFitAnimatedAndBack
 import ru.volgadev.common.view.scrollToItemToCenter
@@ -39,11 +39,10 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val viewModel =
-            ViewModelProvider(
-                this,
-                ArticleGalleryViewModelFactory
-            ).get(ArticleGalleryViewModel::class.java)
+        val viewModel = ViewModelProvider(
+            this,
+            ArticleGalleryViewModelFactory
+        ).get(ArticleGalleryViewModel::class.java)
 
         val articlesAdapter = ArticleCardAdapter()
 
@@ -68,12 +67,9 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
         contentRecyclerView.run {
             layoutManager = StaggeredGridLayoutManager(spanCount, LinearLayoutManager.VERTICAL)
             adapter = articlesAdapter
-            overScrollMode = OVER_SCROLL_NEVER
             itemAnimator = SlideInUpAnimator().apply {
                 addDuration = 248
                 removeDuration = 200
-                moveDuration = 200
-                changeDuration = 0
             }
         }
 
@@ -116,17 +112,13 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
         }
 
         lifecycleScope.launchWhenResumed {
-            viewModel.currentCategory.collect {
-                categoryTagsAdapter.onChose(it.name)
-            }
+            viewModel.currentCategory.collect { categoryTagsAdapter.onChose(it.name) }
         }
 
         categoryRecyclerView.run {
             setHasFixedSize(true)
-            overScrollMode = OVER_SCROLL_NEVER
             adapter = categoryTagsAdapter
-            val dividerDrawable =
-                ContextCompat.getDrawable(context, R.drawable.empty_divider_4)!!
+            val dividerDrawable = ContextCompat.getDrawable(context, R.drawable.empty_divider_4)!!
             val dividerDecorator =
                 DividerItemDecoration(context, DividerItemDecoration.HORIZONTAL).apply {
                     setDrawable(dividerDrawable)
@@ -155,17 +147,13 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
                 val trackUrl = if (downloadedTracks.isNotEmpty()) {
                     downloadedTracks.random().filePath
                 } else {
-                    if (tracks.isNotEmpty()) {
-                        tracks.random().url
-                    } else {
-                        null
-                    }
+                    tracks.randomOrNull()?.url
                 }
                 trackUrl?.let { url ->
                     try {
                         musicMediaPlayer.playAudio(requireContext(), Uri.parse(url))
-                        backgroundMusicToggleButton.isChecked = true
-                        backgroundMusicToggleButton.isVisible = true
+                        musicToggleButton.isChecked = true
+                        musicToggleButton.isVisible = true
                     } catch (e: Exception) {
                         logger.error("Exception when playing: ${e.message}")
                     }
@@ -173,9 +161,22 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
             }
         }
 
-        backgroundMusicToggleButton.isVisible = false
-        backgroundMusicToggleButton.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) musicMediaPlayer.start() else musicMediaPlayer.pause()
+        musicToggleButton.isVisible = false
+        musicToggleButton.setOnCheckedChangeListener { buttonView, isChecked ->
+            logger.debug("on click backgroundMusicToggleButton")
+            if (isChecked) {
+                musicMediaPlayer.start()
+                musicToggleButton.animateScaledVibration(
+                    scaleAmplitude = MUSIC_BUTTON_SCALE_AMPLITUDE,
+                    durationMs = MUSIC_BUTTON_SCALE_DURATION_MS
+                )
+            } else {
+                musicToggleButton.animateScaledVibration(
+                    scaleAmplitude = -MUSIC_BUTTON_SCALE_AMPLITUDE,
+                    durationMs = MUSIC_BUTTON_SCALE_DURATION_MS
+                )
+                musicMediaPlayer.pause()
+            }
         }
     }
 
@@ -204,5 +205,10 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
             view.elevation = startElevation
             onEnd.invoke()
         }
+    }
+
+    private companion object {
+        const val MUSIC_BUTTON_SCALE_AMPLITUDE = 0.2f
+        const val MUSIC_BUTTON_SCALE_DURATION_MS = 800L
     }
 }

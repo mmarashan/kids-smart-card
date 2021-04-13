@@ -73,11 +73,7 @@ internal class TagViewHolder(private val card: CardView) : RecyclerView.ViewHold
     ) {
         currentPosition = position
         tagTextView.text = tag
-        if (tag == chosenTag) {
-            card.alpha = 1.0f
-        } else {
-            card.alpha = 0.8f
-        }
+        card.alpha = if (tag == chosenTag) 1.0f else 0.8f
         card.setOnClickListener { view ->
             listener?.onClick(tag, view as CardView, currentPosition)
         }
