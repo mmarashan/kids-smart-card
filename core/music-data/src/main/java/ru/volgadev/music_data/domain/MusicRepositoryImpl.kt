@@ -1,11 +1,10 @@
 package ru.volgadev.music_data.domain
 
 import android.content.Context
-import androidx.annotation.WorkerThread
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.first
 import ru.volgadev.common.isValidUrlString
 import ru.volgadev.common.log.Logger
 import ru.volgadev.downloader.Downloader
@@ -18,28 +17,28 @@ import javax.inject.Inject
 class MusicRepositoryImpl @Inject constructor(
     private val context: Context,
     private val musicBackendApi: MusicBackendApi,
-    private val musicTrackDatabase: MusicTrackDatabase
+    private val musicTrackDatabase: MusicTrackDatabase,
+    private val ioDispatcher: CoroutineDispatcher
 ) : MusicRepository {
 
     private val logger = Logger.get("MusicRepositoryImpl")
-    private val musicTracksChannel = ConflatedBroadcastChannel<ArrayList<MusicTrack>>(arrayListOf())
+    private val musicTracksFlow = MutableSharedFlow<ArrayList<MusicTrack>>(replay = 1)
 
-    // TODO: to StateFlow
-    private val articleAudiosChannel =
-        ConflatedBroadcastChannel<ArrayList<MusicTrack>>(arrayListOf())
+    private val articleAudiosFlow = MutableSharedFlow<ArrayList<MusicTrack>>(replay = 1)
 
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + Job())
+    private val scope: CoroutineScope = CoroutineScope(ioDispatcher + Job())
 
     private val downloader = Downloader(context, scope)
 
-    override fun musicTracks(): Flow<ArrayList<MusicTrack>> = musicTracksChannel.asFlow()
+    override fun musicTracks() = musicTracksFlow
 
-    override fun articleAudios(): Flow<ArrayList<MusicTrack>> = articleAudiosChannel.asFlow()
+    override fun articleAudios() = articleAudiosFlow
 
-    override suspend fun loadArticleAudio(url: String): MusicTrack? = withContext(Dispatchers.IO) {
+    override suspend fun loadArticleAudio(url: String): MusicTrack? = withContext(ioDispatcher) {
         logger.debug("loadArticleAudio($url)")
-        loadMusicTrack(url, MusicTrackType.ARTICLE_AUDIO)?.also { loadedTrack ->
-            val audios = articleAudiosChannel.value
+        val loadedTrack = loadMusicTrack(url, MusicTrackType.ARTICLE_AUDIO)
+        loadedTrack?.also { loadedTrack ->
+            val audios = articleAudiosFlow.first()
             var updated = false
             audios.forEach { audio ->
                 if (audio.url == loadedTrack.url) {
@@ -48,26 +47,23 @@ class MusicRepositoryImpl @Inject constructor(
                 }
             }
             if (updated) {
-                articleAudiosChannel.offer(audios)
+                articleAudiosFlow.emit(audios)
             }
         }
     }
 
-    override suspend fun getTrackFromStorage(url: String): MusicTrack? =
-        withContext(Dispatchers.Default) {
-            logger.debug("getTrackFromStorage()")
-            return@withContext musicTrackDatabase.dao().getByUrl(url)
-        }
+    override suspend fun getTrackFromStorage(url: String): MusicTrack? = withContext(ioDispatcher) {
+        logger.debug("getTrackFromStorage()")
+        return@withContext musicTrackDatabase.dao().getByUrl(url)
+    }
 
     private suspend fun loadMusicTrack(url: String, type: MusicTrackType): MusicTrack? =
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             logger.debug("loadMusicTrack($url)")
             if (url.isValidUrlString()) {
                 val filesDir = context.filesDir
-                val fileName: String =
-                    url.substring(url.lastIndexOf('/') + 1, url.length)
+                val fileName: String = url.substring(url.lastIndexOf('/') + 1, url.length)
                 val newFilePath = File(filesDir, fileName).absolutePath
-                logger.debug("Try to load $url to $newFilePath")
                 val isSuccess = downloader.download(url, newFilePath)
                 if (isSuccess) {
                     logger.debug("Success load")
@@ -79,7 +75,7 @@ class MusicRepositoryImpl @Inject constructor(
                     return@withContext null
                 }
             } else {
-                logger.debug("Url not valid")
+                logger.warn("Url not valid")
                 return@withContext null
             }
         }
@@ -87,48 +83,38 @@ class MusicRepositoryImpl @Inject constructor(
     init {
         logger.debug("init")
         scope.launch(Dispatchers.Default) {
-            loadAudios()
-        }
-    }
-
-    @WorkerThread
-    private suspend fun loadAudios() {
-        try {
-            logger.debug("Load data from DB")
-            loadFromDB()
-            logger.debug("Try to update data")
-            updateMusicTracks()
-        } catch (e: ConnectException) {
-            logger.error("Exception when load music tracks $e")
+            try {
+                loadFromDB()
+                updateMusicTracks()
+            } catch (e: ConnectException) {
+                logger.error("Exception when load music tracks $e")
+            }
         }
     }
 
     @Throws(ConnectException::class)
-    private suspend fun updateMusicTracks() = withContext(Dispatchers.IO) {
+    private suspend fun updateMusicTracks() = withContext(ioDispatcher) {
         val fromBackendTracks = musicBackendApi.getTracks()
-        val tracks = mutableListOf<MusicTrack>()
         val tracksToDownloading = mutableListOf<MusicTrack>()
         val inStorageTracks =
             musicTrackDatabase.dao().getAll().map { track -> track.url to track.filePath }.toMap()
         for (track in fromBackendTracks) {
-            val urlStr = track.url
-            val pathInStorage = inStorageTracks[urlStr]
+            val pathInStorage = inStorageTracks[track.url]
             if (pathInStorage != null) {
                 track.filePath = pathInStorage
             } else {
                 tracksToDownloading.add(track)
             }
-            tracks.add(track)
         }
-        musicTracksChannel.offer(ArrayList(fromBackendTracks))
-        loadMusicTracks(tracksToDownloading)
+        musicTracksFlow.emit(ArrayList(fromBackendTracks))
+        loadTracksToStorage(tracksToDownloading)
     }
 
-    private suspend fun loadMusicTracks(newTracks: List<MusicTrack>) = withContext(Dispatchers.IO) {
-        logger.debug("loadTracks(${newTracks.size} tracks)")
-        for (track in newTracks) {
+    private suspend fun loadTracksToStorage(tracks: List<MusicTrack>) = withContext(ioDispatcher) {
+        logger.debug("loadTracks(${tracks.size} tracks)")
+        for (track in tracks) {
             loadMusicTrack(track.url, MusicTrackType.MUSIC)?.also { loadedTrack ->
-                val audios = musicTracksChannel.value
+                val audios = musicTracksFlow.first()
                 var updated = false
                 audios.forEach { audio ->
                     if (audio.url == loadedTrack.url) {
@@ -137,19 +123,17 @@ class MusicRepositoryImpl @Inject constructor(
                     }
                 }
                 if (updated) {
-                    musicTracksChannel.offer(audios)
+                    musicTracksFlow.emit(audios)
                 }
             }
         }
     }
 
-    private suspend fun loadFromDB() = withContext(Dispatchers.Default) {
+    private suspend fun loadFromDB() = withContext(ioDispatcher) {
         val musicTracks = musicTrackDatabase.dao().getAllByType(MusicTrackType.MUSIC)
-        logger.debug("Load ${musicTracks.size} music audio from Db")
-        musicTracksChannel.offer(ArrayList(musicTracks))
+        musicTracksFlow.emit(ArrayList(musicTracks))
 
         val articleAudios = musicTrackDatabase.dao().getAllByType(MusicTrackType.ARTICLE_AUDIO)
-        logger.debug("Load ${articleAudios.size} article tracks from Db")
-        articleAudiosChannel.offer(ArrayList(articleAudios))
+        articleAudiosFlow.emit(ArrayList(articleAudios))
     }
 }
