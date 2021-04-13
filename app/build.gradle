@@ -46,10 +46,11 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:${versions.androidxlifecycle}"
     implementation "com.google.android.material:material:${versions.material}"
 
+    implementation "com.squareup.okhttp3:okhttp:${versions.okhttp}"
+
     implementation project(':common')
     implementation project(':core:module-injector')
     implementation project(':feature:article-galery-feature')
-    implementation project(':feature:article-page-feature')
     implementation project(':feature:cabinet-feature')
     implementation project(':feature:pincode-bubble')
     implementation project(':core:article-repository-impl')

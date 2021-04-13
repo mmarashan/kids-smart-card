@@ -2,7 +2,9 @@ package ru.volgadev.article_galery.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import ru.volgadev.article_galery.domain.ArticleGalleryInteractorImpl
 import ru.volgadev.article_repository.domain.ArticleRepository
+import ru.volgadev.common.FeatureToggles
 import ru.volgadev.music_data.domain.MusicRepository
 
 internal object ArticleGalleryViewModelFactory : ViewModelProvider.Factory {
@@ -20,7 +22,12 @@ internal object ArticleGalleryViewModelFactory : ViewModelProvider.Factory {
         val musicRepository = musicRepository
         checkNotNull(articleRepository) { "articleRepository was not initialized!" }
         checkNotNull(musicRepository) { "musicRepository was not initialized!" }
-        return ArticleGalleryViewModel(articleRepository, musicRepository) as T
+        val interactor = ArticleGalleryInteractorImpl(
+            articleRepository,
+            musicRepository,
+            isBackgroundMusicEnabled = FeatureToggles.ENABLE_BACKGROUND_MUSIC
+        )
+        return ArticleGalleryViewModel(interactor) as T
     }
 
     fun clear() {

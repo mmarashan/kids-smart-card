@@ -1,23 +1,13 @@
 package ru.volgadev.article_repository.domain
 
 import androidx.annotation.WorkerThread
-import com.android.billingclient.api.Purchase
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.ConflatedBroadcastChannel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.FlowCollector
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.*
 import ru.volgadev.article_repository.domain.*
-import ru.volgadev.article_repository.domain.database.ArticleCategoriesDatabase
 import ru.volgadev.article_repository.domain.database.ArticleDatabase
 import ru.volgadev.article_repository.domain.datasource.ArticleBackendApi
 import ru.volgadev.article_repository.domain.model.Article
 import ru.volgadev.article_repository.domain.model.ArticleCategory
-import ru.volgadev.article_repository.domain.model.ArticlePage
-import ru.volgadev.common.DataResult
-import ru.volgadev.common.ErrorResult
-import ru.volgadev.common.SuccessResult
 import ru.volgadev.common.log.Logger
 import ru.volgadev.pay_lib.*
 import ru.volgadev.pay_lib.impl.DefaultPaymentActivity
@@ -27,142 +17,105 @@ import javax.inject.Inject
 @ExperimentalCoroutinesApi
 @InternalCoroutinesApi
 class ArticleRepositoryImpl @Inject constructor(
-    private val articleBackendApi: ArticleBackendApi,
+    private val backendApi: ArticleBackendApi,
     private val paymentManager: PaymentManager,
-    private val articlesDatabase: ArticleDatabase,
-    private val categoriesDatabase: ArticleCategoriesDatabase
+    private val database: ArticleDatabase,
+    private val ioDispatcher: CoroutineDispatcher
 ) : ArticleRepository {
 
     private val logger = Logger.get("ArticleRepositoryImpl")
 
-    private val articleChannel = MutableStateFlow<List<Article>>(value = emptyList())
+    private val scope = CoroutineScope(SupervisorJob())
 
-    // TODO: migrate to StateFlow
-    private val categoriesFlow = ConflatedBroadcastChannel<List<ArticleCategory>>()
-    override fun categories(): Flow<List<ArticleCategory>> = categoriesFlow.asFlow()
+    private val articlesCache = HashMap<String, List<Article>>()
 
-    @Volatile
-    private var isUpdated = false
+    private val categoriesStateFlow = MutableStateFlow<List<ArticleCategory>>(emptyList())
+    override fun categories(): StateFlow<List<ArticleCategory>> = categoriesStateFlow
 
     @Volatile
     private var productIds: List<String> = ArrayList()
 
-    @Volatile
-    private var categories = ArrayList<ArticleCategory>()
-
     init {
-        logger.debug("init")
-        CoroutineScope(Dispatchers.Default).launch {
-            logger.debug("loadData..")
-            try {
-                loadFromServer()
+        scope.launch {
+            val categories = try {
+                updateCategories()
             } catch (e: ConnectException) {
                 logger.error("Exception when load from server $e")
-                loadFromDB()
+                loadCategoriesFromDB()
             }
+
+            val categoriesSkuIds = categories.mapNotNull { category -> category.marketItemId }
+            paymentManager.setSkuIds(categoriesSkuIds)
+            updatePayedCategories(categories, productIds)
         }
 
-        CoroutineScope(Dispatchers.Default).launch {
-            paymentManager.productsFlow()
-                .collect(object : FlowCollector<List<MarketItem>> {
-                    override suspend fun emit(items: List<MarketItem>) {
-                        logger.debug("On market product list: ${items.size} categories")
-                        productIds =
-                            items.filter { item -> item.purchase?.purchaseState == Purchase.PurchaseState.PURCHASED }
-                                .map { item -> item.skuDetails.sku }
-                        updatePayedCategories(categories, productIds)
-                    }
-                })
+        scope.launch {
+            paymentManager.productsFlow().collect(object : FlowCollector<List<MarketItem>> {
+                override suspend fun emit(items: List<MarketItem>) {
+                    logger.debug("On market product list: ${items.size} categories")
+                    productIds = items.filter { it.isPurchased() }.map { it.skuDetails.sku }
+                    val categories = categoriesStateFlow.value
+                    updatePayedCategories(categories, productIds)
+                }
+            })
         }
-    }
-
-    override suspend fun getArticle(id: Long): Article? = withContext(Dispatchers.Default) {
-        logger.debug("Get article with id $id")
-        updateIfNotUpdated()
-        return@withContext articleChannel.value.firstOrNull { article -> article.id == id }
     }
 
     override suspend fun getCategoryArticles(category: ArticleCategory): List<Article> =
         withContext(Dispatchers.Default) {
-            logger.debug("getCategoryArticles(${category.name})")
-            logger.debug("Articles(${articleChannel.value.joinToString(",")})")
-            updateIfNotUpdated()
-            val categoryArticles =
-                articleChannel.value.filter { article -> article.categoryId == category.id }
-            logger.debug("getCategoryArticles(${category.name}) - ${categoryArticles.size} articles")
+            val categoryArticles = articlesCache[category.id] ?: updateCategoryArticles(category)
+            logger.debug("${categoryArticles.size} articles")
             return@withContext categoryArticles
         }
 
-    @Throws(ConnectException::class)
-    private suspend fun updateCategoriesFromApi(): List<ArticleCategory> =
-        withContext(Dispatchers.IO) {
-            val categories = articleBackendApi.getCategories()
-            categoriesDatabase.dao().insertAll(*categories.toTypedArray())
-            return@withContext categories
+    override suspend fun requestPaymentForCategory(paymentRequest: PaymentRequest) =
+        withContext(ioDispatcher) {
+            paymentManager.requestPayment(paymentRequest,
+                DefaultPaymentActivity::class.java,
+                object : PaymentResultListener {
+                    override fun onResult(result: RequestPaymentResult) {
+                        logger.debug("PaymentResultListener.onResult $result")
+                    }
+                }
+            )
         }
 
-    @Throws(ConnectException::class)
-    private suspend fun updateArticlesFromApi(categories: List<ArticleCategory>): List<Article> =
-        withContext(Dispatchers.IO) {
-            logger.debug("updateArticlesFromApi()")
-            val articles = ArrayList<Article>()
-            categories.forEach { category ->
-                val categoryArticles = articleBackendApi.getArticles(category)
-                logger.debug("Load ${categoryArticles.size} articles from category ${category.name}")
-                articlesDatabase.dao().insertAll(*categoryArticles.toTypedArray())
-                articles.addAll(categoryArticles)
-            }
-            return@withContext articles
-        }
+    override suspend fun consumePurchase(itemId: String): Boolean = withContext(ioDispatcher) {
+        logger.debug("consumePurchase $itemId")
+        paymentManager.consumePurchase(itemId)
+    }
 
-    private suspend fun updateIfNotUpdated() {
-        if (isUpdated) return
-        try {
-            loadFromServer()
-        } catch (e: ConnectException) {
-            logger.error("Exception when load from server $e")
-        }
+    override fun dispose() = scope.cancel()
+
+    @Throws(ConnectException::class)
+    private suspend fun updateCategories(): List<ArticleCategory> = withContext(Dispatchers.IO) {
+        val categories = backendApi.getCategories()
+        database.dao().insertAllCategories(*categories.toTypedArray())
+        return@withContext categories
     }
 
     @Throws(ConnectException::class)
-    private suspend fun loadFromServer() {
-        logger.debug("loadFromServer()")
-        val categories = updateCategoriesFromApi()
-        val articles = updateArticlesFromApi(categories)
-        isUpdated = true
-        logger.debug("loadFromServer() OK")
-        this.categories = ArrayList(categories)
-        val categoriesSkuIds = categories.mapNotNull { category -> category.marketItemId }
-        paymentManager.setSkuIds(categoriesSkuIds)
-        updatePayedCategories(categories, productIds)
-        articleChannel.value = ArrayList(articles)
-    }
-
-    private suspend fun loadFromDB() = withContext(Dispatchers.Default) {
-        val articles = articlesDatabase.dao().getAll()
-        val dbCategories = categoriesDatabase.dao().getAll()
-        logger.debug("Load ${dbCategories.size} categories and ${articles.size} articles from Db")
-        articleChannel.value = ArrayList(articles)
-        categories = ArrayList(dbCategories)
-        val categoriesSkuIds = categories.mapNotNull { category -> category.marketItemId }
-        paymentManager.setSkuIds(categoriesSkuIds)
-        updatePayedCategories(dbCategories, productIds)
-    }
-
-    @WorkerThread
-    override suspend fun getArticlePages(article: Article): DataResult<List<ArticlePage>> =
+    private suspend fun updateCategoryArticles(category: ArticleCategory): List<Article> =
         withContext(Dispatchers.IO) {
-            try {
-                logger.debug("getArticlePages(${article.id})")
-                val newArticles = articleBackendApi.getArticlePages(article)
-                logger.debug("${newArticles.size} pages")
-                return@withContext SuccessResult(newArticles)
-            } catch (e: Exception) {
-                return@withContext ErrorResult(e)
-            }
+            val categoryArticles = backendApi.getArticles(category)
+            database.dao().insertAllArticles(*categoryArticles.toTypedArray())
+            articlesCache[category.id] = categoryArticles
+            return@withContext categoryArticles
         }
+
+    private suspend fun loadCategoriesFromDB(): List<ArticleCategory> = withContext(ioDispatcher) {
+        val articles = database.dao().getAllArticles()
+        val categories = database.dao().getAllCategories()
+        logger.debug("Load ${categories.size} categories and ${articles.size} articles from Db")
+        categories.forEach { category ->
+            val categoryArticles = articles.filter { it.categoryId == category.id }
+            articlesCache[category.id] = categoryArticles
+        }
+        return@withContext categories
+    }
 
     @Synchronized
+    @WorkerThread
     private fun updatePayedCategories(
         categories: List<ArticleCategory>,
         payedIds: List<String>
@@ -174,30 +127,9 @@ class ArticleRepositoryImpl @Inject constructor(
             val isPaid = payedIds.singleOrNull { id -> id == category.marketItemId } != null
             if (isPaid != category.isPaid) {
                 category.isPaid = isPaid
-                categoriesDatabase.dao().updateIsPaid(category.id, isPaid)
+                database.dao().updateCategoryIsPaid(category.id, isPaid)
             }
         }
-        logger.debug("categories = ${categories.joinToString(",")}")
-        logger.debug("payedIds = ${payedIds.joinToString(",")}")
-        categoriesFlow.offer(copyCategories)
+        categoriesStateFlow.tryEmit(copyCategories)
     }
-
-    override suspend fun requestPaymentForCategory(paymentRequest: PaymentRequest) =
-        withContext(Dispatchers.Default) {
-            logger.debug("requestPaymentForCategory($paymentRequest)")
-            paymentManager.requestPayment(paymentRequest,
-                DefaultPaymentActivity::class.java,
-                object : PaymentResultListener {
-                    override fun onResult(result: RequestPaymentResult) {
-                        logger.debug("PaymentResultListener.onResult $result")
-                    }
-                }
-            )
-        }
-
-    override suspend fun consumePurchase(itemId: String): Boolean =
-        withContext(Dispatchers.Default) {
-            logger.debug("consumePurchase $itemId")
-            paymentManager.consumePurchase(itemId)
-        }
 }
