@@ -1,5 +1,6 @@
 package ru.volgadev.article_repository.domain.database
 
+import kotlinx.coroutines.flow.Flow
 import ru.volgadev.article_repository.domain.model.Article
 import ru.volgadev.article_repository.domain.model.ArticleCategory
 
@@ -8,7 +9,7 @@ interface ArticleDatabase {
 }
 
 interface ArticleDao {
-    fun getAllArticles(): List<Article>
+    fun articles(): Flow<List<Article>>
 
     fun loadAllByIds(articleIds: IntArray): List<Article>
 
@@ -18,7 +19,7 @@ interface ArticleDao {
 
     fun isArticleExists(id: Int): Boolean
 
-    fun getAllCategories(): List<ArticleCategory>
+    fun categories(): Flow<List<ArticleCategory>>
 
     fun insertAllCategories(vararg users: ArticleCategory)
 

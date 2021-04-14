@@ -1,6 +1,7 @@
 package ru.volgadev.article_repository.data.database
 
 import androidx.room.*
+import kotlinx.coroutines.flow.Flow
 import ru.volgadev.article_repository.domain.database.ArticleDao
 import ru.volgadev.article_repository.domain.database.ArticleDatabase
 import ru.volgadev.article_repository.domain.model.Article
@@ -13,7 +14,7 @@ internal interface ArticleDatabaseInterface: ArticleDatabase {
 @Dao
 internal interface ArticleDaoImpl : ArticleDao {
     @Query("SELECT * FROM article")
-    override fun getAllArticles(): List<Article>
+    override fun articles(): Flow<List<Article>>
 
     @Query("SELECT * FROM article WHERE id IN (:userIds)")
     override fun loadAllByIds(userIds: IntArray): List<Article>
@@ -28,7 +29,7 @@ internal interface ArticleDaoImpl : ArticleDao {
     override fun isArticleExists(id: Int): Boolean
 
     @Query("SELECT * FROM articlecategory")
-    override fun getAllCategories(): List<ArticleCategory>
+    override fun categories(): Flow<List<ArticleCategory>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     override fun insertAllCategories(vararg users: ArticleCategory)

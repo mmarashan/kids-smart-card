@@ -30,7 +30,7 @@ internal class CabinetViewModel(
     init {
         logger.debug("init")
         viewModelScope.launch(Dispatchers.Default) {
-            articleRepository.categories().collect(object : FlowCollector<List<ArticleCategory>> {
+            articleRepository.categories.collect(object : FlowCollector<List<ArticleCategory>> {
                 override suspend fun emit(value: List<ArticleCategory>) {
                     logger.debug("On update categories $value")
                     _categories.postValue(value)
