@@ -109,8 +109,8 @@ class ArticleRepositoryImpl @Inject constructor(
     private suspend fun updateCategoryArticles(category: ArticleCategory): List<Article> =
         withContext(Dispatchers.IO) {
             val categoryArticles = backendApi.getArticles(category)
-            articlesCache.put(category.id, categoryArticles)
             database.dao().insertAllArticles(*categoryArticles.toTypedArray())
+            articlesCache[category.id] = categoryArticles
             return@withContext categoryArticles
         }
 
