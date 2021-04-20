@@ -72,10 +72,8 @@ class ArticleRepositoryImpl @Inject constructor(
     override suspend fun getCategoryArticles(category: ArticleCategory): List<Article> =
         withContext(ioDispatcher) {
             val categoryArticles = articlesCache[category.id] ?: try {
-                logger.debug("1")
                 updateCategoryArticles(category)
             } catch (e: ConnectException) {
-                logger.debug("3")
                 database.dao().getArticlesByCategory(category.id)
             }
             logger.debug("${categoryArticles.size} articles")
