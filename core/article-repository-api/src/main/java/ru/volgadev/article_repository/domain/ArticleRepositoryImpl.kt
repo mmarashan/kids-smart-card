@@ -42,20 +42,8 @@ class ArticleRepositoryImpl @Inject constructor(
 
     init {
         scope.launch {
-            database.dao().articles().collect { articles ->
-                articlesCache.clear()
-                val categoryIds = articles.map { it.categoryId }.toSet()
-                categoryIds.forEach { categoryId ->
-                    articlesCache.put(
-                        categoryId,
-                        articles.filter { it.categoryId == categoryId })
-                }
-            }
-        }
-
-        scope.launch {
-            database.dao().categories().collect { categories ->
-                val categoriesSkuIds = categories.mapNotNull { category -> category.marketItemId }
+            categories.collect { categories ->
+                val categoriesSkuIds = categories.mapNotNull { it.marketItemId }
                 paymentManager.setSkuIds(categoriesSkuIds)
                 updatePayedCategories(categories, productIds)
             }
@@ -83,7 +71,13 @@ class ArticleRepositoryImpl @Inject constructor(
 
     override suspend fun getCategoryArticles(category: ArticleCategory): List<Article> =
         withContext(ioDispatcher) {
-            val categoryArticles = articlesCache[category.id] ?: updateCategoryArticles(category)
+            val categoryArticles = articlesCache[category.id] ?: try {
+                logger.debug("1")
+                updateCategoryArticles(category)
+            } catch (e: ConnectException) {
+                logger.debug("3")
+                database.dao().getArticlesByCategory(category.id)
+            }
             logger.debug("${categoryArticles.size} articles")
             return@withContext categoryArticles
         }
@@ -108,7 +102,7 @@ class ArticleRepositoryImpl @Inject constructor(
     override fun dispose() = scope.cancel()
 
     @Throws(ConnectException::class)
-    private suspend fun updateCategories() = withContext(Dispatchers.IO) {
+    private suspend fun updateCategories() = withContext(ioDispatcher) {
         val categories = backendApi.getCategories()
         database.dao().insertAllCategories(*categories.toTypedArray())
     }
@@ -117,6 +111,7 @@ class ArticleRepositoryImpl @Inject constructor(
     private suspend fun updateCategoryArticles(category: ArticleCategory): List<Article> =
         withContext(Dispatchers.IO) {
             val categoryArticles = backendApi.getArticles(category)
+            articlesCache.put(category.id, categoryArticles)
             database.dao().insertAllArticles(*categoryArticles.toTypedArray())
             return@withContext categoryArticles
         }
@@ -127,10 +122,8 @@ class ArticleRepositoryImpl @Inject constructor(
         categories: List<ArticleCategory>,
         payedIds: List<String>
     ) {
-        val copyCategories = categories.toList()
         logger.debug("updatePayedCategories(${categories.size}, ${payedIds.size})")
-        if (copyCategories.isEmpty()) return
-        copyCategories.forEachIndexed { index, category ->
+        categories.forEachIndexed { index, category ->
             val isPaid = payedIds.singleOrNull { id -> id == category.marketItemId } != null
             if (isPaid != category.isPaid) {
                 category.isPaid = isPaid

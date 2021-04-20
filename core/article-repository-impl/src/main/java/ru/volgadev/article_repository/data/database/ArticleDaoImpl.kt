@@ -14,10 +14,10 @@ internal interface ArticleDatabaseInterface: ArticleDatabase {
 @Dao
 internal interface ArticleDaoImpl : ArticleDao {
     @Query("SELECT * FROM article")
-    override fun articles(): Flow<List<Article>>
+    override fun articles(): List<Article>
 
-    @Query("SELECT * FROM article WHERE id IN (:userIds)")
-    override fun loadAllByIds(userIds: IntArray): List<Article>
+    @Query("SELECT * FROM article where categoryId = :categoryId")
+    override fun getArticlesByCategory(categoryId: String): List<Article>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     override fun insertAllArticles(vararg users: Article)
@@ -32,7 +32,7 @@ internal interface ArticleDaoImpl : ArticleDao {
     override fun categories(): Flow<List<ArticleCategory>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    override fun insertAllCategories(vararg users: ArticleCategory)
+    override fun insertAllCategories(vararg items: ArticleCategory)
 
     @Query("UPDATE articlecategory SET isPaid = :isPaid WHERE id == :id")
     override fun updateCategoryIsPaid(id: String, isPaid: Boolean)

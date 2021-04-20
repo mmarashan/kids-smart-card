@@ -9,9 +9,10 @@ interface ArticleDatabase {
 }
 
 interface ArticleDao {
-    fun articles(): Flow<List<Article>>
 
-    fun loadAllByIds(articleIds: IntArray): List<Article>
+    fun articles(): List<Article>
+
+    fun getArticlesByCategory(categoryId: String): List<Article>
 
     fun insertAllArticles(vararg articles: Article)
 
