@@ -10,6 +10,12 @@ android {
         targetSdkVersion versions.targetSdkVersion
         versionCode 1
         versionName "1.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    buildFeatures {
+        buildConfig = false
     }
 
     compileOptions {
@@ -46,4 +52,10 @@ dependencies {
     implementation project(':core:module-injector')
     implementation project(':core:article-repository-api')
     implementation project(':core:music-data')
+
+    testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
+    testImplementation "junit:junit:${versions.junit}"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:${versions.kotlinxcoroutinestest}"
+    testImplementation "org.mockito:mockito-core:${versions.mockitocore}"
+    testImplementation "com.nhaarman:mockito-kotlin-kt1.1:${versions.mockitokotlin}"
 }
