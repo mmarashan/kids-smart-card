@@ -14,7 +14,7 @@ data class Article(
     val categoryId: String,
     val iconUrl: String? = null,
     val onClickSounds: List<String> = listOf(),
-    val openPhrase: String?
+    val openPhrase: String? = null
 )
 
 @Entity

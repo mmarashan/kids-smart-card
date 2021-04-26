@@ -58,4 +58,5 @@ dependencies {
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:${versions.kotlinxcoroutinestest}"
     testImplementation "org.mockito:mockito-core:${versions.mockitocore}"
     testImplementation "com.nhaarman:mockito-kotlin-kt1.1:${versions.mockitokotlin}"
+    testImplementation "io.mockk:mockk:${versions.mockk}"
 }

@@ -1,14 +1,9 @@
 package ru.volgadev.article_galery.presentation
 
-import androidx.annotation.MainThread
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
 import ru.volgadev.article_galery.domain.ArticleGalleryInteractor
 import ru.volgadev.article_repository.domain.model.Article
@@ -23,44 +18,38 @@ internal class ArticleGalleryViewModel(
 
     private val logger = Logger.get("ArticleGalleryViewModel")
 
-    private val _category = MutableSharedFlow<ArticleCategory>()
-    private val _articles = MutableSharedFlow<List<Article>>()
-    private val trackChannel = Channel<MusicTrack>(onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    private val categoryFlow = MutableSharedFlow<ArticleCategory>(replay = 1)
+    private val articlesFlow = MutableSharedFlow<List<Article>>(replay = 1)
+    private val trackFlow = MutableSharedFlow<MusicTrack>(replay = 0)
 
-    val currentCategory: SharedFlow<ArticleCategory> = _category
+    val currentCategory: SharedFlow<ArticleCategory> = categoryFlow
 
-    val currentArticles: SharedFlow<List<Article>> = _articles
+    val currentArticles: SharedFlow<List<Article>> = articlesFlow
 
     val tracks = interactor.musicTracks()
 
-    val trackToPlaying: Flow<MusicTrack> = trackChannel.consumeAsFlow()
+    val trackToPlaying: SharedFlow<MusicTrack> = trackFlow
 
     val availableCategories = interactor.availableCategories()
 
-    @MainThread
-    fun onClickCategory(category: ArticleCategory) {
+    fun onClickCategory(category: ArticleCategory) = viewModelScope.launch {
         logger.debug("onClickCategory ${category.name}")
-        viewModelScope.launch {
-            _category.emit(category)
-            val categoryArticles = interactor.getCategoryArticles(category)
-            _articles.emit(categoryArticles)
-        }
+        val categoryArticles = interactor.getCategoryArticles(category)
+        categoryFlow.emit(category)
+        articlesFlow.emit(categoryArticles)
     }
 
-    @MainThread
-    fun onClickArticle(article: Article) {
+    fun onClickArticle(article: Article) = viewModelScope.launch {
         logger.debug("onClickArticle ${article.title}")
-        viewModelScope.launch {
-            article.onClickSounds.forEach { audioUrl ->
-                val loadedAudio = interactor.getTrackFromStorage(audioUrl)
-                if (loadedAudio != null) {
-                    trackChannel.send(loadedAudio)
-                } else {
-                    trackChannel.send(
-                        MusicTrack(audioUrl, filePath = null, type = MusicTrackType.ARTICLE_AUDIO)
-                    )
-                    interactor.loadArticleAudio(audioUrl)
-                }
+        article.onClickSounds.forEach { audioUrl ->
+            val loadedAudio = interactor.getTrackFromStorage(audioUrl)
+            if (loadedAudio != null) {
+                trackFlow.emit(loadedAudio)
+            } else {
+                trackFlow.emit(
+                    MusicTrack(audioUrl, filePath = null, type = MusicTrackType.ARTICLE_AUDIO)
+                )
+                interactor.loadArticleAudio(audioUrl)
             }
         }
     }
