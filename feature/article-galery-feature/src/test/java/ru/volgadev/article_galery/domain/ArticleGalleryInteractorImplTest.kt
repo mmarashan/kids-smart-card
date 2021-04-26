@@ -19,8 +19,6 @@ class ArticleGalleryInteractorImplTest {
     private val articleRepository = mock<ArticleRepository>()
     private val musicRepository = mock<MusicRepository>()
 
-    private val emptyString = ""
-
     @Test
     fun `when subscribe to availableCategories, then not paid items filtered`() = runBlockingTest {
         /* arrange */
@@ -55,9 +53,9 @@ class ArticleGalleryInteractorImplTest {
     private fun buildRandomCategory(marketItemId: String? = null, isPaid: Boolean) =
         ArticleCategory(
             id = randomString(),
-            name = emptyString,
-            description = emptyString,
-            fileUrl = emptyString,
+            name = "",
+            description = "",
+            fileUrl = "",
             marketItemId = marketItemId,
             isPaid = isPaid
         )
