@@ -24,3 +24,7 @@ versions.billingclient = "3.0.2"
 versions.coil = "1.0.0"
 versions.coroutines = "1.4.2"
 versions.javaxinject = "1"
+
+// tests
+versions.junit = "4.13"
+versions.mockwebserver = "4.8.0"

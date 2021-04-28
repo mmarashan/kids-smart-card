@@ -11,6 +11,12 @@ android {
         targetSdkVersion versions.targetSdkVersion
         versionCode 1
         versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildFeatures {
+        buildConfig = false
     }
 
     buildTypes {
@@ -37,4 +43,7 @@ dependencies {
     implementation project(':common')
     implementation project(':core:article-repository-api')
     implementation project(':core:pay-lib')
+
+    testImplementation "junit:junit:${versions.junit}"
+    testImplementation "com.squareup.okhttp3:mockwebserver:${versions.mockwebserver}"
 }
