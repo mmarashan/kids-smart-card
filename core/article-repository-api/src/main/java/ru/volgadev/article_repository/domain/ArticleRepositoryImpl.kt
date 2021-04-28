@@ -5,7 +5,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import ru.volgadev.article_repository.domain.*
 import ru.volgadev.article_repository.domain.database.ArticleDatabase
-import ru.volgadev.article_repository.domain.datasource.ArticleBackendApi
+import ru.volgadev.article_repository.domain.datasource.ArticleRemoteDataSource
 import ru.volgadev.article_repository.domain.model.Article
 import ru.volgadev.article_repository.domain.model.ArticleCategory
 import ru.volgadev.common.log.Logger
@@ -17,7 +17,7 @@ import javax.inject.Inject
 @ExperimentalCoroutinesApi
 @InternalCoroutinesApi
 class ArticleRepositoryImpl @Inject constructor(
-    private val backendApi: ArticleBackendApi,
+    private val remoteDataSource: ArticleRemoteDataSource,
     private val paymentManager: PaymentManager,
     private val database: ArticleDatabase,
     private val ioDispatcher: CoroutineDispatcher
@@ -89,7 +89,7 @@ class ArticleRepositoryImpl @Inject constructor(
 
     @Throws(ConnectException::class)
     private suspend fun updateCategories(): List<ArticleCategory> = withContext(Dispatchers.IO) {
-        val categories = backendApi.getCategories()
+        val categories = remoteDataSource.getCategories()
         database.dao().insertAllCategories(*categories.toTypedArray())
         return@withContext categories
     }
@@ -97,7 +97,7 @@ class ArticleRepositoryImpl @Inject constructor(
     @Throws(ConnectException::class)
     private suspend fun updateCategoryArticles(category: ArticleCategory): List<Article> =
         withContext(Dispatchers.IO) {
-            val categoryArticles = backendApi.getArticles(category)
+            val categoryArticles = remoteDataSource.getArticles(category)
             database.dao().insertAllArticles(*categoryArticles.toTypedArray())
             articlesCache[category.id] = categoryArticles
             return@withContext categoryArticles

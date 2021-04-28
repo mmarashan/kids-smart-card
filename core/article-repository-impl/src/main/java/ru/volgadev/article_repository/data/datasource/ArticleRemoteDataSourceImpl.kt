@@ -5,24 +5,22 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONObject
-import ru.volgadev.article_repository.domain.datasource.ArticleBackendApi
+import ru.volgadev.article_repository.domain.datasource.ArticleRemoteDataSource
 import ru.volgadev.article_repository.domain.model.Article
 import ru.volgadev.article_repository.domain.model.ArticleCategory
-import ru.volgadev.common.BACKEND_URL
 import ru.volgadev.common.log.Logger
 import java.net.ConnectException
 import javax.inject.Inject
 
 @WorkerThread
-class ArticleBackendApiImpl @Inject constructor(private val client: OkHttpClient) :
-    ArticleBackendApi {
+class ArticleRemoteDataSourceImpl @Inject constructor(
+    private val baseUrl: String,
+    private val client: OkHttpClient
+) : ArticleRemoteDataSource {
 
     private val logger = Logger.get("ArticleBackendApiImpl")
 
-    private companion object {
-        const val ARTICLE_PAGES_BACKEND_URL = "$BACKEND_URL/articles"
-        const val CATEGORIES_BACKEND_URL = "$BACKEND_URL/category.json"
-    }
+    private val CATEGORIES_BACKEND_URL = "$baseUrl/category.json"
 
     @Throws(ConnectException::class)
     override fun getArticles(category: ArticleCategory): List<Article> {
