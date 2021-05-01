@@ -1,11 +1,11 @@
-package ru.volgadev.article_repository.domain
+package ru.volgadev.article_repository.data
 
 import androidx.annotation.WorkerThread
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import ru.volgadev.article_repository.data.database.ArticleDatabase
+import ru.volgadev.article_repository.data.datasource.ArticleRemoteDataSource
 import ru.volgadev.article_repository.domain.*
-import ru.volgadev.article_repository.domain.database.ArticleDatabase
-import ru.volgadev.article_repository.domain.datasource.ArticleRemoteDataSource
 import ru.volgadev.article_repository.domain.model.Article
 import ru.volgadev.article_repository.domain.model.ArticleCategory
 import ru.volgadev.common.log.Logger

@@ -11,9 +11,9 @@ import okhttp3.OkHttpClient
 import ru.volgadev.article_repository.data.database.ArticleDatabaseProvider
 import ru.volgadev.article_repository.data.datasource.ArticleRemoteDataSourceImpl
 import ru.volgadev.article_repository.domain.ArticleRepository
-import ru.volgadev.article_repository.domain.ArticleRepositoryImpl
-import ru.volgadev.article_repository.domain.database.ArticleDatabase
-import ru.volgadev.article_repository.domain.datasource.ArticleRemoteDataSource
+import ru.volgadev.article_repository.data.ArticleRepositoryImpl
+import ru.volgadev.article_repository.data.database.ArticleDatabase
+import ru.volgadev.article_repository.data.datasource.ArticleRemoteDataSource
 import ru.volgadev.common.BACKEND_URL
 
 @Module(

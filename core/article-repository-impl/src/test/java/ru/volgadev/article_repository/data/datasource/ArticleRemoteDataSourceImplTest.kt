@@ -31,7 +31,7 @@ class ArticleRemoteDataSourceImplTest {
 
     @Test
     fun a() {
-        val responseBody = readFileWithNewLineFromResources("response/categoriesResponse.json")
+        val responseBody = readFileFromResources("response/categoriesResponse.json")
         val response = MockResponse()
             .addHeader("Content-Type", "application/json; charset=utf-8")
             .setBody(responseBody.toString())
@@ -41,10 +41,10 @@ class ArticleRemoteDataSourceImplTest {
         val categories = remoteDataSource.getCategories()
 
 
-        assertEquals(0, categories.size)
+        assertEquals(3, categories.size)
     }
 
-    fun readFileWithNewLineFromResources(fileName: String): String {
+    private fun readFileFromResources(fileName: String): String {
         return getInputStreamFromResource(fileName)?.bufferedReader()
             .use { bufferReader -> bufferReader?.readText() } ?: ""
     }

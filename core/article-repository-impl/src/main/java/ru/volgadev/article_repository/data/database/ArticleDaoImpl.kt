@@ -1,8 +1,6 @@
 package ru.volgadev.article_repository.data.database
 
 import androidx.room.*
-import ru.volgadev.article_repository.domain.database.ArticleDao
-import ru.volgadev.article_repository.domain.database.ArticleDatabase
 import ru.volgadev.article_repository.domain.model.Article
 import ru.volgadev.article_repository.domain.model.ArticleCategory
 

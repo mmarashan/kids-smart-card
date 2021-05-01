@@ -1,4 +1,4 @@
-package ru.volgadev.article_repository.domain.datasource
+package ru.volgadev.article_repository.data.datasource
 
 import androidx.annotation.WorkerThread
 import ru.volgadev.article_repository.domain.model.Article

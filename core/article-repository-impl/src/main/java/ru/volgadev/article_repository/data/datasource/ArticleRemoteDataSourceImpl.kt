@@ -1,11 +1,13 @@
 package ru.volgadev.article_repository.data.datasource
 
 import androidx.annotation.WorkerThread
+import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONObject
-import ru.volgadev.article_repository.domain.datasource.ArticleRemoteDataSource
+import ru.volgadev.article_repository.data.datasource.dto.CategoriesResponseDto
+import ru.volgadev.article_repository.data.datasource.mapper.Mapper
 import ru.volgadev.article_repository.domain.model.Article
 import ru.volgadev.article_repository.domain.model.ArticleCategory
 import ru.volgadev.common.log.Logger
@@ -84,36 +86,14 @@ class ArticleRemoteDataSourceImpl @Inject constructor(
             url(CATEGORIES_BACKEND_URL)
         }.build()
 
-        val result = arrayListOf<ArticleCategory>()
-
         try {
             val response: Response = client.newCall(request).execute()
             val stringResponse = response.body!!.string()
-            val json = JSONObject(stringResponse)
-            val categoriesArray = json.getJSONArray("categories")
-            for (i in 0 until categoriesArray.length()) {
-                val categoriesJson = categoriesArray[i] as JSONObject
-                val id = categoriesJson.optString("id")
-                val name = categoriesJson.optString("name")
-                val description = categoriesJson.optString("description")
-                val iconUrl = categoriesJson.optString("iconUrl")
-                val fileUrl = categoriesJson.optString("fileUrl")
-                val marketItemId =
-                    if (!categoriesJson.isNull("marketItemId")) categoriesJson.optString("marketItemId") else null
-                result.add(
-                    ArticleCategory(
-                        id = id,
-                        name = name,
-                        description = description,
-                        iconUrl = iconUrl,
-                        marketItemId = marketItemId,
-                        fileUrl = fileUrl
-                    )
-                )
-            }
+            val dto = Gson().fromJson(stringResponse, CategoriesResponseDto::class.java)
+            return Mapper.map(dto)
+
         } catch (e: Exception) {
             throw ConnectException("Error when get new categories $e")
         }
-        return result
     }
 }
