@@ -8,9 +8,12 @@ import okhttp3.mockwebserver.MockWebServer
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import ru.volgadev.article_repository.domain.model.ArticleCategory
 
+/**
+ * Test on [ArticleRemoteDataSourceImpl]
+ */
 class ArticleRemoteDataSourceImplTest {
-
 
     private var server = MockWebServer()
     private val client = OkHttpClient()
@@ -30,18 +33,40 @@ class ArticleRemoteDataSourceImplTest {
     }
 
     @Test
-    fun a() {
+    fun checkCategoriesParsing() {
         val responseBody = readFileFromResources("response/categoriesResponse.json")
         val response = MockResponse()
             .addHeader("Content-Type", "application/json; charset=utf-8")
-            .setBody(responseBody.toString())
+            .setBody(responseBody)
 
         server.enqueue(response)
 
         val categories = remoteDataSource.getCategories()
 
-
         assertEquals(3, categories.size)
+    }
+
+    @Test
+    fun checkArticlesParsing() {
+        val responseBody = readFileFromResources("response/articlesResponse.json")
+        val response = MockResponse()
+            .addHeader("Content-Type", "application/json; charset=utf-8")
+            .setBody(responseBody)
+
+        server.enqueue(response)
+
+        val someCategory = ArticleCategory(
+            id = "",
+            name = "",
+            description = "",
+            iconUrl = "",
+            fileUrl = server.url("").toUri().toString(),
+            marketItemId = ""
+        )
+
+        val articles = remoteDataSource.getArticles(someCategory)
+
+        assertEquals(3, articles.size)
     }
 
     private fun readFileFromResources(fileName: String): String {
@@ -51,6 +76,4 @@ class ArticleRemoteDataSourceImplTest {
 
     private fun getInputStreamFromResource(fileName: String) =
         javaClass.classLoader?.getResourceAsStream(fileName)
-
-
 }

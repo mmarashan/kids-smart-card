@@ -1,0 +1,46 @@
+{
+  "articles": [
+    {
+      "id": 0,
+      "tags": [],
+      "categoryId": "Цифры",
+      "lang": "RU",
+      "author": "",
+      "title": "",
+      "type": "NO_PAGES",
+      "iconUrl": "https://raw.githubusercontent.com/mmarashan/psdata/release-0.7/images/numbers/0.jpg",
+      "pagesFile": "",
+      "onClickSounds":["https://raw.githubusercontent.com/mmarashan/psdata/release-0.7/audio/ru/numbers_plus/0.mp3"],
+      "timestamp": 1594785364,
+      "openPhrase": "Ноль"
+    },
+    {
+      "id": 1,
+      "tags": [],
+      "categoryId": "Цифры",
+      "lang": "RU",
+      "author": "",
+      "title": "",
+      "type": "NO_PAGES",
+      "iconUrl": "https://raw.githubusercontent.com/mmarashan/psdata/release-0.7/images/numbers/1.jpg",
+      "pagesFile": "",
+      "onClickSounds":["https://raw.githubusercontent.com/mmarashan/psdata/release-0.7/audio/ru/numbers_plus/1.mp3"],
+      "timestamp": 1594785364,
+      "openPhrase": "Один"
+    },
+    {
+      "id": 2,
+      "tags": [],
+      "categoryId": "Цифры",
+      "lang": "RU",
+      "author": "",
+      "title": "",
+      "type": "NO_PAGES",
+      "iconUrl": "https://raw.githubusercontent.com/mmarashan/psdata/release-0.7/images/numbers/2.jpg",
+      "pagesFile": "",
+      "onClickSounds":["https://raw.githubusercontent.com/mmarashan/psdata/release-0.7/audio/ru/numbers_plus/2.mp3"],
+      "timestamp": 1594785364,
+      "openPhrase": "Два"
+    }
+  ]
+}

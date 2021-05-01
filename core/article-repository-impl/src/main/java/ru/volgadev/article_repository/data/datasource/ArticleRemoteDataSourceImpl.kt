@@ -5,7 +5,7 @@ import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
-import org.json.JSONObject
+import ru.volgadev.article_repository.data.datasource.dto.ArticlesResponseDto
 import ru.volgadev.article_repository.data.datasource.dto.CategoriesResponseDto
 import ru.volgadev.article_repository.data.datasource.mapper.Mapper
 import ru.volgadev.article_repository.domain.model.Article
@@ -14,6 +14,8 @@ import ru.volgadev.common.log.Logger
 import java.net.ConnectException
 import javax.inject.Inject
 
+
+// TODO: refactor code doubling
 @WorkerThread
 class ArticleRemoteDataSourceImpl @Inject constructor(
     private val baseUrl: String,
@@ -31,53 +33,15 @@ class ArticleRemoteDataSourceImpl @Inject constructor(
             url(category.fileUrl)
         }.build()
 
-        val result = arrayListOf<Article>()
-
         try {
             val response: Response = client.newCall(request).execute()
             val stringResponse = response.body!!.string()
-            val json = JSONObject(stringResponse)
-            val articlesArray = json.getJSONArray("articles")
-            for (i in 0 until articlesArray.length()) {
-                val articleJson = articlesArray[i] as JSONObject
-                val id = articleJson.optLong("id")
-                val tags = arrayListOf<String>()
-                val tagsJson = articleJson.optJSONArray("tags")
-                tagsJson?.let { tagsJs ->
-                    for (t in 0 until tagsJs.length()) {
-                        tags.add(tagsJs[t] as String)
-                    }
-                }
-                val onClickSounds = arrayListOf<String>()
-                val onClickSoundsJson = articleJson.optJSONArray("onClickSounds")
-                onClickSoundsJson?.let { onClickSoundsJs ->
-                    for (t in 0 until onClickSoundsJs.length()) {
-                        onClickSounds.add(onClickSoundsJs[t] as String)
-                    }
-                }
-                val author = articleJson.optString("author")
-                val title = articleJson.optString("title")
-                val categoryId = articleJson.optString("categoryId")
-                val iconUrl = articleJson.optString("iconUrl")
-                val openPhrase =
-                    if (!articleJson.isNull("openPhrase")) articleJson.optString("openPhrase") else null
-                result.add(
-                    Article(
-                        id = id,
-                        tags = tags,
-                        author = author,
-                        title = title,
-                        categoryId = categoryId,
-                        iconUrl = iconUrl,
-                        onClickSounds = onClickSounds,
-                        openPhrase = openPhrase
-                    )
-                )
-            }
+            val dto = Gson().fromJson(stringResponse, ArticlesResponseDto::class.java)
+            return Mapper.map(dto)
+
         } catch (e: Exception) {
-            throw ConnectException("Error when get new articles $e")
+            throw ConnectException("Error when get new articles ${e}")
         }
-        return result
     }
 
     @Throws(ConnectException::class)
