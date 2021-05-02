@@ -13,8 +13,6 @@ import ru.volgadev.pay_lib.*
 import ru.volgadev.pay_lib.impl.DefaultPaymentActivity
 import javax.inject.Inject
 
-@ExperimentalCoroutinesApi
-@InternalCoroutinesApi
 class ArticleRepositoryImpl @Inject constructor(
     private val remoteDataSource: ArticleRemoteDataSource,
     private val paymentManager: PaymentManager,
@@ -49,14 +47,12 @@ class ArticleRepositoryImpl @Inject constructor(
         }
 
         scope.launch {
-            paymentManager.productsFlow().collect(object : FlowCollector<List<MarketItem>> {
-                override suspend fun emit(value: List<MarketItem>) {
-                    logger.debug("On market product list: ${value.size} categories")
-                    productIds = value.filter { it.isPurchased() }.map { it.skuDetails.sku }
-                    val categories = categoriesStateFlow.value
-                    updatePayedCategories(categories, productIds)
-                }
-            })
+            paymentManager.productsFlow().collect { products ->
+                logger.debug("On market product list: ${products.size} categories")
+                productIds = products.filter { it.isPurchased() }.map { it.skuDetails.sku }
+                val categories = categoriesStateFlow.value
+                updatePayedCategories(categories, productIds)
+            }
         }
     }
 
