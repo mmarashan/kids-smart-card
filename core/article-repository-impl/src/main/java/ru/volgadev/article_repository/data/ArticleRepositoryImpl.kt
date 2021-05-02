@@ -11,7 +11,6 @@ import ru.volgadev.article_repository.domain.model.ArticleCategory
 import ru.volgadev.common.log.Logger
 import ru.volgadev.pay_lib.*
 import ru.volgadev.pay_lib.impl.DefaultPaymentActivity
-import java.net.ConnectException
 import javax.inject.Inject
 
 @ExperimentalCoroutinesApi
@@ -25,7 +24,7 @@ class ArticleRepositoryImpl @Inject constructor(
 
     private val logger = Logger.get("ArticleRepositoryImpl")
 
-    private val scope = CoroutineScope(SupervisorJob())
+    private val scope = CoroutineScope(ioDispatcher + SupervisorJob())
 
     private val articlesCache = HashMap<String, List<Article>>()
 
@@ -39,7 +38,7 @@ class ArticleRepositoryImpl @Inject constructor(
         scope.launch {
             val categories = try {
                 updateCategories()
-            } catch (e: ConnectException) {
+            } catch (e: Exception) {
                 logger.error("Exception when load from server $e")
                 loadCategoriesFromDB()
             }
@@ -51,9 +50,9 @@ class ArticleRepositoryImpl @Inject constructor(
 
         scope.launch {
             paymentManager.productsFlow().collect(object : FlowCollector<List<MarketItem>> {
-                override suspend fun emit(items: List<MarketItem>) {
-                    logger.debug("On market product list: ${items.size} categories")
-                    productIds = items.filter { it.isPurchased() }.map { it.skuDetails.sku }
+                override suspend fun emit(value: List<MarketItem>) {
+                    logger.debug("On market product list: ${value.size} categories")
+                    productIds = value.filter { it.isPurchased() }.map { it.skuDetails.sku }
                     val categories = categoriesStateFlow.value
                     updatePayedCategories(categories, productIds)
                 }
@@ -62,10 +61,14 @@ class ArticleRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getCategoryArticles(category: ArticleCategory): List<Article> =
-        withContext(Dispatchers.Default) {
-            val categoryArticles = articlesCache[category.id] ?: updateCategoryArticles(category)
-            logger.debug("${categoryArticles.size} articles")
-            return@withContext categoryArticles
+        withContext(ioDispatcher) {
+            try {
+                val articles = articlesCache[category.id] ?: updateCategoryArticles(category)
+                logger.debug("${articles.size} articles")
+                return@withContext articles
+            } catch (e: Exception) {
+                return@withContext emptyList()
+            }
         }
 
     override suspend fun requestPaymentForCategory(paymentRequest: PaymentRequest) =
@@ -87,16 +90,16 @@ class ArticleRepositoryImpl @Inject constructor(
 
     override fun dispose() = scope.cancel()
 
-    @Throws(ConnectException::class)
-    private suspend fun updateCategories(): List<ArticleCategory> = withContext(Dispatchers.IO) {
+    @Throws(Exception::class)
+    private suspend fun updateCategories(): List<ArticleCategory> = withContext(ioDispatcher) {
         val categories = remoteDataSource.getCategories()
         database.dao().insertAllCategories(*categories.toTypedArray())
         return@withContext categories
     }
 
-    @Throws(ConnectException::class)
+    @Throws(Exception::class)
     private suspend fun updateCategoryArticles(category: ArticleCategory): List<Article> =
-        withContext(Dispatchers.IO) {
+        withContext(ioDispatcher) {
             val categoryArticles = remoteDataSource.getArticles(category)
             database.dao().insertAllArticles(*categoryArticles.toTypedArray())
             articlesCache[category.id] = categoryArticles
@@ -116,14 +119,11 @@ class ArticleRepositoryImpl @Inject constructor(
 
     @Synchronized
     @WorkerThread
-    private fun updatePayedCategories(
-        categories: List<ArticleCategory>,
-        payedIds: List<String>
-    ) {
+    private fun updatePayedCategories(categories: List<ArticleCategory>, payedIds: List<String>) {
         val copyCategories = categories.toList()
         logger.debug("updatePayedCategories(${categories.size}, ${payedIds.size})")
         if (copyCategories.isEmpty()) return
-        copyCategories.forEachIndexed { index, category ->
+        copyCategories.forEach { category ->
             val isPaid = payedIds.singleOrNull { id -> id == category.marketItemId } != null
             if (isPaid != category.isPaid) {
                 category.isPaid = isPaid

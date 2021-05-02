@@ -2,62 +2,42 @@ package ru.volgadev.article_repository.data.datasource
 
 import androidx.annotation.WorkerThread
 import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.Response
 import ru.volgadev.article_repository.data.datasource.dto.ArticlesResponseDto
 import ru.volgadev.article_repository.data.datasource.dto.CategoriesResponseDto
 import ru.volgadev.article_repository.data.datasource.mapper.Mapper
 import ru.volgadev.article_repository.domain.model.Article
 import ru.volgadev.article_repository.domain.model.ArticleCategory
-import ru.volgadev.common.log.Logger
-import java.net.ConnectException
+import java.io.IOException
 import javax.inject.Inject
 
-
-// TODO: refactor code doubling
 @WorkerThread
 class ArticleRemoteDataSourceImpl @Inject constructor(
-    private val baseUrl: String,
+    baseUrl: String,
     private val client: OkHttpClient
 ) : ArticleRemoteDataSource {
 
-    private val logger = Logger.get("ArticleBackendApiImpl")
-
     private val CATEGORIES_BACKEND_URL = "$baseUrl/category.json"
 
-    @Throws(ConnectException::class)
+    @Throws(Exception::class)
     override fun getArticles(category: ArticleCategory): List<Article> {
-        logger.debug("getArticles(${category.fileUrl})")
-        val request: Request = Request.Builder().apply {
-            url(category.fileUrl)
-        }.build()
-
-        try {
-            val response: Response = client.newCall(request).execute()
-            val stringResponse = response.body!!.string()
-            val dto = Gson().fromJson(stringResponse, ArticlesResponseDto::class.java)
-            return Mapper.map(dto)
-
-        } catch (e: Exception) {
-            throw ConnectException("Error when get new articles ${e}")
-        }
+        val responseDto = executeGet(category.fileUrl, ArticlesResponseDto::class.java)
+        return Mapper.map(responseDto)
     }
 
-    @Throws(ConnectException::class)
+    @Throws(Exception::class)
     override fun getCategories(): List<ArticleCategory> {
-        val request: Request = Request.Builder().apply {
-            url(CATEGORIES_BACKEND_URL)
-        }.build()
+        val responseDto = executeGet(CATEGORIES_BACKEND_URL, CategoriesResponseDto::class.java)
+        return Mapper.map(responseDto)
+    }
 
-        try {
-            val response: Response = client.newCall(request).execute()
-            val stringResponse = response.body!!.string()
-            val dto = Gson().fromJson(stringResponse, CategoriesResponseDto::class.java)
-            return Mapper.map(dto)
-
-        } catch (e: Exception) {
-            throw ConnectException("Error when get new categories $e")
-        }
+    @Throws(JsonSyntaxException::class, IOException::class, NullPointerException::class)
+    private fun <T> executeGet(url: String, classOfT: Class<T>): T {
+        val request: Request = Request.Builder().url(url).method("GET", null).build()
+        val response = client.newCall(request).execute()
+        val stringResponse = response.body!!.string()
+        return Gson().fromJson(stringResponse, classOfT)
     }
 }
