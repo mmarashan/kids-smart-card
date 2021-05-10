@@ -14,3 +14,4 @@ include ':app',
         ':core:downloader',
         ':core:pay-lib',
         ':core:speaking-character'
+include ':core:lint-rule'

@@ -4,6 +4,8 @@ buildscript {
 
     ext.kotlin_version = "1.4.32"
     ext.detekt_version = "1.1.1"
+    ext.gradlePluginVersion = "4.2.0"
+    ext.lintVersion = "27.2.0"
 
     repositories {
         google()
@@ -11,7 +13,7 @@ buildscript {
         maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:4.2.0"
+        classpath "com.android.tools.build:gradle:$gradlePluginVersion"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:$detekt_version"
     }
