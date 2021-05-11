@@ -9,25 +9,23 @@ import com.android.tools.lint.detector.api.Issue
 import com.android.tools.lint.detector.api.JavaContext
 import com.android.tools.lint.detector.api.Scope
 import com.android.tools.lint.detector.api.Severity
-import org.jetbrains.uast.UElement
-import org.jetbrains.uast.ULiteralExpression
-import org.jetbrains.uast.evaluateString
+import org.jetbrains.uast.*
 
 @Suppress("UnstableApiUsage")
 class SampleCodeDetector : Detector(), UastScanner {
     override fun getApplicableUastTypes(): List<Class<out UElement?>> {
-        return listOf(ULiteralExpression::class.java)
+        return listOf(UExpression::class.java)
     }
 
     override fun createUastHandler(context: JavaContext): UElementHandler {
-
         return object : UElementHandler() {
-            override fun visitLiteralExpression(node: ULiteralExpression) {
-                val string = node.evaluateString() ?: return
-                if (string.contains("lint") && string.matches(Regex(".*\\blint\\b.*"))) {
+
+            override fun visitExpression(node: UExpression) {
+                val string = node.evaluateString().orEmpty()
+                if (string.contains("GlobalScope")) {
                     context.report(
                         ISSUE, node, context.getLocation(node),
-                        "This code mentions `lint`: **Congratulations**"
+                        "Don't use GlobalScope!!!"
                     )
                 }
             }
@@ -41,12 +39,10 @@ class SampleCodeDetector : Detector(), UastScanner {
          */
         @JvmField
         val ISSUE: Issue = Issue.create(
-            id = "ShortUniqueId",
-            briefDescription = "Lint Mentions",
+            id = "GlobalScopeWarningId",
+            briefDescription = "GlobalScope usage warning",
             explanation = """
-                    This check highlights string literals in code which mentions the word `lint`. \
-                    Blah blah blah.
-                    Another paragraph here.
+                    You shouldn't use GlobalScope! Instead of use a custom scope.
                     """,
             category = Category.CORRECTNESS,
             priority = 6,

@@ -1,6 +1,6 @@
 package ru.volgadev.core.lint
 
-import com.android.tools.lint.checks.infrastructure.TestFiles.java
+import com.android.tools.lint.checks.infrastructure.TestFiles.kotlin
 import com.android.tools.lint.checks.infrastructure.TestLintTask
 import com.android.tools.lint.checks.infrastructure.TestLintTask.lint
 import org.junit.Before
@@ -22,13 +22,14 @@ class SampleCodeDetectorTest {
     @Test
     fun testBasic() {
         task.files(
-            java(
+            kotlin(
                 """
-                    package test.pkg;
-                    public class TestClass1 {
-                        // In a comment, mentioning "lint" has no effect
-                        private static String s1 = "Ignore non-word usages: linting";
-                        private static String s2 = "Let's say it: lint";
+                    package test.pkg
+                    class TestClass1 {
+                        
+                        init {
+                           GlobalScope.launch {  }
+                        }
                     }
                     """
             ).indented()
