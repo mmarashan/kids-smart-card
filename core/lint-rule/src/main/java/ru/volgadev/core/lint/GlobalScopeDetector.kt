@@ -12,17 +12,16 @@ import com.android.tools.lint.detector.api.Severity
 import org.jetbrains.uast.*
 
 @Suppress("UnstableApiUsage")
-class SampleCodeDetector : Detector(), UastScanner {
+class GlobalScopeDetector : Detector(), UastScanner {
     override fun getApplicableUastTypes(): List<Class<out UElement?>> {
-        return listOf(UExpression::class.java)
+        return listOf(USimpleNameReferenceExpression::class.java)
     }
 
     override fun createUastHandler(context: JavaContext): UElementHandler {
         return object : UElementHandler() {
 
-            override fun visitExpression(node: UExpression) {
-                val string = node.evaluateString().orEmpty()
-                if (string.contains("GlobalScope")) {
+            override fun  visitSimpleNameReferenceExpression(node: USimpleNameReferenceExpression){
+                if (node.identifier.contains("GlobalScope")) {
                     context.report(
                         ISSUE, node, context.getLocation(node),
                         "Don't use GlobalScope!!!"
@@ -48,7 +47,7 @@ class SampleCodeDetector : Detector(), UastScanner {
             priority = 6,
             severity = Severity.WARNING,
             implementation = Implementation(
-                SampleCodeDetector::class.java,
+                GlobalScopeDetector::class.java,
                 Scope.JAVA_FILE_SCOPE
             )
         )

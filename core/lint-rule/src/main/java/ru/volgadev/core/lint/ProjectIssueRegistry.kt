@@ -7,8 +7,8 @@ import com.android.tools.lint.detector.api.CURRENT_API
  * The list of issues that will be checked when running <code>lint</code>.
  */
 @Suppress("UnstableApiUsage")
-class SampleIssueRegistry : IssueRegistry() {
-    override val issues = listOf(SampleCodeDetector.ISSUE)
+class ProjectIssueRegistry : IssueRegistry() {
+    override val issues = listOf(GlobalScopeDetector.ISSUE)
 
     override val api: Int
         get() = CURRENT_API

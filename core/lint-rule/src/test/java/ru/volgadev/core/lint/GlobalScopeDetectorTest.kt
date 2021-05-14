@@ -6,11 +6,11 @@ import com.android.tools.lint.checks.infrastructure.TestLintTask.lint
 import org.junit.Before
 import org.junit.Test
 
-@Suppress("UnstableApiUsage")
 /**
- * Test on [SampleCodeDetector]
+ * Test on [GlobalScopeDetector]
  */
-class SampleCodeDetectorTest {
+@Suppress("UnstableApiUsage")
+class GlobalScopeDetectorTest {
 
     private lateinit var task: TestLintTask
 
@@ -20,7 +20,7 @@ class SampleCodeDetectorTest {
     }
 
     @Test
-    fun testBasic() {
+    fun checkFoundGlobalScope() {
         task.files(
             kotlin(
                 """
@@ -34,13 +34,13 @@ class SampleCodeDetectorTest {
                     """
             ).indented()
         )
-            .issues(SampleCodeDetector.ISSUE)
+            .issues(GlobalScopeDetector.ISSUE)
             .run()
             .expect(
                 """
-                    src/test/pkg/TestClass1.java:5: Warning: This code mentions lint: Congratulations [ShortUniqueId]
-                        private static String s2 = "Let's say it: lint";
-                                                   ~~~~~~~~~~~~~~~~~~~~
+                    src/test/pkg/TestClass1.kt:5: Warning: Don't use GlobalScope!!! [GlobalScopeWarningId]
+                           GlobalScope.launch {  }
+                           ~~~~~~~~~~~
                     0 errors, 1 warnings
                     """
             )
