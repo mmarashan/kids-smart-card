@@ -11,6 +11,9 @@ import com.android.tools.lint.detector.api.Scope
 import com.android.tools.lint.detector.api.Severity
 import org.jetbrains.uast.*
 
+/**
+ * Detect and warn using of coroutines GlobalScope in project
+ */
 @Suppress("UnstableApiUsage")
 class GlobalScopeDetector : Detector(), UastScanner {
     override fun getApplicableUastTypes(): List<Class<out UElement?>> {
@@ -32,10 +35,6 @@ class GlobalScopeDetector : Detector(), UastScanner {
     }
 
     companion object {
-        /**
-         * Issue describing the problem and pointing to the detector
-         * implementation.
-         */
         @JvmField
         val ISSUE: Issue = Issue.create(
             id = "GlobalScopeWarningId",

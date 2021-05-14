@@ -13,5 +13,5 @@ include ':app',
         ':core:music-data',
         ':core:downloader',
         ':core:pay-lib',
-        ':core:speaking-character'
-include ':core:lint-rule'
+        ':core:speaking-character',
+        ':core:lint-rule'
