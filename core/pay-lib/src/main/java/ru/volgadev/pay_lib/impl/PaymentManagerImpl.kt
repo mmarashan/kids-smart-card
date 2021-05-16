@@ -2,48 +2,47 @@ package ru.volgadev.pay_lib.impl
 
 import android.content.Context
 import com.android.billingclient.api.*
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 import ru.volgadev.common.log.Logger
-import ru.volgadev.pay_lib.*
+import ru.volgadev.pay_lib.MarketItem
+import ru.volgadev.pay_lib.PaymentManager
+import ru.volgadev.pay_lib.PaymentRequest
+import ru.volgadev.pay_lib.extentions.isOk
+import ru.volgadev.pay_lib.extentions.queryInAppPurchases
 
-
-@ExperimentalCoroutinesApi
 internal class PaymentManagerImpl(
-    private val context: Context
+    private val context: Context,
+    private val ioDispatcher: CoroutineDispatcher
 ) : PaymentManager {
 
     private val logger = Logger.get("PaymentManagerImpl")
 
-    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    private val scope = CoroutineScope(ioDispatcher + SupervisorJob())
 
-    private val ownedProductsStateFlow = MutableStateFlow<List<MarketItem>>(listOf())
-    private val ownedSubscriptionStateFlow = MutableStateFlow<List<MarketItem>>(listOf())
-
-    private val itemsMap = HashMap<String, MarketItem>()
+    private val items = HashMap<String, MarketItem>()
 
     private val skuIds = ArrayList<String>()// listOf("numbers_pro_ru")
 
     private val billingClient =
-        BillingClient.newBuilder(context).setListener(object : PurchasesUpdatedListener {
-
+        BillingClient.newBuilder(context).setListener { billingResult, purchases ->
             /**
              * Listener interface for purchase updates which happen when,
              * for example, the user buys something within the app or by initiating a purchase
              * from Google Play Store.
              */
-            override fun onPurchasesUpdated(
-                billingResult: BillingResult,
-                purchases: MutableList<Purchase>?
-            ) {
-                logger.debug("onPurchasesUpdated($billingResult, $purchases)")
-                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && purchases != null) {
-                    //здесь мы можем запросить информацию о товарах и покупках
-                    updateState()
-                }
+            logger.debug("onPurchasesUpdated($billingResult, $purchases)")
+            if (billingResult.isOk() && purchases != null) {
+                updateState()
             }
-        }).enablePendingPurchases().build()
+        }.enablePendingPurchases().build()
+
+    override val ownedProducts = MutableSharedFlow<List<MarketItem>>(replay = 1)
+
+    override val ownedSubscriptions = MutableSharedFlow<List<MarketItem>>(replay = 1)
 
     init {
         billingClient.startConnection(object : BillingClientStateListener {
@@ -54,10 +53,7 @@ internal class PaymentManagerImpl(
              */
             override fun onBillingSetupFinished(billingResult: BillingResult) {
                 logger.debug("onBillingSetupFinished($billingResult)")
-                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                    //здесь мы можем запросить информацию о товарах и покупках
-                    updateState()
-                }
+                if (billingResult.isOk()) updateState()
             }
 
             override fun onBillingServiceDisconnected() {
@@ -67,51 +63,11 @@ internal class PaymentManagerImpl(
         })
     }
 
-    private fun updateState() {
-        logger.debug("updateState() skuIds = ${skuIds.joinToString(",")}")
-
-        if (skuIds.isEmpty()) return
-
-        val param = SkuDetailsParams.newBuilder().setSkusList(skuIds)
-            .setType(BillingClient.SkuType.INAPP).build()
-        scope.launch {
-            billingClient.querySkuDetailsAsync(
-                param
-            ) { billingResult, skuDetails ->
-                logger.debug("SKU detail response ${billingResult.responseCode} ${billingResult.debugMessage}")
-                if (billingResult.responseCode == 0 && skuDetails != null) {
-                    skuDetails.forEach { skuDetails ->
-                        itemsMap.put(skuDetails.sku, MarketItem(skuDetails))
-                    }
-
-                    val purchasesResult = billingClient.queryPurchases(BillingClient.SkuType.INAPP)
-                    val purchasesList = purchasesResult.purchasesList ?: listOf()
-
-                    for (i in purchasesList.indices) {
-                        val purchase = purchasesList[i]
-                        itemsMap.get(purchase.sku)?.purchase = purchase
-
-                        if (!purchase.isAcknowledged) {
-                            logger.debug("Try to acknowledgePurchase")
-                            val acknowledgePurchaseParams = AcknowledgePurchaseParams.newBuilder()
-                                .setPurchaseToken(purchase.purchaseToken)
-                                .build()
-                            billingClient.acknowledgePurchase(acknowledgePurchaseParams) { result ->
-                                logger.debug("acknowledgePurchase result=${result.responseCode}")
-                                updateState()
-                            }
-                        }
-                    }
-
-                    logger.debug("itemsMap=$itemsMap")
-
-                    ownedProductsStateFlow.value = itemsMap.values.toList()
-                }
-            }
-        }
+    override fun dispose() {
+        logger.debug("dispose()")
+        billingClient.endConnection()
+        BillingProcessorServiceLocator.clear()
     }
-
-    private var resultListener: PaymentResultListener? = null
 
     override fun setSkuIds(ids: List<String>) {
         logger.debug("setSkuIds()")
@@ -122,37 +78,40 @@ internal class PaymentManagerImpl(
 
     override fun requestPayment(
         paymentRequest: PaymentRequest,
-        activityClass: Class<out BillingClientActivity>,
-        resultListener: PaymentResultListener
+        activityClass: Class<out BillingClientActivity>
     ) {
-        this.resultListener = resultListener
-        val item = itemsMap.get(paymentRequest.itemId)
+        val item = items[paymentRequest.skuId]
         if (item == null) {
             logger.error("Call paymentRequest() for not exist item")
-            resultListener.onResult(RequestPaymentResult.PAYMENT_ERROR)
             return
         }
 
-        val billingFlowParams = BillingFlowParams.newBuilder()
-            .setSkuDetails(item.skuDetails)
-            .build()
-        BillingProcessorServiceLocator.register(billingClient, billingFlowParams)
+        BillingProcessorServiceLocator.register(
+            billingProcessor = billingClient,
+            params = BillingFlowParams.newBuilder()
+                .setSkuDetails(item.skuDetails)
+                .build()
+        )
 
         BillingClientActivity.startActivity(context, paymentRequest, activityClass)
     }
 
-    override fun consumePurchase(itemId: String): Boolean {
-        logger.debug("consumePurchase($itemId)")
-        val item = itemsMap.get(itemId)
+    override fun consumePurchase(skuId: String): Boolean {
+        logger.debug("consumePurchase($skuId)")
+        val item = items[skuId]
+        val purchase = item?.purchase
 
-        if (item != null) {
-            val token = item.purchase?.purchaseToken ?: ""
-            val consumeParams = ConsumeParams.newBuilder().setPurchaseToken(token).build()
+        if (item != null && purchase != null) {
+            val consumeParams = ConsumeParams
+                .newBuilder()
+                .setPurchaseToken(purchase.purchaseToken)
+                .build()
+
             billingClient.consumeAsync(
                 consumeParams
-            ) { billingResult, purchaseToken ->
-                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                    logger.debug("consumePurchase($itemId) OK")
+            ) { billingResult, _ ->
+                if (billingResult.isOk()) {
+                    logger.debug("consumePurchase($skuId) OK")
                     updateState()
                 }
             }
@@ -160,14 +119,50 @@ internal class PaymentManagerImpl(
         return false
     }
 
-    override fun productsFlow(): StateFlow<List<MarketItem>> = ownedProductsStateFlow
+    private fun updateState() {
+        logger.debug("updateState() skuIds = ${skuIds.joinToString(",")}")
 
-//    override fun ownedSubscriptionsFlow(): StateFlow<List<MarketItem>> =
-//        ownedSubscriptionStateFlow
+        if (skuIds.isEmpty()) return
 
-    override fun dispose() {
-        logger.debug("dispose()")
-        BillingProcessorServiceLocator.clear()
-        resultListener = null
+        val skuDetailsParams = SkuDetailsParams
+            .newBuilder()
+            .setSkusList(skuIds)
+            .setType(BillingClient.SkuType.INAPP)
+            .build()
+
+        scope.launch {
+            billingClient.querySkuDetailsAsync(skuDetailsParams) { result, skuDetails ->
+
+                logger.debug("SKU detail response ${result.responseCode} ${result.debugMessage}")
+                if (result.responseCode == 0 && skuDetails != null) {
+
+                    skuDetails.forEach { items[it.sku] = MarketItem(it) }
+
+                    val purchases = billingClient.queryInAppPurchases()
+
+                    for (i in purchases.indices) {
+                        val purchase = purchases[i]
+                        items[purchase.sku]?.purchase = purchase
+
+                        if (!purchase.isAcknowledged) acknowledgePurchase(purchase)
+                    }
+
+                    scope.launch {
+                        ownedProducts.emit(items.values.toList())
+                    }
+                }
+            }
+        }
+    }
+
+    private fun acknowledgePurchase(purchase: Purchase) {
+        logger.debug("Try to acknowledgePurchase")
+        val acknowledgePurchaseParams = AcknowledgePurchaseParams.newBuilder()
+            .setPurchaseToken(purchase.purchaseToken)
+            .build()
+        billingClient.acknowledgePurchase(acknowledgePurchaseParams) {
+            logger.debug("acknowledgePurchase result=${it.responseCode}")
+            updateState()
+        }
     }
 }

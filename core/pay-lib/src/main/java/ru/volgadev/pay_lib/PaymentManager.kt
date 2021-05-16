@@ -5,7 +5,7 @@ import androidx.annotation.WorkerThread
 import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.SkuDetails
 import kotlinx.android.parcel.Parcelize
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
 import ru.volgadev.pay_lib.impl.BillingClientActivity
 
 @WorkerThread
@@ -15,35 +15,21 @@ interface PaymentManager {
 
     fun requestPayment(
         paymentRequest: PaymentRequest,
-        activityClass: Class<out BillingClientActivity>,
-        resultListener: PaymentResultListener
+        activityClass: Class<out BillingClientActivity>
     )
 
-    fun consumePurchase(itemId: String): Boolean
+    fun consumePurchase(skuId: String): Boolean
 
-    fun productsFlow(): Flow<List<MarketItem>>
+    val ownedProducts: SharedFlow<List<MarketItem>>
 
-    // fun ownedSubscriptionsFlow(): Flow<List<MarketItem>>
+    val ownedSubscriptions: SharedFlow<List<MarketItem>>
 
     fun dispose()
 }
 
-interface PaymentResultListener {
-    fun onResult(result: RequestPaymentResult) = Unit
-}
-
-enum class RequestPaymentResult {
-    SUCCESS_PAYMENT, USER_CANCELED, NOT_ALLOWED_PAYMENT_TYPE, ALREADY_PAYED, PAYMENT_ERROR
-}
-
-enum class PaymentType {
-    PURCHASE, SUBSCRIPTION
-}
-
 @Parcelize
 data class PaymentRequest(
-    val itemId: String,
-    val type: PaymentType,
+    val skuId: String,
     val name: String?,
     val description: String?,
     val imageUrl: String?

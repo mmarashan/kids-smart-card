@@ -50,14 +50,12 @@ class ArticleRepositoryImpl @Inject constructor(
         }
 
         scope.launch {
-            paymentManager.productsFlow().collect(object : FlowCollector<List<MarketItem>> {
-                override suspend fun emit(items: List<MarketItem>) {
-                    logger.debug("On market product list: ${items.size} categories")
-                    productIds = items.filter { it.isPurchased() }.map { it.skuDetails.sku }
-                    val categories = categoriesStateFlow.value
-                    updatePayedCategories(categories, productIds)
-                }
-            })
+            paymentManager.ownedProducts.collect { items ->
+                logger.debug("On market product list: ${items.size} categories")
+                productIds = items.filter { it.isPurchased() }.map { it.skuDetails.sku }
+                val categories = categoriesStateFlow.value
+                updatePayedCategories(categories, productIds)
+            }
         }
     }
 
@@ -70,13 +68,9 @@ class ArticleRepositoryImpl @Inject constructor(
 
     override suspend fun requestPaymentForCategory(paymentRequest: PaymentRequest) =
         withContext(ioDispatcher) {
-            paymentManager.requestPayment(paymentRequest,
-                DefaultPaymentActivity::class.java,
-                object : PaymentResultListener {
-                    override fun onResult(result: RequestPaymentResult) {
-                        logger.debug("PaymentResultListener.onResult $result")
-                    }
-                }
+            paymentManager.requestPayment(
+                paymentRequest,
+                DefaultPaymentActivity::class.java
             )
         }
 

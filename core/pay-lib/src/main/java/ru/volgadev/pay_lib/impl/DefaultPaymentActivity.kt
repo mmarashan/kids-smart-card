@@ -21,8 +21,6 @@ class DefaultPaymentActivity : BillingClientActivity() {
             }
         }
 
-        btnPay.setOnClickListener {
-            onClickPay()
-        }
+        btnPay.setOnClickListener { onClickPay() }
     }
 }

@@ -8,7 +8,7 @@ import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingFlowParams
 import ru.volgadev.pay_lib.PaymentRequest
 
-open class BillingClientActivity : AppCompatActivity() {
+abstract class BillingClientActivity : AppCompatActivity() {
 
     internal val billingClient: BillingClient by lazy { BillingProcessorServiceLocator.get() }
     internal val billingFlowParams: BillingFlowParams by lazy { BillingProcessorServiceLocator.getParams() }

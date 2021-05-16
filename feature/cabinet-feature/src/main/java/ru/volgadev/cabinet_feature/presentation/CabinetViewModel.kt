@@ -15,7 +15,6 @@ import ru.volgadev.article_repository.domain.model.ArticleCategory
 import ru.volgadev.common.log.Logger
 import ru.volgadev.pay_lib.BuildConfig
 import ru.volgadev.pay_lib.PaymentRequest
-import ru.volgadev.pay_lib.PaymentType
 
 @OptIn(InternalCoroutinesApi::class)
 internal class CabinetViewModel(
@@ -46,8 +45,7 @@ internal class CabinetViewModel(
             if (!category.isPaid) {
                 logger.debug("Start payment for $itemId")
                 val paymentRequest = PaymentRequest(
-                    itemId = itemId,
-                    type = PaymentType.PURCHASE,
+                    skuId = itemId,
                     name = category.name,
                     description = category.description,
                     imageUrl = category.iconUrl

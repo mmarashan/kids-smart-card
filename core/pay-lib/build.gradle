@@ -20,6 +20,12 @@ android {
         }
     }
 
+    buildFeatures {
+        buildConfig = false
+        dataBinding = false
+        viewBinding = false
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -34,7 +40,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
     implementation "androidx.core:core-ktx:${versions.corektx}"
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:${versions.androidxlifecycle}"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:${versions.coroutines}"
     implementation "androidx.lifecycle:lifecycle-extensions:${versions.androidxlifecycle}"
     implementation "io.coil-kt:coil:${versions.coil}"
     implementation "com.android.billingclient:billing:${versions.billingclient}"

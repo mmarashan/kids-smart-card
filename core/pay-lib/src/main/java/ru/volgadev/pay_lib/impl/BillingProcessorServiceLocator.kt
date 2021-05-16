@@ -3,18 +3,18 @@ package ru.volgadev.pay_lib.impl
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingFlowParams
 
-object BillingProcessorServiceLocator {
-    private var billingProcessor: BillingClient? = null
-    private var params: BillingFlowParams? = null
+internal object BillingProcessorServiceLocator {
+    private var billingClient: BillingClient? = null
+    private var billingFlowParams: BillingFlowParams? = null
 
     fun register(billingProcessor: BillingClient, params: BillingFlowParams) {
-        this.billingProcessor = billingProcessor
-        this.params = params
+        this.billingClient = billingProcessor
+        this.billingFlowParams = params
     }
 
     @JvmStatic
     fun get(): BillingClient {
-        val bp = billingProcessor
+        val bp = billingClient
         if (bp != null) {
             return bp
         } else {
@@ -24,7 +24,7 @@ object BillingProcessorServiceLocator {
 
     @JvmStatic
     fun getParams(): BillingFlowParams {
-        val bp = params
+        val bp = billingFlowParams
         if (bp != null) {
             return bp
         } else {
@@ -33,8 +33,8 @@ object BillingProcessorServiceLocator {
     }
 
     @JvmStatic
-    fun clear(){
-        billingProcessor = null
-        params = null
+    fun clear() {
+        billingClient = null
+        billingFlowParams = null
     }
 }
