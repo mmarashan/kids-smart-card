@@ -12,9 +12,8 @@ import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.launch
 import ru.volgadev.article_repository.domain.ArticleRepository
 import ru.volgadev.article_repository.domain.model.ArticleCategory
+import ru.volgadev.cabinet_feature.BuildConfig
 import ru.volgadev.common.log.Logger
-import ru.volgadev.googlebillingclientwrapper.BuildConfig
-import ru.volgadev.googlebillingclientwrapper.PaymentRequest
 
 @OptIn(InternalCoroutinesApi::class)
 internal class CabinetViewModel(
@@ -44,17 +43,11 @@ internal class CabinetViewModel(
         category.marketItemId?.let { itemId ->
             if (!category.isPaid) {
                 logger.debug("Start payment for $itemId")
-                val paymentRequest = PaymentRequest(
-                    skuId = itemId,
-                    name = category.name,
-                    description = category.description,
-                    imageUrl = category.iconUrl
-                )
                 /**
                  * In current implementation viewModelScope disposed in onClear
                  */
                 GlobalScope.launch(Dispatchers.IO) {
-                    articleRepository.requestPaymentForCategory(paymentRequest)
+                    articleRepository.requestPaymentForCategory(category)
                 }
             } else {
                 GlobalScope.launch(Dispatchers.IO) {

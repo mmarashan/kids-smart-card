@@ -1,6 +1,5 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion versions.compileSdkVersion
@@ -42,7 +41,6 @@ dependencies {
     implementation "androidx.core:core-ktx:${versions.corektx}"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:${versions.coroutines}"
     implementation "androidx.lifecycle:lifecycle-extensions:${versions.androidxlifecycle}"
-    implementation "io.coil-kt:coil:${versions.coil}"
     implementation "com.android.billingclient:billing:${versions.billingclient}"
 
     implementation project(':common')

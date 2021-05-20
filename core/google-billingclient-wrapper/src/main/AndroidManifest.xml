@@ -5,11 +5,7 @@
 
     <application>
         <activity
-            android:name="ru.volgadev.googlebillingclientwrapper.sample.DefaultPaymentActivity"
-            android:screenOrientation="portrait" />
-
-        <activity
-            android:name="ru.volgadev.googlebillingclientwrapper.impl.BillingClientActivity"
+            android:name="ru.volgadev.googlebillingclientwrapper.impl.TransparentBillingClientActivity"
             android:screenOrientation="portrait" />
     </application>
 </manifest>

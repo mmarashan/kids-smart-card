@@ -6,36 +6,28 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingFlowParams
-import ru.volgadev.googlebillingclientwrapper.PaymentRequest
+import ru.volgadev.googlebillingclientwrapper.R
 
-abstract class BillingClientActivity : AppCompatActivity() {
+internal class TransparentBillingClientActivity : AppCompatActivity() {
 
-    internal val billingClient: BillingClient by lazy { BillingProcessorServiceLocator.get() }
-    internal val billingFlowParams: BillingFlowParams by lazy { BillingProcessorServiceLocator.getParams() }
-
-    lateinit var paymentRequest: PaymentRequest
+    private val billingClient: BillingClient by lazy { BillingProcessorServiceLocator.get() }
+    private val billingFlowParams: BillingFlowParams by lazy { BillingProcessorServiceLocator.getParams() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        paymentRequest = intent.getParcelableExtra(PAYMENT_REQUEST_EXTRA)
-            ?: throw IllegalStateException("You should open pay activity via PaymentActivity.openPaymentActivity(...)")
-    }
-
-    fun onClickPay() {
-        billingClient.launchBillingFlow(this, billingFlowParams)
+        setContentView(R.layout.transparent_layout)
+        launchBillingFlow()
         finish()
     }
 
-    companion object {
-        private const val PAYMENT_REQUEST_EXTRA = "PAYMENT_REQUEST_EXTRA"
+    private fun launchBillingFlow() {
+        billingClient.launchBillingFlow(this, billingFlowParams)
+    }
 
-        fun startActivity(
-            context: Context,
-            paymentRequest: PaymentRequest,
-            activityClass: Class<out BillingClientActivity>
-        ) {
-            val intent = Intent(context, activityClass).apply {
-                putExtra(PAYMENT_REQUEST_EXTRA, paymentRequest)
+    companion object {
+
+        fun launch(context: Context) {
+            val intent = Intent(context, TransparentBillingClientActivity::class.java).apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
             }
             context.startActivity(intent)

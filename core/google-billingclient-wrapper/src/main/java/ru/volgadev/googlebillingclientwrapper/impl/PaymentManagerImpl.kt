@@ -10,8 +10,9 @@ import kotlinx.coroutines.launch
 import ru.volgadev.common.log.Logger
 import ru.volgadev.googlebillingclientwrapper.MarketItem
 import ru.volgadev.googlebillingclientwrapper.PaymentManager
-import ru.volgadev.googlebillingclientwrapper.PaymentRequest
 import ru.volgadev.googlebillingclientwrapper.extentions.isOk
+import ru.volgadev.googlebillingclientwrapper.extentions.packToBillingFlowParams
+import ru.volgadev.googlebillingclientwrapper.extentions.packToConsumeParams
 import ru.volgadev.googlebillingclientwrapper.extentions.queryInAppPurchases
 
 internal class PaymentManagerImpl(
@@ -69,18 +70,15 @@ internal class PaymentManagerImpl(
         BillingProcessorServiceLocator.clear()
     }
 
-    override fun setSkuIds(ids: List<String>) {
+    override fun setProjectSkuIds(ids: List<String>) {
         logger.debug("setSkuIds()")
         skuIds.clear()
         skuIds.addAll(ids)
         updateState()
     }
 
-    override fun requestPayment(
-        paymentRequest: PaymentRequest,
-        activityClass: Class<out BillingClientActivity>
-    ) {
-        val item = items[paymentRequest.skuId]
+    override fun requestPayment(skuId: String) {
+        val item = items[skuId]
         if (item == null) {
             logger.error("Call paymentRequest() for not exist item")
             return
@@ -88,12 +86,10 @@ internal class PaymentManagerImpl(
 
         BillingProcessorServiceLocator.register(
             billingProcessor = billingClient,
-            params = BillingFlowParams.newBuilder()
-                .setSkuDetails(item.skuDetails)
-                .build()
+            params = item.skuDetails.packToBillingFlowParams()
         )
 
-        BillingClientActivity.startActivity(context, paymentRequest, activityClass)
+        TransparentBillingClientActivity.launch(context)
     }
 
     override fun consumePurchase(skuId: String): Boolean {
@@ -102,10 +98,7 @@ internal class PaymentManagerImpl(
         val purchase = item?.purchase
 
         if (item != null && purchase != null) {
-            val consumeParams = ConsumeParams
-                .newBuilder()
-                .setPurchaseToken(purchase.purchaseToken)
-                .build()
+            val consumeParams = purchase.packToConsumeParams()
 
             billingClient.consumeAsync(
                 consumeParams

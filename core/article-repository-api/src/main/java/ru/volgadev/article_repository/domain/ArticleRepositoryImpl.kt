@@ -10,7 +10,6 @@ import ru.volgadev.article_repository.domain.model.Article
 import ru.volgadev.article_repository.domain.model.ArticleCategory
 import ru.volgadev.common.log.Logger
 import ru.volgadev.googlebillingclientwrapper.*
-import ru.volgadev.googlebillingclientwrapper.sample.DefaultPaymentActivity
 import java.net.ConnectException
 import javax.inject.Inject
 
@@ -45,7 +44,7 @@ class ArticleRepositoryImpl @Inject constructor(
             }
 
             val categoriesSkuIds = categories.mapNotNull { category -> category.marketItemId }
-            paymentManager.setSkuIds(categoriesSkuIds)
+            paymentManager.setProjectSkuIds(categoriesSkuIds)
             updatePayedCategories(categories, productIds)
         }
 
@@ -66,12 +65,9 @@ class ArticleRepositoryImpl @Inject constructor(
             return@withContext categoryArticles
         }
 
-    override suspend fun requestPaymentForCategory(paymentRequest: PaymentRequest) =
+    override suspend fun requestPaymentForCategory(category: ArticleCategory): Unit =
         withContext(ioDispatcher) {
-            paymentManager.requestPayment(
-                paymentRequest,
-                DefaultPaymentActivity::class.java
-            )
+            category.marketItemId?.let { paymentManager.requestPayment(skuId = it) }
         }
 
     override suspend fun consumePurchase(itemId: String): Boolean = withContext(ioDispatcher) {
