@@ -1,9 +1,10 @@
-package ru.volgadev.pay_lib.impl
+package ru.volgadev.googlebillingclientwrapper.sample
 
 import android.os.Bundle
 import coil.load
 import kotlinx.android.synthetic.main.default_billing_activity.*
-import ru.volgadev.pay_lib.R
+import ru.volgadev.googlebillingclientwrapper.R
+import ru.volgadev.googlebillingclientwrapper.impl.BillingClientActivity
 
 class DefaultPaymentActivity : BillingClientActivity() {
 

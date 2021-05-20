@@ -13,8 +13,8 @@ import kotlinx.coroutines.launch
 import ru.volgadev.article_repository.domain.ArticleRepository
 import ru.volgadev.article_repository.domain.model.ArticleCategory
 import ru.volgadev.common.log.Logger
-import ru.volgadev.pay_lib.BuildConfig
-import ru.volgadev.pay_lib.PaymentRequest
+import ru.volgadev.googlebillingclientwrapper.BuildConfig
+import ru.volgadev.googlebillingclientwrapper.PaymentRequest
 
 @OptIn(InternalCoroutinesApi::class)
 internal class CabinetViewModel(

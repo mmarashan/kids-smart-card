@@ -1,4 +1,4 @@
-package ru.volgadev.pay_lib
+package ru.volgadev.googlebillingclientwrapper
 
 import android.os.Parcelable
 import androidx.annotation.WorkerThread
@@ -6,7 +6,7 @@ import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.SkuDetails
 import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.flow.SharedFlow
-import ru.volgadev.pay_lib.impl.BillingClientActivity
+import ru.volgadev.googlebillingclientwrapper.impl.BillingClientActivity
 
 @WorkerThread
 interface PaymentManager {

@@ -33,5 +33,5 @@ dependencies {
     kapt "androidx.room:room-compiler:${versions.room}"
 
     implementation project(':common')
-    implementation project(':core:pay-lib')
+    implementation project(':core:google-billingclient-wrapper')
 }

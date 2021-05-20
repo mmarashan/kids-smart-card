@@ -1,4 +1,4 @@
-package ru.volgadev.pay_lib.extentions
+package ru.volgadev.googlebillingclientwrapper.extentions
 
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingResult

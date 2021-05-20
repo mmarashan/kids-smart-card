@@ -1,8 +1,8 @@
-package ru.volgadev.pay_lib
+package ru.volgadev.googlebillingclientwrapper
 
 import android.content.Context
 import androidx.annotation.AnyThread
-import ru.volgadev.pay_lib.impl.PaymentManagerImpl
+import ru.volgadev.googlebillingclientwrapper.impl.PaymentManagerImpl
 
 object PaymentManagerFactory {
 

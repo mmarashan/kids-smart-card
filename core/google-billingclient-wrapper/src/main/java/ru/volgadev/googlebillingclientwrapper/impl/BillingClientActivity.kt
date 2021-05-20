@@ -1,4 +1,4 @@
-package ru.volgadev.pay_lib.impl
+package ru.volgadev.googlebillingclientwrapper.impl
 
 import android.content.Context
 import android.content.Intent
@@ -6,7 +6,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingFlowParams
-import ru.volgadev.pay_lib.PaymentRequest
+import ru.volgadev.googlebillingclientwrapper.PaymentRequest
 
 abstract class BillingClientActivity : AppCompatActivity() {
 

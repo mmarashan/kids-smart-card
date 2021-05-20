@@ -1,4 +1,4 @@
-package ru.volgadev.pay_lib.impl
+package ru.volgadev.googlebillingclientwrapper.impl
 
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingFlowParams

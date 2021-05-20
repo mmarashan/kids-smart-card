@@ -9,8 +9,8 @@ import ru.volgadev.article_repository.domain.datasource.ArticleBackendApi
 import ru.volgadev.article_repository.domain.model.Article
 import ru.volgadev.article_repository.domain.model.ArticleCategory
 import ru.volgadev.common.log.Logger
-import ru.volgadev.pay_lib.*
-import ru.volgadev.pay_lib.impl.DefaultPaymentActivity
+import ru.volgadev.googlebillingclientwrapper.*
+import ru.volgadev.googlebillingclientwrapper.sample.DefaultPaymentActivity
 import java.net.ConnectException
 import javax.inject.Inject
 

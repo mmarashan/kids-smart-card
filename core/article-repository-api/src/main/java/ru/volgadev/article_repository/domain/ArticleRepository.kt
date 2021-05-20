@@ -4,7 +4,7 @@ import androidx.annotation.WorkerThread
 import kotlinx.coroutines.flow.StateFlow
 import ru.volgadev.article_repository.domain.model.Article
 import ru.volgadev.article_repository.domain.model.ArticleCategory
-import ru.volgadev.pay_lib.PaymentRequest
+import ru.volgadev.googlebillingclientwrapper.PaymentRequest
 
 @WorkerThread
 interface ArticleRepository {

@@ -1,4 +1,4 @@
-package ru.volgadev.pay_lib.impl
+package ru.volgadev.googlebillingclientwrapper.impl
 
 import android.content.Context
 import com.android.billingclient.api.*
@@ -8,11 +8,11 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import ru.volgadev.common.log.Logger
-import ru.volgadev.pay_lib.MarketItem
-import ru.volgadev.pay_lib.PaymentManager
-import ru.volgadev.pay_lib.PaymentRequest
-import ru.volgadev.pay_lib.extentions.isOk
-import ru.volgadev.pay_lib.extentions.queryInAppPurchases
+import ru.volgadev.googlebillingclientwrapper.MarketItem
+import ru.volgadev.googlebillingclientwrapper.PaymentManager
+import ru.volgadev.googlebillingclientwrapper.PaymentRequest
+import ru.volgadev.googlebillingclientwrapper.extentions.isOk
+import ru.volgadev.googlebillingclientwrapper.extentions.queryInAppPurchases
 
 internal class PaymentManagerImpl(
     private val context: Context,
