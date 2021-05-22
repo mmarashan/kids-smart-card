@@ -1,5 +1,6 @@
 package ru.volgadev.googlebillingclientwrapper.api
 
+import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.SkuDetails
 import kotlinx.coroutines.flow.SharedFlow
@@ -17,6 +18,8 @@ interface PaymentManager {
     val ownedSubscriptions: SharedFlow<List<MarketItem>>
 
     fun dispose()
+
+    val billingClient: BillingClient
 }
 
 data class MarketItem(

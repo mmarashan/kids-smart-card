@@ -14,8 +14,11 @@ android {
     }
 
     buildTypes {
-        release {
+        debug {
             minifyEnabled false
+        }
+        release {
+            minifyEnabled true
         }
     }
 
@@ -40,8 +43,5 @@ dependencies {
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
     implementation "androidx.core:core-ktx:${versions.corektx}"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:${versions.coroutines}"
-    implementation "androidx.lifecycle:lifecycle-extensions:${versions.androidxlifecycle}"
     implementation "com.android.billingclient:billing:${versions.billingclient}"
-
-    implementation project(':common')
 }
