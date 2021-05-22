@@ -1,14 +1,12 @@
-package ru.volgadev.googlebillingclientwrapper
+package ru.volgadev.googlebillingclientwrapper.api
 
-import androidx.annotation.WorkerThread
 import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.SkuDetails
 import kotlinx.coroutines.flow.SharedFlow
 
-@WorkerThread
 interface PaymentManager {
 
-    fun setProjectSkuIds(ids: List<String>)
+    fun setProjectSkuIds(ids: List<String>, skuType: ItemSkuType)
 
     fun requestPayment(skuId: String)
 
@@ -26,4 +24,14 @@ data class MarketItem(
     var purchase: Purchase? = null
 ) {
     fun isPurchased(): Boolean = purchase?.purchaseState == Purchase.PurchaseState.PURCHASED
+
+    val skuType: ItemSkuType =
+        ItemSkuType.values().firstOrNull { it.skyType == skuDetails.type } ?: ItemSkuType.UNKNOWN
+}
+
+enum class ItemSkuType(val skyType: String) {
+    IN_APP("inapp"),
+    SUBSCRIPTION("subs"),
+    /* этого результатата быть не должно, однако введен для избежания неявных ошибкок */
+    UNKNOWN("")
 }

@@ -10,6 +10,8 @@ import ru.volgadev.article_repository.domain.model.Article
 import ru.volgadev.article_repository.domain.model.ArticleCategory
 import ru.volgadev.common.log.Logger
 import ru.volgadev.googlebillingclientwrapper.*
+import ru.volgadev.googlebillingclientwrapper.api.ItemSkuType
+import ru.volgadev.googlebillingclientwrapper.api.PaymentManager
 import java.net.ConnectException
 import javax.inject.Inject
 
@@ -44,7 +46,8 @@ class ArticleRepositoryImpl @Inject constructor(
             }
 
             val categoriesSkuIds = categories.mapNotNull { category -> category.marketItemId }
-            paymentManager.setProjectSkuIds(categoriesSkuIds)
+            paymentManager.setProjectSkuIds(categoriesSkuIds, ItemSkuType.IN_APP)
+            paymentManager.setProjectSkuIds(listOf("forever_subscription"), ItemSkuType.SUBSCRIPTION)
             updatePayedCategories(categories, productIds)
         }
 

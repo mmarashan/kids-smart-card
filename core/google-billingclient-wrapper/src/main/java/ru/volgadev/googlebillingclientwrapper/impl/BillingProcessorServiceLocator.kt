@@ -12,7 +12,6 @@ internal object BillingProcessorServiceLocator {
         this.billingFlowParams = params
     }
 
-    @JvmStatic
     fun get(): BillingClient {
         val bp = billingClient
         if (bp != null) {
@@ -22,7 +21,6 @@ internal object BillingProcessorServiceLocator {
         }
     }
 
-    @JvmStatic
     fun getParams(): BillingFlowParams {
         val bp = billingFlowParams
         if (bp != null) {
@@ -32,7 +30,6 @@ internal object BillingProcessorServiceLocator {
         }
     }
 
-    @JvmStatic
     fun clear() {
         billingClient = null
         billingFlowParams = null

@@ -1,19 +1,20 @@
 package ru.volgadev.googlebillingclientwrapper.impl
 
 import android.content.Context
-import com.android.billingclient.api.*
+import com.android.billingclient.api.BillingClient
+import com.android.billingclient.api.BillingClientStateListener
+import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.SkuDetailsParams
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import ru.volgadev.common.log.Logger
-import ru.volgadev.googlebillingclientwrapper.MarketItem
-import ru.volgadev.googlebillingclientwrapper.PaymentManager
-import ru.volgadev.googlebillingclientwrapper.extentions.isOk
-import ru.volgadev.googlebillingclientwrapper.extentions.packToBillingFlowParams
-import ru.volgadev.googlebillingclientwrapper.extentions.packToConsumeParams
-import ru.volgadev.googlebillingclientwrapper.extentions.queryInAppPurchases
+import ru.volgadev.googlebillingclientwrapper.api.ItemSkuType
+import ru.volgadev.googlebillingclientwrapper.api.MarketItem
+import ru.volgadev.googlebillingclientwrapper.api.PaymentManager
+import ru.volgadev.googlebillingclientwrapper.utils.*
 
 internal class PaymentManagerImpl(
     private val context: Context,
@@ -26,15 +27,14 @@ internal class PaymentManagerImpl(
 
     private val items = HashMap<String, MarketItem>()
 
-    private val skuIds = ArrayList<String>()// listOf("numbers_pro_ru")
+    private val skuIds = HashMap<ItemSkuType, List<String>>().apply {
+        put(ItemSkuType.IN_APP, emptyList())
+        put(ItemSkuType.SUBSCRIPTION, emptyList())
+    }
 
     private val billingClient =
         BillingClient.newBuilder(context).setListener { billingResult, purchases ->
-            /**
-             * Listener interface for purchase updates which happen when,
-             * for example, the user buys something within the app or by initiating a purchase
-             * from Google Play Store.
-             */
+
             logger.debug("onPurchasesUpdated($billingResult, $purchases)")
             if (billingResult.isOk() && purchases != null) {
                 updateState()
@@ -64,17 +64,10 @@ internal class PaymentManagerImpl(
         })
     }
 
-    override fun dispose() {
-        logger.debug("dispose()")
-        billingClient.endConnection()
-        BillingProcessorServiceLocator.clear()
-    }
-
-    override fun setProjectSkuIds(ids: List<String>) {
-        logger.debug("setSkuIds()")
-        skuIds.clear()
-        skuIds.addAll(ids)
-        updateState()
+    override fun setProjectSkuIds(ids: List<String>, skuType: ItemSkuType) {
+        logger.debug("setProjectSkuIds(); ids = $ids; type = $skuType")
+        skuIds[skuType] = ids
+        updateState(skuType)
     }
 
     override fun requestPayment(skuId: String) {
@@ -105,57 +98,69 @@ internal class PaymentManagerImpl(
             ) { billingResult, _ ->
                 if (billingResult.isOk()) {
                     logger.debug("consumePurchase($skuId) OK")
-                    updateState()
+                    updateState(item.skuType)
                 }
             }
         }
         return false
     }
 
-    private fun updateState() {
-        logger.debug("updateState() skuIds = ${skuIds.joinToString(",")}")
+    override fun dispose() {
+        logger.debug("dispose()")
+        billingClient.endConnection()
+        BillingProcessorServiceLocator.clear()
+    }
 
+    private fun updateState() {
+        ItemSkuType.values().forEach { type ->
+            if (skuIds[type]?.size ?: 0 > 0) updateState(type)
+        }
+    }
+
+    private fun updateState(skuType: ItemSkuType) {
+        val skuIds = skuIds[skuType] ?: emptyList()
+        logger.debug("updateState(); type = $skuType; skuIds = ${skuIds.joinToString(",")}")
         if (skuIds.isEmpty()) return
 
         val skuDetailsParams = SkuDetailsParams
             .newBuilder()
             .setSkusList(skuIds)
-            .setType(BillingClient.SkuType.INAPP)
+            .setType(skuType.skyType)
             .build()
 
         scope.launch {
             billingClient.querySkuDetailsAsync(skuDetailsParams) { result, skuDetails ->
 
-                logger.debug("SKU detail response ${result.responseCode} ${result.debugMessage}")
+                logger.debug("SKU detail response ${result.responseCode}")
                 if (result.responseCode == 0 && skuDetails != null) {
 
                     skuDetails.forEach { items[it.sku] = MarketItem(it) }
 
-                    val purchases = billingClient.queryInAppPurchases()
+                    val purchases = billingClient.queryPurchases(skuType)
 
-                    for (i in purchases.indices) {
-                        val purchase = purchases[i]
+                    for (purchase in purchases) {
                         items[purchase.sku]?.purchase = purchase
 
-                        if (!purchase.isAcknowledged) acknowledgePurchase(purchase)
+                        if (!purchase.isAcknowledged) {
+                            logger.debug("Try to acknowledgePurchase")
+                            billingClient.acknowledge(purchase) {
+                                logger.debug("acknowledgePurchase result=${it.responseCode}")
+                                updateState(skuType)
+                            }
+                        }
                     }
 
                     scope.launch {
-                        ownedProducts.emit(items.values.toList())
+                        val updated = items.values.toList()
+                        logger.debug("update items ${updated.joinToString()}")
+                        when (skuType) {
+                            ItemSkuType.IN_APP -> ownedProducts.emit(updated)
+                            ItemSkuType.SUBSCRIPTION -> ownedSubscriptions.emit(updated)
+                            ItemSkuType.UNKNOWN -> Unit
+                        }
                     }
                 }
             }
-        }
-    }
-
-    private fun acknowledgePurchase(purchase: Purchase) {
-        logger.debug("Try to acknowledgePurchase")
-        val acknowledgePurchaseParams = AcknowledgePurchaseParams.newBuilder()
-            .setPurchaseToken(purchase.purchaseToken)
-            .build()
-        billingClient.acknowledgePurchase(acknowledgePurchaseParams) {
-            logger.debug("acknowledgePurchase result=${it.responseCode}")
-            updateState()
         }
     }
 }

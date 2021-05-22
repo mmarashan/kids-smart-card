@@ -1,4 +1,4 @@
-package ru.volgadev.googlebillingclientwrapper
+package ru.volgadev.googlebillingclientwrapper.api
 
 import android.content.Context
 import androidx.annotation.AnyThread
