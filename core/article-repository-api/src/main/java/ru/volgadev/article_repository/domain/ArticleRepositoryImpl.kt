@@ -9,8 +9,9 @@ import ru.volgadev.article_repository.domain.datasource.ArticleBackendApi
 import ru.volgadev.article_repository.domain.model.Article
 import ru.volgadev.article_repository.domain.model.ArticleCategory
 import ru.volgadev.common.log.Logger
-import ru.volgadev.pay_lib.*
-import ru.volgadev.pay_lib.impl.DefaultPaymentActivity
+import ru.volgadev.googlebillingclientwrapper.*
+import ru.volgadev.googlebillingclientwrapper.api.ItemSkuType
+import ru.volgadev.googlebillingclientwrapper.api.PaymentManager
 import java.net.ConnectException
 import javax.inject.Inject
 
@@ -45,19 +46,18 @@ class ArticleRepositoryImpl @Inject constructor(
             }
 
             val categoriesSkuIds = categories.mapNotNull { category -> category.marketItemId }
-            paymentManager.setSkuIds(categoriesSkuIds)
+            paymentManager.setProjectSkuIds(categoriesSkuIds, ItemSkuType.IN_APP)
+            paymentManager.setProjectSkuIds(listOf("forever_subscription"), ItemSkuType.SUBSCRIPTION)
             updatePayedCategories(categories, productIds)
         }
 
         scope.launch {
-            paymentManager.productsFlow().collect(object : FlowCollector<List<MarketItem>> {
-                override suspend fun emit(items: List<MarketItem>) {
-                    logger.debug("On market product list: ${items.size} categories")
-                    productIds = items.filter { it.isPurchased() }.map { it.skuDetails.sku }
-                    val categories = categoriesStateFlow.value
-                    updatePayedCategories(categories, productIds)
-                }
-            })
+            paymentManager.ownedProducts.collect { items ->
+                logger.debug("On market product list: ${items.size} categories")
+                productIds = items.filter { it.isPurchased() }.map { it.skuDetails.sku }
+                val categories = categoriesStateFlow.value
+                updatePayedCategories(categories, productIds)
+            }
         }
     }
 
@@ -68,16 +68,9 @@ class ArticleRepositoryImpl @Inject constructor(
             return@withContext categoryArticles
         }
 
-    override suspend fun requestPaymentForCategory(paymentRequest: PaymentRequest) =
+    override suspend fun requestPaymentForCategory(category: ArticleCategory): Unit =
         withContext(ioDispatcher) {
-            paymentManager.requestPayment(paymentRequest,
-                DefaultPaymentActivity::class.java,
-                object : PaymentResultListener {
-                    override fun onResult(result: RequestPaymentResult) {
-                        logger.debug("PaymentResultListener.onResult $result")
-                    }
-                }
-            )
+            category.marketItemId?.let { paymentManager.requestPayment(skuId = it) }
         }
 
     override suspend fun consumePurchase(itemId: String): Boolean = withContext(ioDispatcher) {
