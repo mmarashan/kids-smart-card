@@ -36,5 +36,5 @@ dependencies {
 
     implementation project(':common')
     implementation project(':core:article-repository-api')
-    implementation project(':core:google-billingclient-wrapper')
+    implementation "com.github.mmarashan:google-billingclient-wrapper:${versions.billingclientwrapper}"
 }
