@@ -27,7 +27,7 @@ internal class ArticleGalleryInteractorImpl(
     private val isBackgroundMusicEnabled: Boolean
 ) : ArticleGalleryInteractor {
     override fun availableCategories(): Flow<List<ArticleCategory>> =
-        articleRepository.categories().map { categories ->
+        articleRepository.categories.map { categories ->
             categories.filter { (it.isFree || it.isPaid) }
         }
 
