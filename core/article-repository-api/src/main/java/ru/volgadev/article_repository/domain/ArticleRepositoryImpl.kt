@@ -3,6 +3,7 @@ package ru.volgadev.article_repository.domain
 import androidx.annotation.WorkerThread
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.SharingStarted.Companion.Eagerly
 import ru.volgadev.article_repository.domain.*
 import ru.volgadev.article_repository.domain.database.ArticleDatabase
 import ru.volgadev.article_repository.domain.datasource.ArticleBackendApi
@@ -30,40 +31,50 @@ class ArticleRepositoryImpl @Inject constructor(
 
     private val articlesCache = HashMap<String, List<Article>>()
 
-    private val categoriesStateFlow = MutableStateFlow<List<ArticleCategory>>(emptyList())
-    override fun categories(): StateFlow<List<ArticleCategory>> = categoriesStateFlow
+    override val categories: SharedFlow<List<ArticleCategory>> =
+        database.dao().categories().distinctUntilChanged().shareIn(
+            scope = scope,
+            started = Eagerly,
+            replay = 1
+        )
 
     @Volatile
     private var productIds: List<String> = ArrayList()
 
     init {
         scope.launch {
-            val categories = try {
-                updateCategories()
-            } catch (e: ConnectException) {
-                logger.error("Exception when load from server $e")
-                loadCategoriesFromDB()
+            categories.collect { categories ->
+                val categoriesSkuIds = categories.mapNotNull { it.marketItemId }
+                paymentManager.setProjectSkuIds(categoriesSkuIds, ItemSkuType.IN_APP)
+                updatePayedCategories(categories, productIds)
             }
-
-            val categoriesSkuIds = categories.mapNotNull { category -> category.marketItemId }
-            paymentManager.setProjectSkuIds(categoriesSkuIds, ItemSkuType.IN_APP)
-            paymentManager.setProjectSkuIds(listOf("forever_subscription"), ItemSkuType.SUBSCRIPTION)
-            updatePayedCategories(categories, productIds)
         }
 
         scope.launch {
             paymentManager.ownedProducts.collect { items ->
                 logger.debug("On market product list: ${items.size} categories")
                 productIds = items.filter { it.isPurchased() }.map { it.skuDetails.sku }
-                val categories = categoriesStateFlow.value
+                val categories = database.dao().categories().first()
                 updatePayedCategories(categories, productIds)
+            }
+        }
+
+        scope.launch {
+            try {
+                updateCategories()
+            } catch (e: ConnectException) {
+                logger.error("Exception when load from server $e")
             }
         }
     }
 
     override suspend fun getCategoryArticles(category: ArticleCategory): List<Article> =
-        withContext(Dispatchers.Default) {
-            val categoryArticles = articlesCache[category.id] ?: updateCategoryArticles(category)
+        withContext(ioDispatcher) {
+            val categoryArticles = articlesCache[category.id] ?: try {
+                updateCategoryArticles(category)
+            } catch (e: ConnectException) {
+                database.dao().getArticlesByCategory(category.id)
+            }
             logger.debug("${categoryArticles.size} articles")
             return@withContext categoryArticles
         }
@@ -81,10 +92,9 @@ class ArticleRepositoryImpl @Inject constructor(
     override fun dispose() = scope.cancel()
 
     @Throws(ConnectException::class)
-    private suspend fun updateCategories(): List<ArticleCategory> = withContext(Dispatchers.IO) {
+    private suspend fun updateCategories() = withContext(ioDispatcher) {
         val categories = backendApi.getCategories()
         database.dao().insertAllCategories(*categories.toTypedArray())
-        return@withContext categories
     }
 
     @Throws(ConnectException::class)
@@ -96,33 +106,19 @@ class ArticleRepositoryImpl @Inject constructor(
             return@withContext categoryArticles
         }
 
-    private suspend fun loadCategoriesFromDB(): List<ArticleCategory> = withContext(ioDispatcher) {
-        val articles = database.dao().getAllArticles()
-        val categories = database.dao().getAllCategories()
-        logger.debug("Load ${categories.size} categories and ${articles.size} articles from Db")
-        categories.forEach { category ->
-            val categoryArticles = articles.filter { it.categoryId == category.id }
-            articlesCache[category.id] = categoryArticles
-        }
-        return@withContext categories
-    }
-
     @Synchronized
     @WorkerThread
     private fun updatePayedCategories(
         categories: List<ArticleCategory>,
         payedIds: List<String>
     ) {
-        val copyCategories = categories.toList()
         logger.debug("updatePayedCategories(${categories.size}, ${payedIds.size})")
-        if (copyCategories.isEmpty()) return
-        copyCategories.forEachIndexed { index, category ->
+        categories.forEachIndexed { index, category ->
             val isPaid = payedIds.singleOrNull { id -> id == category.marketItemId } != null
             if (isPaid != category.isPaid) {
                 category.isPaid = isPaid
                 database.dao().updateCategoryIsPaid(category.id, isPaid)
             }
         }
-        categoriesStateFlow.tryEmit(copyCategories)
     }
 }
