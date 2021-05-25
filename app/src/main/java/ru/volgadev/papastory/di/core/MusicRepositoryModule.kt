@@ -25,5 +25,5 @@ interface MusicRepositoryModule {
 
     @InternalCoroutinesApi
     @Binds
-    fun bindsMusicRepository(MusicRepository: MusicRepositoryImpl): MusicRepository
+    fun bindsMusicRepository(repository: MusicRepositoryImpl): MusicRepository
 }

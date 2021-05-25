@@ -5,13 +5,11 @@ import android.app.AlertDialog
 import android.os.Bundle
 import android.transition.Slide
 import android.view.Gravity
-import android.view.MenuItem
 import android.view.View
 import androidx.annotation.MainThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.android.synthetic.main.main_activity.*
 import kotlinx.coroutines.InternalCoroutinesApi
 import ru.volgadev.article_galery.presentation.ArticleGalleryFragment
@@ -61,24 +59,21 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        bottomNavigation.setOnNavigationItemSelectedListener(object :
-            BottomNavigationView.OnNavigationItemSelectedListener {
-            override fun onNavigationItemSelected(item: MenuItem): Boolean {
-                when (item.itemId) {
-                    HOME_ITEM_ID -> {
-                        logger.debug("Show gallery fragment")
-                        showCabinet()
-                        return true
-                    }
-                    GALLERY_ITEM_ID -> {
-                        logger.debug("galleryFragment selected")
-                        showGallery()
-                        return true
-                    }
+        bottomNavigation.setOnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                HOME_ITEM_ID -> {
+                    logger.debug("Show gallery fragment")
+                    showCabinet()
+                    true
                 }
-                return false
+                GALLERY_ITEM_ID -> {
+                    logger.debug("galleryFragment selected")
+                    showGallery()
+                    true
+                }
+                else -> false
             }
-        })
+        }
         bottomNavigation.selectedItemId = GALLERY_ITEM_ID
 
         supportFragmentManager.addOnBackStackChangedListener {

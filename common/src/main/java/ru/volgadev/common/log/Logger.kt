@@ -1,29 +1,29 @@
 package ru.volgadev.common.log
 
 interface LoggerDelegate {
-    fun debug(TAG: String, m: String)
-    fun info(TAG: String, m: String)
-    fun warn(TAG: String, m: String)
-    fun error(TAG: String, m: String)
+    fun debug(tag: String, m: String)
+    fun info(tag: String, m: String)
+    fun warn(tag: String, m: String)
+    fun error(tag: String, m: String)
 }
 
-class Logger(private val TAG: String,
+class Logger(private val tag: String,
              private val delegates: List<LoggerDelegate>) {
 
     fun debug(m: String) {
-        delegates.forEach {delegate -> delegate.debug(TAG, m) }
+        delegates.forEach {delegate -> delegate.debug(tag, m) }
     }
 
     fun info(m: String) {
-        delegates.forEach {delegate -> delegate.info(TAG, m) }
+        delegates.forEach {delegate -> delegate.info(tag, m) }
     }
 
     fun warn(m: String) {
-        delegates.forEach {delegate -> delegate.warn(TAG, m) }
+        delegates.forEach {delegate -> delegate.warn(tag, m) }
     }
 
     fun error(m: String) {
-        delegates.forEach {delegate -> delegate.error(TAG, m) }
+        delegates.forEach {delegate -> delegate.error(tag, m) }
     }
 
     companion object {
@@ -38,8 +38,8 @@ class Logger(private val TAG: String,
             Companion.delegates = delegates.toList()
         }
 
-        fun get(TAG: String): Logger {
-            return Logger(TAG, delegates)
+        fun get(tag: String): Logger {
+            return Logger(tag, delegates)
         }
     }
 

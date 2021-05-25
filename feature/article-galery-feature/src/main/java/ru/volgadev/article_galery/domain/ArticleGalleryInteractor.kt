@@ -14,7 +14,7 @@ internal interface ArticleGalleryInteractor {
 
     suspend fun getCategoryArticles(category: ArticleCategory): List<Article>
 
-    fun musicTracks(): Flow<ArrayList<MusicTrack>>
+    fun musicTracks(): Flow<List<MusicTrack>>
 
     suspend fun loadArticleAudio(url: String): MusicTrack?
 
@@ -27,14 +27,14 @@ internal class ArticleGalleryInteractorImpl(
     private val isBackgroundMusicEnabled: Boolean
 ) : ArticleGalleryInteractor {
     override fun availableCategories(): Flow<List<ArticleCategory>> =
-        articleRepository.categories().map { categories ->
+        articleRepository.categories.map { categories ->
             categories.filter { (it.isFree || it.isPaid) }
         }
 
     override suspend fun getCategoryArticles(category: ArticleCategory) =
         articleRepository.getCategoryArticles(category)
 
-    override fun musicTracks(): Flow<ArrayList<MusicTrack>> =
+    override fun musicTracks(): Flow<List<MusicTrack>> =
         if (isBackgroundMusicEnabled) musicRepository.musicTracks() else emptyFlow()
 
     override suspend fun loadArticleAudio(url: String) = musicRepository.loadArticleAudio(url)
