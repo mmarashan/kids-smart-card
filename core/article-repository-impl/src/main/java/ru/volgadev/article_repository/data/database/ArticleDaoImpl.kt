@@ -1,16 +1,11 @@
 package ru.volgadev.article_repository.data.database
 
 import androidx.room.*
-<<<<<<< HEAD
-=======
 import kotlinx.coroutines.flow.Flow
-import ru.volgadev.article_repository.domain.database.ArticleDao
-import ru.volgadev.article_repository.domain.database.ArticleDatabase
->>>>>>> origin/develop
 import ru.volgadev.article_repository.domain.model.Article
 import ru.volgadev.article_repository.domain.model.ArticleCategory
 
-internal interface ArticleDatabaseInterface: ArticleDatabase {
+internal interface ArticleDatabaseInterface : ArticleDatabase {
     override fun dao(): ArticleDaoImpl
 }
 
