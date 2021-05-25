@@ -12,4 +12,5 @@ include ':app',
         ':core:article-repository-impl',
         ':core:music-data',
         ':core:downloader',
-        ':core:speaking-character'
+        ':core:speaking-character',
+        ':core:lint-rule'

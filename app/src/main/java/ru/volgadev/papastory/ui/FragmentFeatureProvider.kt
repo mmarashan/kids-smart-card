@@ -48,7 +48,6 @@ class FragmentFeatureProvider(activity: Activity) {
             }
         }) as ComponentHolder<BaseAPI, BaseDependencies>
 
-
         return when (code) {
             AppFragment.GALLERY_FRAGMENT -> articleGalleryFeatureHolder.get().get().getFragment()
             AppFragment.CABINET_FRAGMENT -> cabinetFeatureComponentHolder.get().get().getFragment()

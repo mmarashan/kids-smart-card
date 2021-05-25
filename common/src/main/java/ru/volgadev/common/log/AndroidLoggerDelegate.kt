@@ -3,20 +3,19 @@ package ru.volgadev.common.log
 import android.util.Log
 
 class AndroidLoggerDelegate: LoggerDelegate {
-    override fun debug(TAG: String, m: String) {
-        Log.d(TAG, m)
+    override fun debug(tag: String, m: String) {
+        Log.d(tag, m)
     }
 
-    override fun info(TAG: String, m: String) {
-        Log.i(TAG, m)
+    override fun info(tag: String, m: String) {
+        Log.i(tag, m)
     }
 
-    override fun warn(TAG: String, m: String) {
-        Log.w(TAG, m)
+    override fun warn(tag: String, m: String) {
+        Log.w(tag, m)
     }
 
-    override fun error(TAG: String, m: String) {
-        Log.e(TAG, m)
+    override fun error(tag: String, m: String) {
+        Log.e(tag, m)
     }
-
 }

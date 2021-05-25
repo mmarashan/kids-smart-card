@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+apply from: "$rootDir/detekt/detekt.gradle"
 
 android {
     compileSdkVersion versions.compileSdkVersion
@@ -57,4 +58,6 @@ dependencies {
     implementation project(':core:article-repository-api')
     implementation project(':core:music-data')
     implementation "com.github.mmarashan:google-billingclient-wrapper:${versions.billingclientwrapper}"
+
+    lintChecks project(':core:lint-rule')
 }

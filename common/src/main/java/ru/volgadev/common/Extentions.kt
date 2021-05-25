@@ -139,19 +139,17 @@ fun View.scaleToFitAnimatedAndBack(
     animScaleUp.duration = timeUp
     animScaleUp.fillAfter = true
     animScaleUp.setAnimationListener(object : Animation.AnimationListener {
-        override fun onAnimationStart(animation: Animation?) {
-        }
+        override fun onAnimationStart(animation: Animation?) = Unit
 
         override fun onAnimationEnd(animation: Animation?) {
             animScaleDown.setAnimationListener(object : Animation.AnimationListener {
-                override fun onAnimationStart(animation: Animation?) {
-                }
+                override fun onAnimationStart(animation: Animation?) = Unit
 
                 override fun onAnimationEnd(animation: Animation?) {
                     onEnd.invoke()
                 }
 
-                override fun onAnimationRepeat(animation: Animation?) {}
+                override fun onAnimationRepeat(animation: Animation?) = Unit
             })
             if (view.isShown) {
                 view.postDelayed({
@@ -163,10 +161,13 @@ fun View.scaleToFitAnimatedAndBack(
             }
         }
 
-        override fun onAnimationRepeat(animation: Animation?) {}
+        override fun onAnimationRepeat(animation: Animation?) = Unit
     })
     this.startAnimation(animScaleUp)
 }
+
+private const val half = 0.5f
+private const val full = 1.0f
 
 private fun scaleToFitParentAnimation(
     view: View,
@@ -180,17 +181,17 @@ private fun scaleToFitParentAnimation(
     val scaleX = screenW.toFloat() / view.width
     val scaleY = screenH.toFloat() / view.height
     val scaleFactor = min(scaleX, scaleY) * scaleRate
-    val pivotY = 0.5f + yBelowCenter.toFloat() / (screenH / 2)
-    val pivotX = 0.5f + xBelowCenter.toFloat() / (screenW / 2)
+    val pivotY = half + yBelowCenter.toFloat() / (screenH / 2)
+    val pivotX = half + xBelowCenter.toFloat() / (screenW / 2)
     val scaleUpAnimation = ScaleAnimation(
-        1f, scaleFactor,
-        1f, scaleFactor,
+        full, scaleFactor,
+        full, scaleFactor,
         Animation.RELATIVE_TO_SELF, pivotX,
         Animation.RELATIVE_TO_SELF, pivotY
     )
     val scaleDownAnimation = ScaleAnimation(
-        scaleFactor, 1f,
-        scaleFactor, 1f,
+        scaleFactor, full,
+        scaleFactor, full,
         Animation.RELATIVE_TO_SELF, pivotX,
         Animation.RELATIVE_TO_SELF, pivotY
     )
@@ -216,9 +217,9 @@ fun String.isValidUrlString(): Boolean {
         URL(this)
         return URLUtil.isValidUrl(this) && Patterns.WEB_URL.matcher(this)
             .matches()
-    } catch (e: Exception) {
+    } catch (e: MalformedURLException) {
+        return false
     }
-    return false
 }
 
 fun File.isExistsNonEmptyFile(): Boolean {
