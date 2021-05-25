@@ -1,4 +1,4 @@
-package ru.volgadev.article_repository.domain.database
+package ru.volgadev.article_repository.data.database
 
 import kotlinx.coroutines.flow.Flow
 import ru.volgadev.article_repository.domain.model.Article

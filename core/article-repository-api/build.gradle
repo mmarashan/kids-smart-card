@@ -12,6 +12,10 @@ android {
         versionName "1.0"
     }
 
+    buildFeatures {
+        buildConfig = false
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -24,9 +28,6 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:${versions.coroutines}"
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
     implementation "androidx.core:core-ktx:${versions.corektx}"
-    implementation "javax.inject:javax.inject:${versions.javaxinject}"
-
-    implementation "com.android.billingclient:billing:${versions.billingclient}"
 
     implementation "androidx.room:room-runtime:${versions.room}"
     implementation "androidx.room:room-ktx:${versions.room}"

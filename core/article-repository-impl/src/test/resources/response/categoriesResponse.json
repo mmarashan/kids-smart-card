@@ -1,0 +1,28 @@
+{
+  "categories": [
+    {
+      "id": "Цифры",
+      "name":"Цифры",
+      "description":"Цифры с русской озвучкой",
+      "iconUrl":"https://raw.githubusercontent.com/mmarashan/psdata/master/images/numbers/1.jpg",
+      "fileUrl":"",
+      "marketItemId": null
+    },
+    {
+      "id": "Алфавит",
+      "name":"Алфавит",
+      "description":"Алфавит с русской озвучкой",
+      "iconUrl":"https://raw.githubusercontent.com/mmarashan/psdata/master/images/alphabet/a.jpg",
+      "fileUrl":"",
+      "marketItemId": null
+    },
+    {
+      "id": "Цифры от логопеда",
+      "name":"Цифры от логопеда",
+      "description":"Цифры с авторской методикой от логопеда",
+      "iconUrl":"https://raw.githubusercontent.com/mmarashan/psdata/master/images/numbers/1.jpg",
+      "fileUrl":"",
+      "marketItemId": "numbers_pro_ru"
+    }
+  ]
+}

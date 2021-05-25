@@ -11,6 +11,12 @@ android {
         targetSdkVersion versions.targetSdkVersion
         versionCode 1
         versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildFeatures {
+        buildConfig = false
     }
 
     buildFeatures {
@@ -28,7 +34,6 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
     implementation "androidx.core:core-ktx:${versions.corektx}"
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:${versions.androidxlifecycle}"
     implementation "javax.inject:javax.inject:${versions.javaxinject}"
 
     implementation "androidx.room:room-runtime:${versions.room}"
@@ -37,8 +42,12 @@ dependencies {
 
     implementation "com.squareup.okhttp3:okhttp:${versions.okhttp}"
     implementation "com.android.billingclient:billing:${versions.billingclient}"
+    implementation "com.google.code.gson:gson:${versions.gson}"
 
     implementation project(':common')
     implementation project(':core:article-repository-api')
     implementation "com.github.mmarashan:google-billingclient-wrapper:${versions.billingclientwrapper}"
+
+    testImplementation "junit:junit:${versions.junit}"
+    testImplementation "com.squareup.okhttp3:mockwebserver:${versions.mockwebserver}"
 }

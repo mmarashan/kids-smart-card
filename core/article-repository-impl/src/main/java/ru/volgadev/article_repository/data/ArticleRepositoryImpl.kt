@@ -1,12 +1,12 @@
-package ru.volgadev.article_repository.domain
+package ru.volgadev.article_repository.data
 
 import androidx.annotation.WorkerThread
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import ru.volgadev.article_repository.data.database.ArticleDatabase
+import ru.volgadev.article_repository.data.datasource.ArticleRemoteDataSource
 import kotlinx.coroutines.flow.SharingStarted.Companion.Eagerly
 import ru.volgadev.article_repository.domain.*
-import ru.volgadev.article_repository.domain.database.ArticleDatabase
-import ru.volgadev.article_repository.domain.datasource.ArticleBackendApi
 import ru.volgadev.article_repository.domain.model.Article
 import ru.volgadev.article_repository.domain.model.ArticleCategory
 import ru.volgadev.common.log.Logger
@@ -16,10 +16,8 @@ import ru.volgadev.googlebillingclientwrapper.api.PaymentManager
 import java.net.ConnectException
 import javax.inject.Inject
 
-@ExperimentalCoroutinesApi
-@InternalCoroutinesApi
 class ArticleRepositoryImpl @Inject constructor(
-    private val backendApi: ArticleBackendApi,
+    private val remoteDataSource: ArticleRemoteDataSource,
     private val paymentManager: PaymentManager,
     private val database: ArticleDatabase,
     private val ioDispatcher: CoroutineDispatcher
@@ -27,7 +25,7 @@ class ArticleRepositoryImpl @Inject constructor(
 
     private val logger = Logger.get("ArticleRepositoryImpl")
 
-    private val scope = CoroutineScope(SupervisorJob())
+    private val scope = CoroutineScope(ioDispatcher + SupervisorJob())
 
     private val articlesCache = HashMap<String, List<Article>>()
 
@@ -70,6 +68,7 @@ class ArticleRepositoryImpl @Inject constructor(
 
     override suspend fun getCategoryArticles(category: ArticleCategory): List<Article> =
         withContext(ioDispatcher) {
+
             val categoryArticles = articlesCache[category.id] ?: try {
                 updateCategoryArticles(category)
             } catch (e: ConnectException) {
@@ -93,14 +92,14 @@ class ArticleRepositoryImpl @Inject constructor(
 
     @Throws(ConnectException::class)
     private suspend fun updateCategories() = withContext(ioDispatcher) {
-        val categories = backendApi.getCategories()
+        val categories = remoteDataSource.getCategories()
         database.dao().insertAllCategories(*categories.toTypedArray())
     }
 
-    @Throws(ConnectException::class)
+    @Throws(Exception::class)
     private suspend fun updateCategoryArticles(category: ArticleCategory): List<Article> =
-        withContext(Dispatchers.IO) {
-            val categoryArticles = backendApi.getArticles(category)
+        withContext(ioDispatcher) {
+            val categoryArticles = remoteDataSource.getArticles(category)
             database.dao().insertAllArticles(*categoryArticles.toTypedArray())
             articlesCache[category.id] = categoryArticles
             return@withContext categoryArticles
