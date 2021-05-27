@@ -83,7 +83,7 @@ class ArticleRepositoryImpl @Inject constructor(
             category.marketItemId?.let { paymentManager.requestPayment(skuId = it) }
         }
 
-    override suspend fun consumePurchase(itemId: String): Boolean = withContext(ioDispatcher) {
+    override suspend fun consumePurchase(itemId: String) = withContext(ioDispatcher) {
         logger.debug("consumePurchase $itemId")
         paymentManager.consumePurchase(itemId)
     }

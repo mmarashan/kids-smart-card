@@ -14,7 +14,7 @@ interface ArticleRepository {
 
     suspend fun requestPaymentForCategory(category: ArticleCategory)
 
-    suspend fun consumePurchase(itemId: String): Boolean
+    suspend fun consumePurchase(itemId: String)
 
     fun dispose()
 }
