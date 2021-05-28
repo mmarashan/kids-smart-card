@@ -17,6 +17,7 @@ import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
 import kotlinx.android.synthetic.main.main_fragment.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.firstOrNull
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import ru.volgadev.article_galery.R
 import ru.volgadev.article_galery.presentation.adapter.ArticleCardAdapter
 import ru.volgadev.article_galery.presentation.adapter.TagsAdapter
@@ -36,13 +37,10 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
     private val musicMediaPlayer by lazy { BackgroundMediaPlayer() }
     private val cardsMediaPlayer by lazy { BackgroundMediaPlayer() }
 
+    private val viewModel: ArticleGalleryViewModel by viewModel()
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val viewModel = ViewModelProvider(
-            this,
-            ArticleGalleryViewModelFactory
-        ).get(ArticleGalleryViewModel::class.java)
 
         val articlesAdapter = ArticleCardAdapter()
 
