@@ -4,6 +4,6 @@ import androidx.annotation.WorkerThread
 import ru.volgadev.music_data.domain.model.MusicTrack
 
 @WorkerThread
-interface MusicBackendApi {
+internal interface MusicBackendApi {
     fun getTracks(): List<MusicTrack>
 }

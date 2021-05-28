@@ -10,12 +10,9 @@ import ru.volgadev.common.log.Logger
 import ru.volgadev.music_data.domain.MusicBackendApi
 import ru.volgadev.music_data.domain.model.MusicTrack
 import java.net.ConnectException
-import javax.inject.Inject
 
-@WorkerThread
-class MusicBackendApiImpl @Inject constructor(): MusicBackendApi {
+internal class MusicBackendApiImpl(private val client: OkHttpClient) : MusicBackendApi {
 
-    var client = OkHttpClient()
     private val logger = Logger.get("MusicBackendApiImpl")
 
     @Throws(ConnectException::class)

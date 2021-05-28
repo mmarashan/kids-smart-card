@@ -1,10 +1,14 @@
 package ru.volgadev.papastory
 
 import android.app.Application
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
+import org.koin.core.context.startKoin
+import org.koin.dsl.module
+import ru.volgadev.article_repository.data.di.articleRepositoryModule
 import ru.volgadev.common.log.AndroidLoggerDelegate
 import ru.volgadev.common.log.Logger
-import ru.volgadev.papastory.di.ApplicationComponent
-import ru.volgadev.papastory.di.DaggerApplicationComponent
+import ru.volgadev.music_data.di.musicRepositoryModule
 
 class KidsCardApplication : Application() {
 
@@ -14,11 +18,22 @@ class KidsCardApplication : Application() {
         Logger.setDelegates(AndroidLoggerDelegate())
     }
 
-    lateinit var appComponent: ApplicationComponent
+    val appModule = module {
+
+    }
 
     override fun onCreate() {
         super.onCreate()
         logger.debug("onCreate()")
-        appComponent = DaggerApplicationComponent.factory().create(applicationContext)
+
+        startKoin {
+            androidLogger()
+            androidContext(this@KidsCardApplication)
+            modules(
+                appModule,
+                articleRepositoryModule,
+                musicRepositoryModule
+            )
+        }
     }
 }
