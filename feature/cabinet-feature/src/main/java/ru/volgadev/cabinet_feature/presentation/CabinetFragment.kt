@@ -3,13 +3,12 @@ package ru.volgadev.cabinet_feature.presentation
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.annotation.MainThread
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.cabinet_fragment.*
-import ru.volgadev.cabinet_feature.BuildConfig
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import ru.volgadev.cabinet_feature.R
+import ru.volgadev.common.BuildConfig
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.observeOnce
 import ru.volgadev.pincode_bubble.PinCodeBubbleAlertDialog
@@ -19,11 +18,11 @@ class CabinetFragment : Fragment(R.layout.cabinet_fragment) {
 
     private val logger = Logger.get("CabinetFragment")
 
+    private val viewModel: CabinetViewModel by viewModel()
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         logger.debug("On fragment created; savedInstanceState=$savedInstanceState")
-
-        val viewModel = ViewModelProvider(this, CabinetViewModelFactory).get(CabinetViewModel::class.java)
 
         val categoriesAdapter = CategoryCardAdapter().apply {
             setOnItemClickListener(object : CategoryCardAdapter.OnItemClickListener {
@@ -57,13 +56,12 @@ class CabinetFragment : Fragment(R.layout.cabinet_fragment) {
             adapter = categoriesAdapter
         }
 
-        viewModel.categories.observe(viewLifecycleOwner, { categories ->
+        viewModel.categories.observe(viewLifecycleOwner) { categories ->
             logger.debug("Set new market categories ${categories.joinToString(",")} ")
             categoriesAdapter.setData(categories)
-        })
+        }
     }
 
-    @MainThread
     private inline fun checkCorrectPayment(crossinline onAnswer: (Boolean) -> Unit) {
         logger.debug("checkCorrectPayment()")
         val activity = this@CabinetFragment.requireActivity()

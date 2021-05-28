@@ -14,7 +14,6 @@ import ru.volgadev.common.hideNavBar
 import ru.volgadev.common.log.Logger
 import ru.volgadev.pincode_bubble.quizgenerator.QuizGenerator
 
-@MainThread
 class PinCodeBubbleAlertDialog private constructor(
     private val activity: Activity,
     private val title: String,

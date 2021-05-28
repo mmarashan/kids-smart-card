@@ -7,6 +7,7 @@ import org.koin.core.context.startKoin
 import org.koin.dsl.module
 import ru.volgadev.article_galery.di.articleGalleryFeatureModule
 import ru.volgadev.article_repository.data.di.articleRepositoryModule
+import ru.volgadev.cabinet_feature.di.cabinetFeatureModule
 import ru.volgadev.common.log.AndroidLoggerDelegate
 import ru.volgadev.common.log.Logger
 import ru.volgadev.music_data.di.musicRepositoryModule
@@ -34,7 +35,8 @@ class KidsCardApplication : Application() {
                 appModule,
                 articleRepositoryModule,
                 musicRepositoryModule,
-                articleGalleryFeatureModule
+                articleGalleryFeatureModule,
+                cabinetFeatureModule
             )
         }
     }

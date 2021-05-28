@@ -43,9 +43,10 @@ dependencies {
     implementation "androidx.cardview:cardview:${versions.cardview}"
     implementation "com.github.bumptech.glide:glide:${versions.glide}"
     implementation "jp.wasabeef:recyclerview-animators:${versions.recyclerviewanimators}"
+    implementation "io.insert-koin:koin-android:${versions.koin}"
+    implementation "io.insert-koin:koin-android-viewmodel:${versions.koin}"
 
     implementation project(':common')
-    implementation project(':core:module-injector')
     implementation project(':core:article-repository-api')
     implementation project(':core:music-data')
     implementation project(':feature:pincode-bubble')

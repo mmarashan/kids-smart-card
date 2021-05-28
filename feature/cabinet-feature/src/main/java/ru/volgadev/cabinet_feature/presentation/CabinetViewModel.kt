@@ -1,21 +1,16 @@
 package ru.volgadev.cabinet_feature.presentation
 
-import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.flow.FlowCollector
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import ru.volgadev.article_repository.domain.ArticleRepository
 import ru.volgadev.article_repository.domain.model.ArticleCategory
-import ru.volgadev.cabinet_feature.BuildConfig
+import ru.volgadev.common.BuildConfig
 import ru.volgadev.common.log.Logger
 
-@OptIn(InternalCoroutinesApi::class)
 internal class CabinetViewModel(
     private val articleRepository: ArticleRepository
 ) : ViewModel() {
@@ -27,17 +22,14 @@ internal class CabinetViewModel(
 
     init {
         logger.debug("init")
-        viewModelScope.launch(Dispatchers.Default) {
-            articleRepository.categories.collect(object : FlowCollector<List<ArticleCategory>> {
-                override suspend fun emit(value: List<ArticleCategory>) {
-                    logger.debug("On update categories $value")
-                    _categories.postValue(value)
-                }
-            })
+        viewModelScope.launch {
+            articleRepository.categories.collect { categories ->
+                logger.debug("On update categories $categories")
+                _categories.postValue(categories)
+            }
         }
     }
 
-    @MainThread
     fun onReadyToPayment(category: ArticleCategory) {
         logger.debug("onReadyToPayment ${category.name}, marketItemId = ${category.marketItemId}, isPaid = ${category.isPaid}")
         category.marketItemId?.let { itemId ->
@@ -46,11 +38,11 @@ internal class CabinetViewModel(
                 /**
                  * In current implementation viewModelScope disposed in onClear
                  */
-                GlobalScope.launch(Dispatchers.IO) {
+                viewModelScope.launch {
                     articleRepository.requestPaymentForCategory(category)
                 }
             } else {
-                GlobalScope.launch(Dispatchers.IO) {
+                viewModelScope.launch {
                     if (BuildConfig.DEBUG) {
                         logger.debug("debug consume purchase $itemId")
                         articleRepository.consumePurchase(itemId)

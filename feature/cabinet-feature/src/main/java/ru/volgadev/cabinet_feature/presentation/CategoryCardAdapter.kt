@@ -16,7 +16,7 @@ import ru.volgadev.article_repository.domain.model.ArticleCategory
 import ru.volgadev.cabinet_feature.R
 import ru.volgadev.common.log.Logger
 
-class CategoryCardAdapter :
+internal class CategoryCardAdapter :
     RecyclerView.Adapter<CategoryCardAdapter.ViewHolder>() {
 
     interface OnItemClickListener {
