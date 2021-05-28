@@ -2,7 +2,7 @@ package ru.volgadev.article_repository.data.datasource.dto
 
 import com.google.gson.annotations.SerializedName
 
-data class ArticleCategoryDto(
+internal data class ArticleCategoryDto(
     @SerializedName("id")
     val id: String,
     @SerializedName("name")

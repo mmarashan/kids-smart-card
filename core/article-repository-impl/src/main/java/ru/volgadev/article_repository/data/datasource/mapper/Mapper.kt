@@ -5,7 +5,7 @@ import ru.volgadev.article_repository.data.datasource.dto.CategoriesResponseDto
 import ru.volgadev.article_repository.domain.model.Article
 import ru.volgadev.article_repository.domain.model.ArticleCategory
 
-object Mapper {
+internal object Mapper {
 
     fun map(dto: CategoriesResponseDto): List<ArticleCategory> = dto.categories.map {
         ArticleCategory(

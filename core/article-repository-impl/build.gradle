@@ -19,14 +19,19 @@ android {
         buildConfig = false
     }
 
-    buildFeatures {
-        buildConfig = false
-    }
-
     buildTypes {
         release {
             minifyEnabled false
         }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 }
 
@@ -35,6 +40,7 @@ dependencies {
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
     implementation "androidx.core:core-ktx:${versions.corektx}"
     implementation "javax.inject:javax.inject:${versions.javaxinject}"
+    implementation "io.insert-koin:koin-android:${versions.koin}"
 
     implementation "androidx.room:room-runtime:${versions.room}"
     implementation "androidx.room:room-ktx:${versions.room}"

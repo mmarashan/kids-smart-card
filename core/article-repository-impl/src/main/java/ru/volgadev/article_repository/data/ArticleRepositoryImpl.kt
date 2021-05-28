@@ -3,9 +3,9 @@ package ru.volgadev.article_repository.data
 import androidx.annotation.WorkerThread
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.SharingStarted.Companion.Eagerly
 import ru.volgadev.article_repository.data.database.ArticleDatabase
 import ru.volgadev.article_repository.data.datasource.ArticleRemoteDataSource
-import kotlinx.coroutines.flow.SharingStarted.Companion.Eagerly
 import ru.volgadev.article_repository.domain.*
 import ru.volgadev.article_repository.domain.model.Article
 import ru.volgadev.article_repository.domain.model.ArticleCategory
@@ -14,9 +14,8 @@ import ru.volgadev.googlebillingclientwrapper.*
 import ru.volgadev.googlebillingclientwrapper.api.ItemSkuType
 import ru.volgadev.googlebillingclientwrapper.api.PaymentManager
 import java.net.ConnectException
-import javax.inject.Inject
 
-class ArticleRepositoryImpl @Inject constructor(
+internal class ArticleRepositoryImpl(
     private val remoteDataSource: ArticleRemoteDataSource,
     private val paymentManager: PaymentManager,
     private val database: ArticleDatabase,

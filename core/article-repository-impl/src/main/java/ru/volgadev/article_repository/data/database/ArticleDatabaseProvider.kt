@@ -5,7 +5,7 @@ import android.content.Context
 /**
  * Provider hides Room dependencies from internal module
  */
-class ArticleDatabaseProvider {
+internal class ArticleDatabaseProvider {
     companion object {
         @JvmStatic
         fun createArticleDatabase(context: Context): ArticleDatabase =
