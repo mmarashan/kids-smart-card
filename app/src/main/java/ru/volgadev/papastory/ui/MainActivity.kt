@@ -11,7 +11,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import kotlinx.android.synthetic.main.main_activity.*
-import kotlinx.coroutines.InternalCoroutinesApi
 import ru.volgadev.article_galery.presentation.ArticleGalleryFragment
 import ru.volgadev.common.hideNavBar
 import ru.volgadev.common.isPermissionGranted
@@ -36,11 +35,8 @@ class MainActivity : AppCompatActivity() {
 
     private val logger = Logger.get("MainActivity")
 
-    private val fragmentProvider by lazy {
-        FragmentFeatureProvider(this)
-    }
+    private val fragmentProvider = FragmentFeatureProvider()
 
-    @InternalCoroutinesApi
     override fun onCreate(savedInstanceState: Bundle?) {
         logger.debug("onCreate($savedInstanceState)")
         super.onCreate(savedInstanceState)

@@ -2,7 +2,6 @@ package ru.volgadev.music_data.domain
 
 import android.content.Context
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
 import ru.volgadev.common.isValidUrlString
@@ -12,9 +11,8 @@ import ru.volgadev.music_data.domain.model.MusicTrack
 import ru.volgadev.music_data.domain.model.MusicTrackType
 import java.io.File
 import java.net.ConnectException
-import javax.inject.Inject
 
-class MusicRepositoryImpl @Inject constructor(
+internal class MusicRepositoryImpl(
     private val context: Context,
     private val musicBackendApi: MusicBackendApi,
     private val musicTrackDatabase: MusicTrackDatabase,

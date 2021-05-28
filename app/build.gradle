@@ -1,7 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-apply plugin: 'kotlin-kapt'
 apply from: "$rootDir/detekt/detekt.gradle"
 
 android {
@@ -53,24 +52,20 @@ dependencies {
     implementation "androidx.core:core-ktx:${versions.corektx}"
     implementation "androidx.constraintlayout:constraintlayout:${versions.constraintlayout}"
 
-    implementation "com.google.dagger:dagger:${versions.dagger}"
-    kapt "com.google.dagger:dagger-compiler:${versions.dagger}"
+    implementation "io.insert-koin:koin-android:${versions.koin}"
     implementation "androidx.lifecycle:lifecycle-extensions:${versions.androidxlifecycle}"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${versions.androidxlifecycle}"
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:${versions.androidxlifecycle}"
     implementation "com.google.android.material:material:${versions.material}"
 
     implementation "com.squareup.okhttp3:okhttp:${versions.okhttp}"
 
     implementation project(':common')
-    implementation project(':core:module-injector')
     implementation project(':feature:article-galery-feature')
     implementation project(':feature:cabinet-feature')
     implementation project(':feature:pincode-bubble')
     implementation project(':core:article-repository-impl')
     implementation project(':core:article-repository-api')
     implementation project(':core:music-data')
-    implementation "com.github.mmarashan:google-billingclient-wrapper:${versions.billingclientwrapper}"
 
     lintChecks project(':core:lint-rule')
 }

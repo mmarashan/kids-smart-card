@@ -6,7 +6,7 @@ import ru.volgadev.music_data.domain.MusicTrackDatabase
 /**
  * Provider hides Room dependencies from internal module
  */
-class MusicDatabaseProvider {
+internal class MusicDatabaseProvider {
     companion object {
         fun createDatabase(context: Context): MusicTrackDatabase = MusicTrackDatabaseImpl.getInstance(context)
     }

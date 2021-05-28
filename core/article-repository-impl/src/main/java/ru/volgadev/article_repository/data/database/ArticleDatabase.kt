@@ -4,11 +4,11 @@ import kotlinx.coroutines.flow.Flow
 import ru.volgadev.article_repository.domain.model.Article
 import ru.volgadev.article_repository.domain.model.ArticleCategory
 
-interface ArticleDatabase {
+internal interface ArticleDatabase {
     fun dao(): ArticleDao
 }
 
-interface ArticleDao {
+internal interface ArticleDao {
 
     fun articles(): List<Article>
 

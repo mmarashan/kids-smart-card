@@ -1,6 +1,5 @@
 package ru.volgadev.article_repository.data.datasource
 
-import androidx.annotation.WorkerThread
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
 import okhttp3.OkHttpClient
@@ -13,8 +12,7 @@ import ru.volgadev.article_repository.domain.model.ArticleCategory
 import java.io.IOException
 import javax.inject.Inject
 
-@WorkerThread
-class ArticleRemoteDataSourceImpl @Inject constructor(
+internal class ArticleRemoteDataSourceImpl @Inject constructor(
     baseUrl: String,
     private val client: OkHttpClient
 ) : ArticleRemoteDataSource {

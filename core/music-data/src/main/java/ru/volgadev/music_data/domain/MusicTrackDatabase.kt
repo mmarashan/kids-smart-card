@@ -9,13 +9,13 @@ import androidx.room.Query
 import ru.volgadev.music_data.domain.model.MusicTrack
 import ru.volgadev.music_data.domain.model.MusicTrackType
 
-interface MusicTrackDatabase {
+internal interface MusicTrackDatabase {
     fun dao(): MusicTrackDao
 }
 
 @Dao
 @WorkerThread
-interface MusicTrackDao {
+internal interface MusicTrackDao {
     @Query("SELECT * FROM musictrack")
     fun getAll(): List<MusicTrack>
 
