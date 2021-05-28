@@ -1,6 +1,7 @@
 package ru.volgadev.papastory
 
 import android.app.Application
+import okhttp3.OkHttpClient
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -22,6 +23,7 @@ class KidsCardApplication : Application() {
 
     val appModule = module {
 
+        factory<OkHttpClient> { OkHttpClient() }
     }
 
     override fun onCreate() {

@@ -21,6 +21,5 @@ val musicRepositoryModule = module {
     }
 
     single<MusicBackendApi> { MusicBackendApiImpl(client = get()) }
-    single<OkHttpClient> { OkHttpClient() }
     single<MusicTrackDatabase> { MusicDatabaseProvider.createDatabase(get()) }
 }

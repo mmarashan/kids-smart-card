@@ -34,5 +34,4 @@ val articleRepositoryModule = module {
     }
     single<PaymentManager> { PaymentManagerFactory.createPaymentManager(get()) }
     single<ArticleDatabase> { ArticleDatabaseProvider.createArticleDatabase(get()) }
-    single<OkHttpClient> { OkHttpClient() }
 }

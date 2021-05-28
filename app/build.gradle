@@ -57,6 +57,8 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${versions.androidxlifecycle}"
     implementation "com.google.android.material:material:${versions.material}"
 
+    implementation "com.squareup.okhttp3:okhttp:${versions.okhttp}"
+
     implementation project(':common')
     implementation project(':feature:article-galery-feature')
     implementation project(':feature:cabinet-feature')
