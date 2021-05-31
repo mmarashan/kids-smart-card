@@ -2,7 +2,7 @@ buildscript {
 
     apply from: 'versions.gradle'
 
-    ext.kotlin_version = "1.4.32"
+    ext.kotlin_version = "1.5.0"
     ext.detekt_version = "1.1.1"
     ext.gradlePluginVersion = "4.2.0"
     ext.lintVersion = "27.2.0"
