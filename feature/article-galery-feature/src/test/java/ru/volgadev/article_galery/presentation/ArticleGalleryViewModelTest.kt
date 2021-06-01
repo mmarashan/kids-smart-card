@@ -28,11 +28,51 @@ class ArticleGalleryViewModelTest {
     @Test
     fun `when onClickCategory, then new articles emit`() = runBlockingTest {
         /* arrange */
-        val category1 = ArticleCategory(id = "1", name = "", description = "", fileUrl = "/")
-        val category2 = ArticleCategory(id = "2", name = "", description = "", fileUrl = "/")
+        val category1 =
+            ArticleCategory(
+                id = "1",
+                name = "",
+                description = "",
+                fileUrl = "/",
+                isPaid = true,
+                iconUrl = null,
+                marketItemId = null
+            )
+        val category2 =
+            ArticleCategory(
+                id = "2",
+                name = "",
+                description = "",
+                fileUrl = "/",
+                isPaid = true,
+                iconUrl = null,
+                marketItemId = null
+            )
 
-        val listArticles1 = listOf(Article(id = 1L, author = "", title = "", categoryId = "1"))
-        val listArticles2 = listOf(Article(id = 2L, author = "", title = "", categoryId = "2"))
+        val listArticles1 = listOf(
+            Article(
+                id = 1L,
+                author = "",
+                title = "",
+                categoryId = "1",
+                tags = emptyList(),
+                iconUrl = null,
+                openPhrase = null,
+                onClickSounds = emptyList()
+            )
+        )
+        val listArticles2 = listOf(
+            Article(
+                id = 2L,
+                author = "",
+                title = "",
+                categoryId = "2",
+                tags = emptyList(),
+                iconUrl = null,
+                openPhrase = null,
+                onClickSounds = emptyList()
+            )
+        )
 
         val categories = listOf(category1, category2)
 

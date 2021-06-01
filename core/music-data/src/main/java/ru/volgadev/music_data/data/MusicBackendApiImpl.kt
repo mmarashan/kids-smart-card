@@ -9,6 +9,7 @@ import ru.volgadev.common.BACKEND_URL
 import ru.volgadev.common.log.Logger
 import ru.volgadev.music_data.domain.MusicBackendApi
 import ru.volgadev.music_data.domain.model.MusicTrack
+import ru.volgadev.music_data.domain.model.MusicTrackType
 import java.net.ConnectException
 
 internal class MusicBackendApiImpl(private val client: OkHttpClient) : MusicBackendApi {
@@ -32,9 +33,7 @@ internal class MusicBackendApiImpl(private val client: OkHttpClient) : MusicBack
             for (i in 0 until articlesArray.length()) {
                 val url = articlesArray[i] as String
                 result.add(
-                    MusicTrack(
-                        url = url, filePath = null
-                    )
+                    MusicTrack(url = url, filePath = null, type = MusicTrackType.MUSIC)
                 )
             }
         } catch (e: Exception) {

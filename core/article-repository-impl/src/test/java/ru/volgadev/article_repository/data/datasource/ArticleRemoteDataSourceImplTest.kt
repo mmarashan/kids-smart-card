@@ -21,7 +21,7 @@ class ArticleRemoteDataSourceImplTest {
 
     @Before
     fun setup() {
-        server.start(8080)
+        server.start(8888)
         val baseUrl: HttpUrl = server.url("")
         remoteDataSource =
             ArticleRemoteDataSourceImpl(baseUrl = baseUrl.toUri().toString(), client = client)
@@ -61,7 +61,8 @@ class ArticleRemoteDataSourceImplTest {
             description = "",
             iconUrl = "",
             fileUrl = server.url("").toUri().toString(),
-            marketItemId = ""
+            marketItemId = "",
+            isPaid = true
         )
 
         val articles = remoteDataSource.getArticles(someCategory)
