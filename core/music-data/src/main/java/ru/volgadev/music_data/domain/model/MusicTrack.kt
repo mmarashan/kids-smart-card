@@ -8,7 +8,7 @@ data class MusicTrack(
     @PrimaryKey
     var url: String,
     var filePath: String?,
-    var type: MusicTrackType = MusicTrackType.MUSIC
+    var type: MusicTrackType
 )
 
 enum class MusicTrackType{
