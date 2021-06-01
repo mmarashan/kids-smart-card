@@ -42,22 +42,6 @@ fun Context.isPermissionGranted(permission: String): Boolean {
     return permissionCheck == PackageManager.PERMISSION_GRANTED
 }
 
-fun Drawable.toBitmap(): Bitmap {
-    val drawable = this
-    if (drawable is BitmapDrawable) {
-        return (drawable as BitmapDrawable).bitmap
-    }
-    val bitmap = Bitmap.createBitmap(
-        drawable.intrinsicWidth,
-        drawable.intrinsicHeight,
-        Bitmap.Config.ARGB_8888
-    )
-    val canvas = Canvas(bitmap)
-    drawable.setBounds(0, 0, canvas.width, canvas.height)
-    drawable.draw(canvas)
-    return bitmap
-}
-
 fun Activity.hideNavBar() {
     window.hideNavBar()
 }
