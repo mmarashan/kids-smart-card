@@ -32,7 +32,7 @@ class ArticleGalleryInteractorImplTest {
                 paidCategory
             )
         )
-        `when`(articleRepository.categories()).thenReturn(categoriesFlow)
+        `when`(articleRepository.categories).thenReturn(categoriesFlow)
 
         /* act */
         val interactor = ArticleGalleryInteractorImpl(
@@ -57,6 +57,7 @@ class ArticleGalleryInteractorImplTest {
             description = "",
             fileUrl = "",
             marketItemId = marketItemId,
-            isPaid = isPaid
+            isPaid = isPaid,
+            iconUrl = null
         )
 }

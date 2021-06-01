@@ -14,7 +14,8 @@ internal object Mapper {
             description = it.description.orEmpty(),
             iconUrl = it.iconUrl,
             fileUrl = it.fileUrl,
-            marketItemId = it.marketItemId
+            marketItemId = it.marketItemId,
+            isPaid = false
         )
     }
 

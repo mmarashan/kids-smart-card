@@ -8,13 +8,13 @@ import androidx.room.PrimaryKey
 data class Article(
     @PrimaryKey
     val id: Long,
-    val tags: List<String> = listOf(),
+    val tags: List<String>,
     val author: String,
     val title: String,
     val categoryId: String,
-    val iconUrl: String? = null,
-    val onClickSounds: List<String> = listOf(),
-    val openPhrase: String? = null
+    val iconUrl: String?,
+    val onClickSounds: List<String>,
+    val openPhrase: String?
 )
 
 @Entity
@@ -23,10 +23,10 @@ data class ArticleCategory(
     val id: String,
     val name: String,
     val description: String,
-    val iconUrl: String? = null,
+    val iconUrl: String?,
     val fileUrl: String,
-    val marketItemId: String? = null,
-    var isPaid: Boolean = true
+    val marketItemId: String?,
+    var isPaid: Boolean
 ) {
     @Ignore
     val isFree = marketItemId == null
