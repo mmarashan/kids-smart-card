@@ -2,14 +2,11 @@ package ru.volgadev.article_galery.presentation.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.annotation.AnyThread
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
-import ru.volgadev.article_galery.R
+import ru.volgadev.article_galery.databinding.CategoryTagBinding
 
-internal class TagsAdapter(private val itemLayout: Int) :
-    RecyclerView.Adapter<TagViewHolder>() {
+internal class TagsAdapter : RecyclerView.Adapter<TagViewHolder>() {
 
     interface OnItemClickListener {
         fun onClick(item: String, clickedView: CardView, position: Int)
@@ -25,58 +22,55 @@ internal class TagsAdapter(private val itemLayout: Int) :
         parent: ViewGroup,
         viewType: Int
     ): TagViewHolder {
-        val card =
-            LayoutInflater.from(parent.context).inflate(itemLayout, parent, false) as CardView
-        return TagViewHolder(card)
+        val binding = CategoryTagBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return TagViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: TagViewHolder, position: Int) {
-        holder.bind(position, tags[position], chosenTag, onItemClickListener)
+        val tag = tags[position]
+        holder.bind(position, tag, isChosen = tag == chosenTag, onItemClickListener)
     }
 
     override fun getItemCount() = tags.size
 
-    @AnyThread
     fun setData(dataset: Collection<String>) {
         tags.clear()
-        dataset.forEach { article ->
-            tags.add(article)
-        }
+        dataset.forEach { tags.add(it) }
         notifyDataSetChanged()
     }
 
-    @AnyThread
     fun getChosenTag(): String? = chosenTag
 
     fun setOnItemClickListener(listener: OnItemClickListener) {
         onItemClickListener = listener
     }
 
-    fun onChose(tag: String) {
+    fun onChoose(tag: String) {
         if (tag == chosenTag) return
         chosenTag = tag
         notifyDataSetChanged()
     }
 }
 
-internal class TagViewHolder(private val card: CardView) : RecyclerView.ViewHolder(card) {
-
-    private val tagTextView = card.findViewById<TextView>(R.id.tagTextView)
-
-    private var currentPosition = 0
+internal class TagViewHolder(private val binding: CategoryTagBinding) :
+    RecyclerView.ViewHolder(binding.root) {
 
     fun bind(
         position: Int,
         tag: String,
-        chosenTag: String?,
+        isChosen: Boolean,
         listener: TagsAdapter.OnItemClickListener?
     ) {
-        currentPosition = position
-        tagTextView.text = tag
-        card.alpha = if (tag == chosenTag) 1.0f else 0.8f
-        card.setOnClickListener { view ->
-            listener?.onClick(tag, view as CardView, currentPosition)
+        binding.tagTextView.text = tag
+        binding.root.alpha = if (isChosen) CHOSEN_ALPHA else NO_CHOSEN_ALPHA
+        binding.root.setOnClickListener { view ->
+            listener?.onClick(tag, view as CardView, position)
         }
+    }
+
+    private companion object {
+        const val CHOSEN_ALPHA = 1.0f
+        const val NO_CHOSEN_ALPHA = 0.8f
     }
 }
 

@@ -3,19 +3,15 @@ package ru.volgadev.article_galery.presentation.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.cardview.widget.CardView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import ru.volgadev.article_galery.R
+import ru.volgadev.article_galery.databinding.CardArticleBinding
 import ru.volgadev.article_repository.domain.model.Article
 
-internal class ArticleCardAdapter :
-    RecyclerView.Adapter<ViewHolder>() {
+internal class ArticleCardAdapter : RecyclerView.Adapter<ViewHolder>() {
 
     interface OnItemClickListener {
         fun onClick(item: Article, clickedView: View, position: Int)
@@ -30,9 +26,8 @@ internal class ArticleCardAdapter :
         parent: ViewGroup,
         viewType: Int
     ): ViewHolder {
-        val card = LayoutInflater.from(parent.context)
-            .inflate(R.layout.card_article, parent, false) as CardView
-        return ViewHolder(card)
+        val binding = CardArticleBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) =
@@ -55,43 +50,35 @@ internal class ArticleCardAdapter :
     }
 }
 
-internal class ViewHolder(val card: CardView) : RecyclerView.ViewHolder(card) {
-
-    private val author = card.findViewById<TextView>(R.id.cardAuthor)
-    private val title = card.findViewById<TextView>(R.id.cardTitle)
-    private val image = card.findViewById<ImageView>(R.id.cardImage)
-
+internal class ViewHolder(private val binding: CardArticleBinding) :
+    RecyclerView.ViewHolder(binding.root) {
 
     fun bind(
         position: Int,
         article: Article,
         onItemClickListener: ArticleCardAdapter.OnItemClickListener?
     ) {
-        title.text = article.title
+        binding.cardTitle.text = article.title
 
-        if (article.title.isNotEmpty()) {
-            title.isVisible = true
-            title.text = article.title
-        } else {
-            title.isVisible = false
-        }
+        binding.cardTitle.isVisible = article.title.isNotEmpty()
+        binding.cardTitle.text = article.title
 
-        if (article.author.isNotEmpty()) {
-            author.isVisible = true
-            author.text = article.author
-        } else {
-            author.isVisible = false
-        }
+        binding.cardAuthor.isVisible = article.author.isNotEmpty()
+        binding.cardAuthor.text = article.author
 
         article.iconUrl?.let { url ->
-            Glide.with(image.context).load(url)
-                .transition(DrawableTransitionOptions.withCrossFade(500))
+            Glide.with(binding.cardImage.context).load(url)
+                .transition(DrawableTransitionOptions.withCrossFade(CROSS_FADE_ANIM_DURATION_MS))
                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                .into(image)
+                .into(binding.cardImage)
         }
 
-        card.setOnClickListener { view ->
+        binding.root.setOnClickListener { view ->
             onItemClickListener?.onClick(article, view, position)
         }
+    }
+
+    private companion object {
+        const val CROSS_FADE_ANIM_DURATION_MS = 500
     }
 }

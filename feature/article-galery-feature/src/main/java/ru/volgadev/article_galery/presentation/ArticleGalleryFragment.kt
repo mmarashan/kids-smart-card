@@ -3,22 +3,23 @@ package ru.volgadev.article_galery.presentation
 import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.cardview.widget.CardView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
-import kotlinx.android.synthetic.main.main_fragment.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.firstOrNull
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import ru.volgadev.article_galery.R
+import ru.volgadev.article_galery.databinding.GalleryFragmentLayoutBinding
 import ru.volgadev.article_galery.presentation.adapter.ArticleCardAdapter
 import ru.volgadev.article_galery.presentation.adapter.TagsAdapter
 import ru.volgadev.article_repository.domain.model.Article
@@ -29,7 +30,7 @@ import ru.volgadev.common.scaleToFitAnimatedAndBack
 import ru.volgadev.common.view.scrollToItemToCenter
 
 // TODO: вынести константы
-class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
+class ArticleGalleryFragment : Fragment(R.layout.gallery_fragment_layout) {
 
     private val logger = Logger.get("ArticleGalleryFragment")
 
@@ -39,8 +40,13 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
 
     private val viewModel: ArticleGalleryViewModel by viewModel()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+
+        val binding = GalleryFragmentLayoutBinding.inflate(inflater, container, false)
 
         val articlesAdapter = ArticleCardAdapter()
 
@@ -49,12 +55,10 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
                 val audioPath = track.filePath ?: track.url
                 logger.debug("Play $audioPath")
                 cardsMediaPlayer.setOnCompletionListener {
-                    view.postDelayed({
-                        musicMediaPlayer.setVolume(1f, 1f)
-                    }, 700L)
+                    musicMediaPlayer.setVolume(1f, 1f)
                 }
                 musicMediaPlayer.setVolume(0.4f, 0.4f)
-                cardsMediaPlayer.playAudio(view.context, Uri.parse(audioPath))
+                cardsMediaPlayer.playAudio(requireContext(), Uri.parse(audioPath))
             }
         }
 
@@ -62,7 +66,7 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
             requireActivity().resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
         val spanCount = if (isPortraitOrientation) 2 else 3
 
-        contentRecyclerView.run {
+        binding.contentRecyclerView.run {
             layoutManager = StaggeredGridLayoutManager(spanCount, LinearLayoutManager.VERTICAL)
             adapter = articlesAdapter
             itemAnimator = SlideInUpAnimator().apply {
@@ -94,10 +98,10 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
             }
         }
 
-        val categoryTagsAdapter = TagsAdapter(R.layout.category_tag).apply {
+        val categoryTagsAdapter = TagsAdapter().apply {
             setOnItemClickListener(object : TagsAdapter.OnItemClickListener {
                 override fun onClick(item: String, clickedView: CardView, position: Int) {
-                    categoryRecyclerView.scrollToItemToCenter(position)
+                    binding.categoryRecyclerView.scrollToItemToCenter(position)
                     lifecycleScope.launchWhenCreated {
                         val category = viewModel.availableCategories.firstOrNull()
                             ?.firstOrNull { it.name == item }
@@ -110,10 +114,10 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
         }
 
         lifecycleScope.launchWhenResumed {
-            viewModel.currentCategory.collect { categoryTagsAdapter.onChose(it.name) }
+            viewModel.currentCategory.collect { categoryTagsAdapter.onChoose(it.name) }
         }
 
-        categoryRecyclerView.run {
+        binding.categoryRecyclerView.run {
             setHasFixedSize(true)
             adapter = categoryTagsAdapter
             val dividerDrawable = ContextCompat.getDrawable(context, R.drawable.empty_divider_4)!!
@@ -150,8 +154,8 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
                 trackUrl?.let { url ->
                     try {
                         musicMediaPlayer.playAudio(requireContext(), Uri.parse(url))
-                        musicToggleButton.isChecked = true
-                        musicToggleButton.isVisible = true
+                        binding.musicToggleButton.isChecked = true
+                        binding.musicToggleButton.isVisible = true
                     } catch (e: Exception) {
                         logger.error("Exception when playing: ${e.message}")
                     }
@@ -159,23 +163,24 @@ class ArticleGalleryFragment : Fragment(R.layout.main_fragment) {
             }
         }
 
-        musicToggleButton.isVisible = false
-        musicToggleButton.setOnCheckedChangeListener { buttonView, isChecked ->
+        binding.musicToggleButton.isVisible = false
+        binding.musicToggleButton.setOnCheckedChangeListener { buttonView, isChecked ->
             logger.debug("on click backgroundMusicToggleButton")
             if (isChecked) {
                 musicMediaPlayer.start()
-                musicToggleButton.animateScaledVibration(
+                binding.musicToggleButton.animateScaledVibration(
                     scaleAmplitude = MUSIC_BUTTON_SCALE_AMPLITUDE,
                     durationMs = MUSIC_BUTTON_SCALE_DURATION_MS
                 )
             } else {
-                musicToggleButton.animateScaledVibration(
+                binding.musicToggleButton.animateScaledVibration(
                     scaleAmplitude = -MUSIC_BUTTON_SCALE_AMPLITUDE,
                     durationMs = MUSIC_BUTTON_SCALE_DURATION_MS
                 )
                 musicMediaPlayer.pause()
             }
         }
+        return binding.root
     }
 
     override fun onResume() {
