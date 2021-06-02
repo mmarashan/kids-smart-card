@@ -1,13 +1,15 @@
 package ru.volgadev.cabinet_feature.presentation
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.cabinet_fragment.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import ru.volgadev.cabinet_feature.R
+import ru.volgadev.cabinet_feature.databinding.CabinetFragmentBinding
 import ru.volgadev.common.BuildConfig
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.observeOnce
@@ -20,9 +22,13 @@ class CabinetFragment : Fragment(R.layout.cabinet_fragment) {
 
     private val viewModel: CabinetViewModel by viewModel()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        logger.debug("On fragment created; savedInstanceState=$savedInstanceState")
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+
+        val binding = CabinetFragmentBinding.inflate(inflater, container, false)
 
         val categoriesAdapter = CategoryCardAdapter().apply {
             setOnItemClickListener(object : CategoryCardAdapter.OnItemClickListener {
@@ -50,7 +56,7 @@ class CabinetFragment : Fragment(R.layout.cabinet_fragment) {
             })
         }
 
-        contentRecyclerView.run {
+        binding.contentRecyclerView.run {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
             overScrollMode = View.OVER_SCROLL_NEVER
             adapter = categoriesAdapter
@@ -60,6 +66,8 @@ class CabinetFragment : Fragment(R.layout.cabinet_fragment) {
             logger.debug("Set new market categories ${categories.joinToString(",")} ")
             categoriesAdapter.setData(categories)
         }
+
+        return binding.root
     }
 
     private inline fun checkCorrectPayment(crossinline onAnswer: (Boolean) -> Unit) {

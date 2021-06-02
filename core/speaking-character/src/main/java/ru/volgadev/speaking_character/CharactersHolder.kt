@@ -1,15 +1,11 @@
 package ru.volgadev.speaking_character
 
 import android.content.Context
-import ru.volgadev.speaking_character.Character
-import ru.volgadev.speaking_character.CharacterSize
-import ru.volgadev.speaking_character.Directon
-import ru.volgadev.speaking_character.TextBound
 
 class CharactersHolder(private val context: Context) {
 
     fun getRandom(): Character {
-        return when ((0..2).random()){
+        return when ((0..2).random()) {
             0 -> gingerCat
             1 -> mole
             2 -> whale

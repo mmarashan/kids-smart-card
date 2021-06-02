@@ -12,6 +12,7 @@ import ru.volgadev.cabinet_feature.di.cabinetFeatureModule
 import ru.volgadev.common.log.AndroidLoggerDelegate
 import ru.volgadev.common.log.Logger
 import ru.volgadev.music_data.di.musicRepositoryModule
+import ru.volgadev.papastory.di.appModule
 
 class KidsCardApplication : Application() {
 
@@ -19,11 +20,6 @@ class KidsCardApplication : Application() {
 
     init {
         Logger.setDelegates(AndroidLoggerDelegate())
-    }
-
-    val appModule = module {
-
-        factory<OkHttpClient> { OkHttpClient() }
     }
 
     override fun onCreate() {

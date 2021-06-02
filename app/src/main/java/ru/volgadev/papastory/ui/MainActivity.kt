@@ -6,27 +6,22 @@ import android.os.Bundle
 import android.transition.Slide
 import android.view.Gravity
 import android.view.View
-import androidx.annotation.MainThread
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import kotlinx.android.synthetic.main.main_activity.*
-import ru.volgadev.article_galery.presentation.ArticleGalleryFragment
 import ru.volgadev.common.hideNavBar
 import ru.volgadev.common.isPermissionGranted
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.setVisibleWithTransition
 import ru.volgadev.papastory.R
+import ru.volgadev.papastory.databinding.MainActivityBinding
 
-const val HOME_ITEM_ID = R.id.action_home
-const val GALLERY_ITEM_ID = R.id.action_galery
 const val CONTENT_CONTAINER_ID = R.id.contentContainer
 
-private val NEEDED_PERMISSIONS = arrayOf(
+private val neededPermissions = arrayOf(
     Manifest.permission.READ_EXTERNAL_STORAGE,
     Manifest.permission.WRITE_EXTERNAL_STORAGE
 )
-private const val REQUEST_CODE = 123
 
 private const val ENTER_FRAGMENT_TRANSITION_DURATION_MS = 600L
 private const val EXIT_FRAGMENT_TRANSITION_DURATION_MS = 600L
@@ -40,71 +35,46 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         logger.debug("onCreate($savedInstanceState)")
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.main_activity)
+        val binding = MainActivityBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         val needRequestPermission =
-            NEEDED_PERMISSIONS.map { permission -> this.isPermissionGranted(permission) }
-                .contains(false)
+            neededPermissions.map { isPermissionGranted(it) }.contains(false)
+
         if (needRequestPermission) {
             showPermissionAlertDialog {
-                ActivityCompat.requestPermissions(
-                    this,
-                    NEEDED_PERMISSIONS,
-                    REQUEST_CODE
-                )
+                ActivityCompat.requestPermissions(this, neededPermissions, 0)
             }
         }
 
-        bottomNavigation.setOnNavigationItemSelectedListener { item ->
+        binding.bottomNavigation.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
-                HOME_ITEM_ID -> {
-                    logger.debug("Show gallery fragment")
+                R.id.action_home -> {
                     showCabinet()
                     true
                 }
-                GALLERY_ITEM_ID -> {
-                    logger.debug("galleryFragment selected")
+                R.id.action_galery -> {
                     showGallery()
                     true
                 }
                 else -> false
             }
         }
-        bottomNavigation.selectedItemId = GALLERY_ITEM_ID
+        binding.bottomNavigation.selectedItemId = R.id.action_galery
 
         supportFragmentManager.addOnBackStackChangedListener {
-            supportFragmentManager.findFragmentById(
-                R.id.contentContainer
-            )?.let { provideNavigationPanelVisibility(it) }
+            val currentFragment = supportFragmentManager.findFragmentById(R.id.contentContainer)
+            currentFragment?.let { provideNavigationPanelVisibility(binding, it) }
         }
     }
 
     private fun showCabinet() {
-        logger.debug("showCabinet()")
-        val cabinetFragment =
-            fragmentProvider.getNextFragmentFeature(AppFragment.CABINET_FRAGMENT).apply {
-                enterTransition = Slide(Gravity.START).apply {
-                    duration = ENTER_FRAGMENT_TRANSITION_DURATION_MS
-                }
-                exitTransition = Slide(Gravity.END).apply {
-                    duration = EXIT_FRAGMENT_TRANSITION_DURATION_MS
-                }
-            }
+        val cabinetFragment = fragmentProvider.getFragment(AppFragment.CABINET_FRAGMENT)
         showFragment(cabinetFragment)
     }
 
     private fun showGallery() {
-        logger.debug("showGallery()")
-        val galleryFragment =
-            (fragmentProvider.getNextFragmentFeature(AppFragment.GALLERY_FRAGMENT) as ArticleGalleryFragment).apply {
-                enterTransition = Slide(Gravity.END).apply {
-                    duration = ENTER_FRAGMENT_TRANSITION_DURATION_MS
-                }
-                exitTransition = Slide(Gravity.START).apply {
-                    duration = EXIT_FRAGMENT_TRANSITION_DURATION_MS
-                }
-            }
-
+        val galleryFragment = (fragmentProvider.getFragment(AppFragment.GALLERY_FRAGMENT))
         showFragment(galleryFragment)
     }
 
@@ -114,57 +84,46 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
     }
 
-    override fun onPause() {
-        super.onPause()
-        logger.debug("onPause()")
-    }
-
     private fun showFragment(
         fragment: Fragment,
-        arguments: Bundle? = null,
-        addToBackStack: Boolean = false,
-        clickedView: View? = null
+        addToBackStack: Boolean = false
     ) {
         logger.debug("Show fragment ${fragment.javaClass.canonicalName}")
-        fragment.arguments = arguments
-        val tagFragment = fragment.javaClass.canonicalName
-        val transaction = supportFragmentManager.beginTransaction()
-            .replace(CONTENT_CONTAINER_ID, fragment, tagFragment)
-        if (addToBackStack) transaction.addToBackStack(null)
+        val transaction = supportFragmentManager
+            .beginTransaction()
+            .replace(CONTENT_CONTAINER_ID, fragment, null)
+        if (addToBackStack) transaction.addToBackStack(fragment.javaClass.name)
         transaction.commit()
     }
 
-    private fun provideNavigationPanelVisibility(fragment: Fragment) {
+    private fun provideNavigationPanelVisibility(binding: MainActivityBinding, fragment: Fragment) {
         if (FragmentFeatureProvider.isFullscreen(fragment)) {
-            hideBottomNavigationPanel()
+            binding.hideBottomNavigationPanel()
         } else {
-            showBottomNavigationPanel()
+            binding.showBottomNavigationPanel()
         }
     }
 
-    private fun showBottomNavigationPanel() {
-        logger.debug("showBottomNavigationPanel()")
+    private fun MainActivityBinding.showBottomNavigationPanel() =
         bottomNavigation.setVisibleWithTransition(
             View.VISIBLE,
-            Slide(Gravity.BOTTOM), ENTER_FRAGMENT_TRANSITION_DURATION_MS, mainActivityLayout
+            Slide(Gravity.BOTTOM),
+            ENTER_FRAGMENT_TRANSITION_DURATION_MS,
+            root
         )
-    }
 
-    private fun hideBottomNavigationPanel() {
-        logger.debug("hideBottomNavigationPanel()")
+    private fun MainActivityBinding.hideBottomNavigationPanel() =
         bottomNavigation.setVisibleWithTransition(
             View.GONE,
-            Slide(Gravity.BOTTOM), EXIT_FRAGMENT_TRANSITION_DURATION_MS, mainActivityLayout
+            Slide(Gravity.BOTTOM),
+            EXIT_FRAGMENT_TRANSITION_DURATION_MS,
+            root
         )
-    }
 
-    @MainThread
     private fun showPermissionAlertDialog(onClose: () -> Unit) {
         AlertDialog.Builder(this)
             .setMessage(R.string.request_storage_permission_text)
-            .setPositiveButton(android.R.string.yes) { _, _ ->
-                onClose.invoke()
-            }
+            .setPositiveButton(android.R.string.yes) { _, _ -> onClose.invoke() }
             .setIcon(android.R.drawable.ic_dialog_alert)
             .show()
     }

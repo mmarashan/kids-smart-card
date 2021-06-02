@@ -1,6 +1,5 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion versions.compileSdkVersion
@@ -16,6 +15,8 @@ android {
 
     buildFeatures {
         buildConfig = false
+        viewBinding true
+        dataBinding false
     }
 
     compileOptions {
