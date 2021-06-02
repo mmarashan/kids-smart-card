@@ -10,7 +10,7 @@ enum class AppFragment {
 
 class FragmentFeatureProvider {
 
-    fun getNextFragmentFeature(code: AppFragment): Fragment {
+    fun getFragment(code: AppFragment): Fragment {
         return when (code) {
             AppFragment.GALLERY_FRAGMENT -> ArticleGalleryFragment()
             AppFragment.CABINET_FRAGMENT -> CabinetFragment()
