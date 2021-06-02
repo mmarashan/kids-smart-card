@@ -34,13 +34,7 @@ internal class CabinetViewModel(
         logger.debug("onReadyToPayment ${category.name}, marketItemId = ${category.marketItemId}, isPaid = ${category.isPaid}")
         category.marketItemId?.let { itemId ->
             if (!category.isPaid) {
-                logger.debug("Start payment for $itemId")
-                /**
-                 * In current implementation viewModelScope disposed in onClear
-                 */
-                viewModelScope.launch {
-                    articleRepository.requestPaymentForCategory(category)
-                }
+                viewModelScope.launch { articleRepository.requestPaymentForCategory(category) }
             } else {
                 viewModelScope.launch {
                     if (BuildConfig.DEBUG) {
