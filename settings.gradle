@@ -12,4 +12,5 @@ include ':app',
         ':core:music-data',
         ':core:downloader',
         ':core:speaking-character',
-        ':core:lint-rule'
+        ':core:lint-rule',
+        ':core:player'
