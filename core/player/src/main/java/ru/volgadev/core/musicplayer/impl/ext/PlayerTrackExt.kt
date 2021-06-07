@@ -5,7 +5,7 @@ import com.google.android.exoplayer2.MediaItem
 import ru.volgadev.core.musicplayer.api.PlayerTrack
 import java.io.File
 
-fun PlayerTrack.toMediaItem(): MediaItem? {
+internal fun PlayerTrack.toMediaItem(): MediaItem? {
     val path = if (file != null && file.isExistsNonEmptyFile()) file.path else remoteUri?.toString()
     val uri: Uri = try {
         Uri.parse(path)
@@ -15,6 +15,6 @@ fun PlayerTrack.toMediaItem(): MediaItem? {
     return MediaItem.Builder().setUri(uri).setMediaId(id).build()
 }
 
-fun File.isExistsNonEmptyFile(): Boolean {
+internal fun File.isExistsNonEmptyFile(): Boolean {
     return isFile && exists() && length() > 0
 }

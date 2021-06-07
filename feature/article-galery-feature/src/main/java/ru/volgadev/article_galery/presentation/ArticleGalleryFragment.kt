@@ -34,10 +34,6 @@ class ArticleGalleryFragment : Fragment(R.layout.gallery_fragment_layout) {
 
     private val logger = Logger.get("ArticleGalleryFragment")
 
-    // TODO: рефакторить работу с плеерами (мб в свой интерактор их)
-    private val musicMediaPlayer by lazy { BackgroundMediaPlayer() }
-    private val cardsMediaPlayer by lazy { BackgroundMediaPlayer() }
-
     private val viewModel: ArticleGalleryViewModel by viewModel()
 
     override fun onCreateView(
@@ -49,18 +45,6 @@ class ArticleGalleryFragment : Fragment(R.layout.gallery_fragment_layout) {
         val binding = GalleryFragmentLayoutBinding.inflate(inflater, container, false)
 
         val articlesAdapter = ArticleCardAdapter()
-
-        lifecycleScope.launchWhenResumed {
-            viewModel.trackToPlaying.collect { track ->
-                val audioPath = track.filePath ?: track.url
-                logger.debug("Play $audioPath")
-                cardsMediaPlayer.setOnCompletionListener {
-                    musicMediaPlayer.setVolume(1f, 1f)
-                }
-                musicMediaPlayer.setVolume(0.4f, 0.4f)
-                cardsMediaPlayer.playAudio(requireContext(), Uri.parse(audioPath))
-            }
-        }
 
         val isPortraitOrientation =
             requireActivity().resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
@@ -142,43 +126,14 @@ class ArticleGalleryFragment : Fragment(R.layout.gallery_fragment_layout) {
             }
         }
 
-        lifecycleScope.launchWhenResumed {
-            viewModel.tracks.collect { tracks ->
-                // TODO: refactor work with players. remove from view!
-                val downloadedTracks = tracks.filter { track -> track.filePath != null }
-                val trackUrl = if (downloadedTracks.isNotEmpty()) {
-                    downloadedTracks.random().filePath
-                } else {
-                    tracks.randomOrNull()?.url
-                }
-                trackUrl?.let { url ->
-                    try {
-                        musicMediaPlayer.playAudio(requireContext(), Uri.parse(url))
-                        binding.musicToggleButton.isChecked = true
-                        binding.musicToggleButton.isVisible = true
-                    } catch (e: Exception) {
-                        logger.error("Exception when playing: ${e.message}")
-                    }
-                }
-            }
-        }
-
-        binding.musicToggleButton.isVisible = false
-        binding.musicToggleButton.setOnCheckedChangeListener { buttonView, isChecked ->
+        binding.musicToggleButton.setOnCheckedChangeListener { _, isChecked ->
             logger.debug("on click backgroundMusicToggleButton")
-            if (isChecked) {
-                musicMediaPlayer.start()
-                binding.musicToggleButton.animateScaledVibration(
-                    scaleAmplitude = MUSIC_BUTTON_SCALE_AMPLITUDE,
-                    durationMs = MUSIC_BUTTON_SCALE_DURATION_MS
-                )
-            } else {
-                binding.musicToggleButton.animateScaledVibration(
-                    scaleAmplitude = -MUSIC_BUTTON_SCALE_AMPLITUDE,
-                    durationMs = MUSIC_BUTTON_SCALE_DURATION_MS
-                )
-                musicMediaPlayer.pause()
-            }
+            viewModel.onToggleMusicPlayer(isChecked)
+            val buttonAmplitudeSign = if (isChecked) 1 else -1
+            binding.musicToggleButton.animateScaledVibration(
+                scaleAmplitude = buttonAmplitudeSign * MUSIC_BUTTON_SCALE_AMPLITUDE,
+                durationMs = MUSIC_BUTTON_SCALE_DURATION_MS
+            )
         }
         return binding.root
     }
@@ -186,13 +141,12 @@ class ArticleGalleryFragment : Fragment(R.layout.gallery_fragment_layout) {
     override fun onResume() {
         super.onResume()
         logger.debug("onResume()")
-        if (musicMediaPlayer.isPaused()) musicMediaPlayer.start()
-
+        viewModel.onToggleMusicPlayer(true)
     }
 
     override fun onPause() {
         logger.debug("onPause()")
-        musicMediaPlayer.pause()
+        viewModel.onToggleMusicPlayer(false)
         super.onPause()
     }
 

@@ -3,8 +3,10 @@ package ru.volgadev.core.musicplayer.impl
 import android.content.Context
 import android.os.Handler
 import android.os.HandlerThread
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import ru.volgadev.core.musicplayer.api.MusicPlayer
+import ru.volgadev.core.musicplayer.api.PlayerListener
 import ru.volgadev.core.musicplayer.api.PlayerTrack
 import ru.volgadev.core.musicplayer.impl.ext.toMediaItem
 
@@ -13,19 +15,29 @@ internal class MusicPlayerImpl(
 ) : MusicPlayer {
 
     private val handler by lazy {
-        val handlerThread = HandlerThread("background_music_player $this")
+        val handlerThread = HandlerThread("music_player_$this")
             .apply { start() }
         Handler(handlerThread.looper)
+    }
+
+    private val listener = object : Player.Listener {
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+            playerListener?.onIsPlayingChanged(isPlaying, getCurrent())
+        }
     }
 
     private val player by lazy {
         SimpleExoPlayer
             .Builder(context)
             .setLooper(handler.looper)
-            .build()
+            .build().apply {
+                addListener(listener)
+            }
     }
 
     private val playlist = ArrayList<PlayerTrack>()
+
+    private var playerListener: PlayerListener? = null
 
     override fun play() {
         if (isPlaying()) return
@@ -45,6 +57,10 @@ internal class MusicPlayerImpl(
         handler.post {
             player.stop()
         }
+    }
+
+    override fun setListener(listener: PlayerListener?) {
+        playerListener = listener
     }
 
     override fun setPlaylist(playlist: Collection<PlayerTrack>) {
@@ -68,6 +84,7 @@ internal class MusicPlayerImpl(
                     player.seekTo(0, 0)
                 }
             }
+            player.play()
         }
     }
 
@@ -97,6 +114,10 @@ internal class MusicPlayerImpl(
     override fun isPlaying(): Boolean = player.isPlaying
 
     override fun release() {
-        handler.post { player.release() }
+        playlist.clear()
+        handler.post {
+            player.release()
+            handler.looper.quitSafely()
+        }
     }
 }

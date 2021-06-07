@@ -11,6 +11,8 @@ interface MusicPlayer {
 
     fun stop()
 
+    fun setListener(listener: PlayerListener?)
+
     fun setPlaylist(playlist: Collection<PlayerTrack>)
 
     fun playNow(track: PlayerTrack)
@@ -33,3 +35,7 @@ data class PlayerTrack(
     val file: File? = null,
     val remoteUri: URI? = null
 )
+
+interface PlayerListener {
+    fun onIsPlayingChanged(isPlaying: Boolean, track: PlayerTrack?)
+}
