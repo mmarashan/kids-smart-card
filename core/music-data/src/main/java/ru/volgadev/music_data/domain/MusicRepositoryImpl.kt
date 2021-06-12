@@ -16,7 +16,8 @@ internal class MusicRepositoryImpl(
     private val context: Context,
     private val musicBackendApi: MusicBackendApi,
     private val musicTrackDatabase: MusicTrackDatabase,
-    private val ioDispatcher: CoroutineDispatcher
+    private val ioDispatcher: CoroutineDispatcher,
+    private val downloader: Downloader
 ) : MusicRepository {
 
     private val logger = Logger.get("MusicRepositoryImpl")
@@ -25,8 +26,6 @@ internal class MusicRepositoryImpl(
     private val articleAudiosFlow = MutableSharedFlow<ArrayList<MusicTrack>>(replay = 1)
 
     private val scope: CoroutineScope = CoroutineScope(ioDispatcher + Job())
-
-    private val downloader = Downloader(context, scope)
 
     override fun musicTracks() = musicTracksFlow
 
