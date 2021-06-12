@@ -20,6 +20,7 @@
         android:background="@color/navigationBarColor"
         app:itemIconTint="@color/colorLightText"
         app:itemTextColor="@color/colorLightText"
+        app:itemTextAppearanceActive="@style/TextAppearance.AppCompat"
         app:labelVisibilityMode="labeled"
         app:layout_constraintBottom_toBottomOf="parent"
         app:menu="@menu/bottom_navigation_menu" />

@@ -77,7 +77,6 @@ class ArticleGalleryViewModelTest {
         val categories = listOf(category1, category2)
 
         every { interactor.availableCategories() } returns MutableStateFlow(categories)
-        every { interactor.musicTracks() } returns emptyFlow()
         coEvery { interactor.getCategoryArticles(category1) } returns listArticles1
         coEvery { interactor.getCategoryArticles(category2) } returns listArticles2
 
