@@ -23,7 +23,6 @@ import ru.volgadev.article_galery.databinding.GalleryFragmentLayoutBinding
 import ru.volgadev.article_galery.presentation.adapter.ArticleCardAdapter
 import ru.volgadev.article_galery.presentation.adapter.TagsAdapter
 import ru.volgadev.article_repository.domain.model.Article
-import ru.volgadev.common.BackgroundMediaPlayer
 import ru.volgadev.common.animateScaledVibration
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.scaleToFitAnimatedAndBack

@@ -35,18 +35,16 @@ internal class MusicRepositoryImpl(
     override suspend fun loadArticleAudio(url: String): MusicTrack? = withContext(ioDispatcher) {
         logger.debug("loadArticleAudio($url)")
         val loadedTrack = loadMusicTrack(url, MusicTrackType.ARTICLE_AUDIO)
-        loadedTrack?.also { loadedTrack ->
+        loadedTrack?.also {
             val audios = articleAudiosFlow.first()
             var updated = false
             audios.forEach { audio ->
-                if (audio.url == loadedTrack.url) {
-                    audio.filePath = loadedTrack.url
+                if (audio.url == it.url) {
+                    audio.filePath = it.url
                     updated = true
                 }
             }
-            if (updated) {
-                articleAudiosFlow.emit(audios)
-            }
+            if (updated) articleAudiosFlow.emit(audios)
         }
     }
 
@@ -80,7 +78,7 @@ internal class MusicRepositoryImpl(
 
     init {
         logger.debug("init")
-        scope.launch(Dispatchers.Default) {
+        scope.launch {
             try {
                 loadFromDB()
                 updateMusicTracks()
@@ -95,7 +93,7 @@ internal class MusicRepositoryImpl(
         val fromBackendTracks = musicBackendApi.getTracks()
         val tracksToDownloading = mutableListOf<MusicTrack>()
         val inStorageTracks =
-            musicTrackDatabase.dao().getAll().map { track -> track.url to track.filePath }.toMap()
+            musicTrackDatabase.dao().getAll().map { it.url to it.filePath }.toMap()
         for (track in fromBackendTracks) {
             val pathInStorage = inStorageTracks[track.url]
             if (pathInStorage != null) {

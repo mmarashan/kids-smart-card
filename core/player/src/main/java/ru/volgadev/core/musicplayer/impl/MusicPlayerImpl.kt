@@ -3,6 +3,7 @@ package ru.volgadev.core.musicplayer.impl
 import android.content.Context
 import android.os.Handler
 import android.os.HandlerThread
+import android.util.Log
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import ru.volgadev.core.musicplayer.api.MusicPlayer
@@ -26,13 +27,15 @@ internal class MusicPlayerImpl(
         }
     }
 
-    private val player by lazy {
+    private val player: SimpleExoPlayer by lazy {
+        Log.d(TAG, "Create player")
         SimpleExoPlayer
-            .Builder(context)
+            .Builder(context.applicationContext)
             .setLooper(handler.looper)
             .build().apply {
                 addListener(listener)
             }
+
     }
 
     private val playlist = ArrayList<PlayerTrack>()
@@ -40,20 +43,21 @@ internal class MusicPlayerImpl(
     private var playerListener: PlayerListener? = null
 
     override fun play() {
-        if (isPlaying()) return
+        Log.d(TAG, "play")
         handler.post {
-            player.prepare()
             player.play()
         }
     }
 
     override fun pause() {
+        Log.d(TAG, "pause")
         handler.post {
             player.pause()
         }
     }
 
     override fun stop() {
+        Log.d(TAG, "stop")
         handler.post {
             player.stop()
         }
@@ -64,27 +68,27 @@ internal class MusicPlayerImpl(
     }
 
     override fun setPlaylist(playlist: Collection<PlayerTrack>) {
+        Log.d(TAG, "setPlaylist $playlist")
         this.playlist.clear()
         this.playlist.addAll(playlist)
 
         val mediaItems = playlist.mapNotNull { it.toMediaItem() }
         handler.post {
             player.setMediaItems(mediaItems, true)
+            player.prepare()
         }
     }
 
     override fun playNow(track: PlayerTrack) {
+        Log.d(TAG, "playNow $track")
         handler.post {
             val itemPositionInPlaylist = playlist.indexOf(track)
             if (itemPositionInPlaylist >= 0) {
                 player.seekTo(itemPositionInPlaylist, 0)
             } else {
-                track.toMediaItem()?.let {
-                    player.addMediaItem(0, it)
-                    player.seekTo(0, 0)
-                }
+                Log.d(TAG, "playNow $track; track not in playlist!")
             }
-            player.play()
+            play()
         }
     }
 
@@ -119,5 +123,9 @@ internal class MusicPlayerImpl(
             player.release()
             handler.looper.quitSafely()
         }
+    }
+
+    private companion object {
+        const val TAG = "MusicPlayerImpl"
     }
 }

@@ -46,9 +46,11 @@ internal class ArticleGalleryInteractorImpl(
 
     override suspend fun startBackgroundPlayer() {
         if (isBackgroundMusicEnabled) {
-            if (musicTracks == null) loadMusicTracks()
-            val tracks = musicTracks
-            if (!tracks.isNullOrEmpty()) musicPlayer.setPlaylist(tracks)
+            if (musicTracks == null) {
+                loadMusicTracks()
+                val tracks = musicTracks
+                if (!tracks.isNullOrEmpty()) musicPlayer.setPlaylist(tracks)
+            }
 
             musicPlayer.play()
         }
@@ -63,7 +65,10 @@ internal class ArticleGalleryInteractorImpl(
     override suspend fun playCardSounds(article: Article) {
         article.onClickSounds.forEach { audioUrl ->
             val track = getCardTrack(audioUrl)
-            track?.let { cardPlayer.playNow(track) }
+            track?.let {
+                cardPlayer.setPlaylist(listOf(track))
+                cardPlayer.play()
+            }
         }
     }
 
@@ -94,6 +99,5 @@ internal class ArticleGalleryInteractorImpl(
             map(MusicTrack(url = url, filePath = null, type = MusicTrackType.ARTICLE_AUDIO))
         }
     }
-
 }
 
