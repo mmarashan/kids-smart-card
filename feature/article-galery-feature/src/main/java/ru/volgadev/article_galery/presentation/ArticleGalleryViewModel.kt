@@ -9,8 +9,6 @@ import ru.volgadev.article_galery.domain.ArticleGalleryInteractor
 import ru.volgadev.article_repository.domain.model.Article
 import ru.volgadev.article_repository.domain.model.ArticleCategory
 import ru.volgadev.common.log.Logger
-import ru.volgadev.music_data.domain.model.MusicTrack
-import ru.volgadev.music_data.domain.model.MusicTrackType
 
 internal class ArticleGalleryViewModel(
     private val interactor: ArticleGalleryInteractor
@@ -20,15 +18,10 @@ internal class ArticleGalleryViewModel(
 
     private val categoryFlow = MutableSharedFlow<ArticleCategory>(replay = 1)
     private val articlesFlow = MutableSharedFlow<List<Article>>(replay = 1)
-    private val trackFlow = MutableSharedFlow<MusicTrack>(replay = 0)
 
     val currentCategory: SharedFlow<ArticleCategory> = categoryFlow
 
     val currentArticles: SharedFlow<List<Article>> = articlesFlow
-
-    val tracks = interactor.musicTracks()
-
-    val trackToPlaying: SharedFlow<MusicTrack> = trackFlow
 
     val availableCategories = interactor.availableCategories()
 
@@ -41,16 +34,11 @@ internal class ArticleGalleryViewModel(
 
     fun onClickArticle(article: Article) = viewModelScope.launch {
         logger.debug("onClickArticle ${article.title}")
-        article.onClickSounds.forEach { audioUrl ->
-            val loadedAudio = interactor.getTrackFromStorage(audioUrl)
-            if (loadedAudio != null) {
-                trackFlow.emit(loadedAudio)
-            } else {
-                trackFlow.emit(
-                    MusicTrack(audioUrl, filePath = null, type = MusicTrackType.ARTICLE_AUDIO)
-                )
-                interactor.loadArticleAudio(audioUrl)
-            }
-        }
+        interactor.playCardSounds(article)
+    }
+
+    fun onToggleMusicPlayer(isChecked: Boolean) = viewModelScope.launch {
+        if (isChecked) interactor.startBackgroundPlayer()
+        else interactor.pauseBackgroundPlayer()
     }
 }
