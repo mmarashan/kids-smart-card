@@ -4,9 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/categoryCardView"
     android:layout_width="match_parent"
-    android:layout_height="100dp"
+    android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    android:minHeight="100dp"
     card_view:cardCornerRadius="8dp"
     card_view:cardElevation="8dp">
 
@@ -21,6 +20,8 @@
             android:layout_height="64dp"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
             android:scaleType="fitCenter"
             card_view:layout_constraintBottom_toBottomOf="parent"
             card_view:layout_constraintStart_toStartOf="parent"
@@ -30,27 +31,27 @@
 
         <TextView
             android:id="@+id/categoryTitle"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginStart="16dp"
             android:textSize="20sp"
             android:textStyle="bold"
+            card_view:layout_constraintEnd_toStartOf="@id/categoryStatus"
             card_view:layout_constraintStart_toEndOf="@id/categoryImage"
             card_view:layout_constraintTop_toTopOf="@id/categoryImage"
             tools:text="Цифры от логопеда Алешки" />
 
         <TextView
             android:id="@+id/categoryDescription"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_marginStart="8dp"
-            android:layout_marginBottom="4dp"
+            android:layout_marginStart="16dp"
             android:lineSpacingExtra="-0.02dp"
             android:lines="2"
             android:textSize="16sp"
+            card_view:layout_constraintEnd_toStartOf="@id/categoryStatus"
             card_view:layout_constraintStart_toEndOf="@id/categoryImage"
             card_view:layout_constraintTop_toBottomOf="@id/categoryTitle"
             tools:text="Цифры с авторской методикой от логопеда Алешки" />

@@ -37,6 +37,7 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launchWhenResumed {
             viewModel.currentScreen.collect {
                 showFragment(it.getScreen())
+                hideNavBar()
             }
         }
 
@@ -54,12 +55,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
         binding.bottomNavigation.selectedItemId = R.id.action_galery
-    }
-
-    override fun onResume() {
-        logger.debug("onResume()")
-        hideNavBar()
-        super.onResume()
     }
 
     private fun showFragment(
