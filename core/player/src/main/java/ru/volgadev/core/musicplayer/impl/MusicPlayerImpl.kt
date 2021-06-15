@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Handler
 import android.os.HandlerThread
 import android.util.Log
+import com.google.android.exoplayer2.ExoPlaybackException
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import ru.volgadev.core.musicplayer.api.MusicPlayer
@@ -24,6 +25,10 @@ internal class MusicPlayerImpl(
     private val listener = object : Player.Listener {
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             playerListener?.onIsPlayingChanged(isPlaying, getCurrent())
+        }
+
+        override fun onPlayerError(error: ExoPlaybackException) {
+            Log.e(TAG, "ExoPlayer error, ${error.sourceException.message}")
         }
     }
 
