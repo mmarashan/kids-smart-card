@@ -10,12 +10,10 @@
     card_view:cardCornerRadius="8dp"
     card_view:cardElevation="8dp">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cardLinearLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal"
-        android:weightSum="1">
+        android:layout_height="match_parent">
 
         <ImageView
             android:id="@+id/categoryImage"
@@ -24,51 +22,53 @@
             android:layout_gravity="center_vertical"
             android:layout_marginStart="16dp"
             android:scaleType="fitCenter"
+            card_view:layout_constraintBottom_toBottomOf="parent"
+            card_view:layout_constraintStart_toStartOf="parent"
+            card_view:layout_constraintTop_toTopOf="parent"
             tools:src="@drawable/app_icon" />
 
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
+
+        <TextView
+            android:id="@+id/categoryTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:gravity="center"
-            android:layout_weight="0.9"
-            android:orientation="vertical">
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            card_view:layout_constraintStart_toEndOf="@id/categoryImage"
+            card_view:layout_constraintTop_toTopOf="@id/categoryImage"
+            tools:text="Цифры от логопеда Алешки" />
 
-            <TextView
-                android:id="@+id/categoryTitle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="4dp"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                tools:text="Цифры от логопеда Алешки" />
+        <TextView
+            android:id="@+id/categoryDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="8dp"
+            android:layout_marginBottom="4dp"
+            android:lineSpacingExtra="-0.02dp"
+            android:lines="2"
+            android:textSize="16sp"
+            card_view:layout_constraintStart_toEndOf="@id/categoryImage"
+            card_view:layout_constraintTop_toBottomOf="@id/categoryTitle"
+            tools:text="Цифры с авторской методикой от логопеда Алешки" />
 
-            <TextView
-                android:id="@+id/categoryDescription"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_marginStart="8dp"
-                android:layout_marginBottom="4dp"
-                android:lineSpacingExtra="-0.02dp"
-                android:lines="2"
-                android:textSize="16sp"
-                tools:text="Цифры с авторской методикой от логопеда Алешки" />
-
-        </LinearLayout>
 
         <ImageView
             android:id="@+id/categoryStatus"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="24dp"
             android:layout_weight="0.1"
-            android:layout_gravity="center_vertical"
             android:scaleType="fitCenter"
-            android:src="@drawable/ic_baseline_star_24" />
-    </LinearLayout>
+            android:src="@drawable/ic_baseline_star_24"
+            card_view:layout_constraintBottom_toBottomOf="parent"
+            card_view:layout_constraintEnd_toEndOf="parent"
+            card_view:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>
