@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import ru.volgadev.article_galery.domain.ArticleGalleryInteractor
 import ru.volgadev.article_repository.domain.model.Article
@@ -27,9 +28,12 @@ internal class ArticleGalleryViewModel(
 
     fun onClickCategory(category: ArticleCategory) = viewModelScope.launch {
         logger.debug("onClickCategory ${category.name}")
-        val categoryArticles = interactor.getCategoryArticles(category)
-        categoryFlow.emit(category)
-        articlesFlow.emit(categoryArticles)
+        val currentCategory = categoryFlow.replayCache.firstOrNull()
+        if (category != currentCategory) {
+            val categoryArticles = interactor.getCategoryArticles(category)
+            categoryFlow.emit(category)
+            articlesFlow.emit(categoryArticles)
+        }
     }
 
     fun onClickArticle(article: Article) = viewModelScope.launch {

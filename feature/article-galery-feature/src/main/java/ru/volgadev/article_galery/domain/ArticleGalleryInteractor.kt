@@ -57,9 +57,7 @@ internal class ArticleGalleryInteractorImpl(
     }
 
     override suspend fun pauseBackgroundPlayer() {
-        if (isBackgroundMusicEnabled) {
-            musicPlayer.pause()
-        }
+        if (isBackgroundMusicEnabled) musicPlayer.pause()
     }
 
     override suspend fun playCardSounds(article: Article) {

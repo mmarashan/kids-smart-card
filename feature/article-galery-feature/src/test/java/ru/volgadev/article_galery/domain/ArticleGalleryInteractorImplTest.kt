@@ -8,6 +8,7 @@ import org.junit.Test
 import org.mockito.Mockito.`when`
 import ru.volgadev.article_repository.domain.ArticleRepository
 import ru.volgadev.article_repository.domain.model.ArticleCategory
+import ru.volgadev.core.musicplayer.api.MusicPlayer
 import ru.volgadev.music_data.domain.MusicRepository
 import java.util.*
 
@@ -18,6 +19,8 @@ class ArticleGalleryInteractorImplTest {
 
     private val articleRepository = mock<ArticleRepository>()
     private val musicRepository = mock<MusicRepository>()
+    private val musicPlayer = mock<MusicPlayer>()
+    private val cardPlayer = mock<MusicPlayer>()
 
     @Test
     fun `when subscribe to availableCategories, then not paid items filtered`() = runBlockingTest {
@@ -34,10 +37,12 @@ class ArticleGalleryInteractorImplTest {
         )
         `when`(articleRepository.categories).thenReturn(categoriesFlow)
 
-        /* act */
+        /* action */
         val interactor = ArticleGalleryInteractorImpl(
             articleRepository,
             musicRepository,
+            musicPlayer,
+            cardPlayer,
             isBackgroundMusicEnabled = false
         )
         val availableCategories = interactor.availableCategories().first()

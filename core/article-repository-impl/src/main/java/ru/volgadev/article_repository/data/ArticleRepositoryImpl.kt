@@ -13,7 +13,7 @@ import ru.volgadev.common.log.Logger
 import ru.volgadev.googlebillingclientwrapper.*
 import ru.volgadev.googlebillingclientwrapper.api.ItemSkuType
 import ru.volgadev.googlebillingclientwrapper.api.PaymentManager
-import java.net.ConnectException
+import java.io.IOException
 
 internal class ArticleRepositoryImpl(
     private val remoteDataSource: ArticleRemoteDataSource,
@@ -59,7 +59,7 @@ internal class ArticleRepositoryImpl(
         scope.launch {
             try {
                 updateCategories()
-            } catch (e: ConnectException) {
+            } catch (e: IOException) {
                 logger.error("Exception when load from server $e")
             }
         }
@@ -70,7 +70,8 @@ internal class ArticleRepositoryImpl(
 
             val categoryArticles = articlesCache[category.id] ?: try {
                 updateCategoryArticles(category)
-            } catch (e: ConnectException) {
+            } catch (e: IOException) {
+                logger.error("Exception when load from server $e")
                 database.dao().getArticlesByCategory(category.id)
             }
             logger.debug("${categoryArticles.size} articles")
@@ -89,13 +90,13 @@ internal class ArticleRepositoryImpl(
 
     override fun dispose() = scope.cancel()
 
-    @Throws(ConnectException::class)
+    @Throws(IOException::class)
     private suspend fun updateCategories() = withContext(ioDispatcher) {
         val categories = remoteDataSource.getCategories()
         database.dao().insertAllCategories(*categories.toTypedArray())
     }
 
-    @Throws(Exception::class)
+    @Throws(IOException::class)
     private suspend fun updateCategoryArticles(category: ArticleCategory): List<Article> =
         withContext(ioDispatcher) {
             val categoryArticles = remoteDataSource.getArticles(category)

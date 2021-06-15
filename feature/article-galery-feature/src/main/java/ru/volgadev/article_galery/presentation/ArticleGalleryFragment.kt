@@ -1,24 +1,19 @@
 package ru.volgadev.article_galery.presentation
 
 import android.content.res.Configuration
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.cardview.widget.CardView
-import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.firstOrNull
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import ru.volgadev.article_galery.R
 import ru.volgadev.article_galery.databinding.GalleryFragmentLayoutBinding
 import ru.volgadev.article_galery.presentation.adapter.ArticleCardAdapter
 import ru.volgadev.article_galery.presentation.adapter.TagsAdapter
@@ -28,8 +23,7 @@ import ru.volgadev.common.log.Logger
 import ru.volgadev.common.scaleToFitAnimatedAndBack
 import ru.volgadev.common.view.scrollToItemToCenter
 
-// TODO: вынести константы
-class ArticleGalleryFragment : Fragment(R.layout.gallery_fragment_layout) {
+class ArticleGalleryFragment : Fragment() {
 
     private val logger = Logger.get("ArticleGalleryFragment")
 
@@ -53,8 +47,9 @@ class ArticleGalleryFragment : Fragment(R.layout.gallery_fragment_layout) {
             layoutManager = StaggeredGridLayoutManager(spanCount, LinearLayoutManager.VERTICAL)
             adapter = articlesAdapter
             itemAnimator = SlideInUpAnimator().apply {
-                addDuration = 248
-                removeDuration = 200
+                addDuration = CARD_ADD_ANIMATION_DURATION_MS
+                removeDuration = CARD_ADD_ANIMATION_DURATION_MS
+                changeDuration = CARD_ADD_ANIMATION_DURATION_MS
             }
         }
 
@@ -88,9 +83,7 @@ class ArticleGalleryFragment : Fragment(R.layout.gallery_fragment_layout) {
                     lifecycleScope.launchWhenCreated {
                         val category = viewModel.availableCategories.firstOrNull()
                             ?.firstOrNull { it.name == item }
-                        category?.let { cat ->
-                            viewModel.onClickCategory(cat)
-                        }
+                        category?.let { viewModel.onClickCategory(it) }
                     }
                 }
             })
@@ -103,12 +96,6 @@ class ArticleGalleryFragment : Fragment(R.layout.gallery_fragment_layout) {
         binding.categoryRecyclerView.run {
             setHasFixedSize(true)
             adapter = categoryTagsAdapter
-            val dividerDrawable = ContextCompat.getDrawable(context, R.drawable.empty_divider_4)!!
-            val dividerDecorator =
-                DividerItemDecoration(context, DividerItemDecoration.HORIZONTAL).apply {
-                    setDrawable(dividerDrawable)
-                }
-            addItemDecoration(dividerDecorator)
             itemAnimator = null
         }
 
@@ -134,6 +121,7 @@ class ArticleGalleryFragment : Fragment(R.layout.gallery_fragment_layout) {
                 durationMs = MUSIC_BUTTON_SCALE_DURATION_MS
             )
         }
+        viewModel.onToggleMusicPlayer(binding.musicToggleButton.isChecked)
         return binding.root
     }
 
@@ -164,7 +152,8 @@ class ArticleGalleryFragment : Fragment(R.layout.gallery_fragment_layout) {
     }
 
     private companion object {
-        const val MUSIC_BUTTON_SCALE_AMPLITUDE = 0.2f
-        const val MUSIC_BUTTON_SCALE_DURATION_MS = 800L
+        const val MUSIC_BUTTON_SCALE_AMPLITUDE = 0.15f
+        const val MUSIC_BUTTON_SCALE_DURATION_MS = 600L
+        const val CARD_ADD_ANIMATION_DURATION_MS = 250L
     }
 }

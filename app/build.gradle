@@ -59,6 +59,7 @@ dependencies {
     implementation "io.insert-koin:koin-android:${versions.koin}"
     implementation "androidx.lifecycle:lifecycle-extensions:${versions.androidxlifecycle}"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${versions.androidxlifecycle}"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:${versions.androidxlifecycleruntime}"
     implementation "com.google.android.material:material:${versions.material}"
 
     implementation "com.squareup.okhttp3:okhttp:${versions.okhttp}"
