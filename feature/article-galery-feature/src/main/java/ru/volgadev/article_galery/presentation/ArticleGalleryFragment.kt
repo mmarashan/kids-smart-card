@@ -6,9 +6,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.cardview.widget.CardView
+import androidx.core.view.postDelayed
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_DRAGGING
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import jp.wasabeef.recyclerview.animators.SlideInUpAnimator
 import kotlinx.coroutines.flow.collect
@@ -21,6 +24,7 @@ import ru.volgadev.article_repository.domain.model.Article
 import ru.volgadev.common.animateScaledVibration
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.scaleToFitAnimatedAndBack
+import ru.volgadev.common.setVisibleWithTransition
 import ru.volgadev.common.view.scrollToItemToCenter
 
 class ArticleGalleryFragment : Fragment() {
@@ -51,6 +55,12 @@ class ArticleGalleryFragment : Fragment() {
                 removeDuration = CARD_ADD_ANIMATION_DURATION_MS
                 changeDuration = CARD_ADD_ANIMATION_DURATION_MS
             }
+            addOnScrollListener(object: RecyclerView.OnScrollListener() {
+                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                    super.onScrollStateChanged(recyclerView, newState)
+                    if (newState == SCROLL_STATE_DRAGGING) binding.showMusicControlPanelForTime()
+                }
+            })
         }
 
         var canClick = true
@@ -112,19 +122,21 @@ class ArticleGalleryFragment : Fragment() {
             }
         }
 
-        binding.musicToggleButton.setOnCheckedChangeListener { _, isChecked ->
+        val musicToggleButton = binding.musicControlsLayout.musicToggleButton
+        musicToggleButton.setOnCheckedChangeListener { _, isChecked ->
             logger.debug("on click backgroundMusicToggleButton")
             viewModel.onToggleMusicPlayer(isChecked)
             val buttonAmplitudeSign = if (isChecked) 1 else -1
-            binding.musicToggleButton.animateScaledVibration(
+            musicToggleButton.animateScaledVibration(
                 scaleAmplitude = buttonAmplitudeSign * MUSIC_BUTTON_SCALE_AMPLITUDE,
                 durationMs = MUSIC_BUTTON_SCALE_DURATION_MS
             )
         }
-        viewModel.onToggleMusicPlayer(binding.musicToggleButton.isChecked)
+        viewModel.onToggleMusicPlayer(musicToggleButton.isChecked)
 
-        binding.prevTrackButton.setOnClickListener { viewModel.onClickPreviousTrack() }
-        binding.nextTrackButton.setOnClickListener { viewModel.onClickNextTrack()  }
+        binding.musicControlsLayout.prevTrackButton.setOnClickListener { viewModel.onClickPreviousTrack() }
+        binding.musicControlsLayout.nextTrackButton.setOnClickListener { viewModel.onClickNextTrack() }
+        binding.showMusicControlPanelForTime()
 
         return binding.root
     }
@@ -153,6 +165,14 @@ class ArticleGalleryFragment : Fragment() {
             view.elevation = startElevation
             onEnd.invoke()
         }
+    }
+
+
+    private fun GalleryFragmentLayoutBinding.showMusicControlPanelForTime(){
+        musicControlsLayout.root.visibility = View.VISIBLE
+        musicControlsLayout.root.postDelayed({
+            musicControlsLayout.root.visibility = View.GONE
+        }, 2000L)
     }
 
     private companion object {

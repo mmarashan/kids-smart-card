@@ -27,6 +27,8 @@ interface MusicPlayer {
 
     fun isPlaying(): Boolean
 
+    fun setRepeat(repeatAll: Boolean)
+
     fun release()
 }
 

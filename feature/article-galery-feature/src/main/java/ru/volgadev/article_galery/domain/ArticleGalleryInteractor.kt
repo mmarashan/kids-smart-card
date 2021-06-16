@@ -54,6 +54,7 @@ internal class ArticleGalleryInteractorImpl(
                 loadMusicTracks()
                 val tracks = musicTracks?.shuffled()
                 if (!tracks.isNullOrEmpty()) musicPlayer.setPlaylist(tracks)
+                musicPlayer.setRepeat(repeatAll = true)
             }
 
             musicPlayer.play()

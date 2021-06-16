@@ -36,40 +36,15 @@
         tools:itemCount="2"
         tools:listitem="@layout/card_article" />
 
-    <LinearLayout
-        android:layout_width="0dp"
+    <include
+        android:id="@+id/musicControlsLayout"
+        layout="@layout/music_controls_layout"
+        android:layout_width="wrap_content"
         android:layout_height="@dimen/sound_button_size"
-        android:layout_margin="16dp"
+        android:layout_margin="8dp"
         android:gravity="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"/>
 
-        <Button
-            android:id="@+id/prevTrackButton"
-            android:layout_width="@dimen/sound_button_size"
-            android:layout_height="@dimen/sound_button_size"
-            android:background="@android:color/transparent"
-            android:foreground="@drawable/ic_baseline_skip_previous"
-            android:foregroundTint="@color/colorDarkText" />
-
-        <ToggleButton
-            android:id="@+id/musicToggleButton"
-            android:layout_width="@dimen/sound_button_size"
-            android:layout_height="@dimen/sound_button_size"
-            android:background="@android:color/transparent"
-            android:foreground="@drawable/ic_volume_toggle"
-            android:foregroundTint="@color/colorDarkText"
-            android:textOff=""
-            android:textOn="" />
-
-        <Button
-            android:id="@+id/nextTrackButton"
-            android:layout_width="@dimen/sound_button_size"
-            android:layout_height="@dimen/sound_button_size"
-            android:background="@android:color/transparent"
-            android:foreground="@drawable/ic_baseline_skip_next"
-            android:foregroundTint="@color/colorDarkText" />
-
-    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

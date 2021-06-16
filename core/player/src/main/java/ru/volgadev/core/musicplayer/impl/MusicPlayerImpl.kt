@@ -122,6 +122,12 @@ internal class MusicPlayerImpl(
 
     override fun isPlaying(): Boolean = player.isPlaying
 
+    override fun setRepeat(repeatAll: Boolean) {
+        handler.post {
+            player.repeatMode = if (repeatAll) Player.REPEAT_MODE_ALL else Player.REPEAT_MODE_OFF
+        }
+    }
+
     override fun release() {
         playlist.clear()
         handler.post {
