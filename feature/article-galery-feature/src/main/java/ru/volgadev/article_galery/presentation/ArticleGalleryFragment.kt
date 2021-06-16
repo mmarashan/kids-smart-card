@@ -122,6 +122,10 @@ class ArticleGalleryFragment : Fragment() {
             )
         }
         viewModel.onToggleMusicPlayer(binding.musicToggleButton.isChecked)
+
+        binding.prevTrackButton.setOnClickListener { viewModel.onClickPreviousTrack() }
+        binding.nextTrackButton.setOnClickListener { viewModel.onClickNextTrack()  }
+
         return binding.root
     }
 

@@ -45,4 +45,12 @@ internal class ArticleGalleryViewModel(
         if (isChecked) interactor.startBackgroundPlayer()
         else interactor.pauseBackgroundPlayer()
     }
+
+    fun onClickNextTrack() = viewModelScope.launch {
+        interactor.nextTrack()
+    }
+
+    fun onClickPreviousTrack() = viewModelScope.launch {
+        interactor.previousTrack()
+    }
 }
