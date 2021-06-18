@@ -1,4 +1,4 @@
-package ru.volgadev.common
+package ru.volgadev.common.ext
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter

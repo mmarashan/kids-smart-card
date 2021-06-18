@@ -16,11 +16,11 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.children
-import ru.volgadev.common.dpToPx
-import ru.volgadev.common.getNavigationBarHeight
-import ru.volgadev.common.getScreenSize
+import ru.volgadev.common.ext.dpToPx
+import ru.volgadev.common.ext.getNavigationBarHeight
+import ru.volgadev.common.ext.getScreenSize
 import ru.volgadev.common.log.Logger
-import ru.volgadev.common.runSwingAnimation
+import ru.volgadev.common.ext.runSwingAnimation
 import kotlin.math.roundToInt
 
 class SpeakingCharacterManager(private val context: Context) {

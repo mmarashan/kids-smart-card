@@ -6,11 +6,10 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.annotation.MainThread
 import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import ru.volgadev.common.hideNavBar
+import ru.volgadev.common.ext.hideNavBar
 import ru.volgadev.common.log.Logger
 import ru.volgadev.pincode_bubble.quizgenerator.QuizGenerator
 
