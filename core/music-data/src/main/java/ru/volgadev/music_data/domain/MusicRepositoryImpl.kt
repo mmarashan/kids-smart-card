@@ -4,7 +4,7 @@ import android.content.Context
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
-import ru.volgadev.common.isValidUrlString
+import ru.volgadev.common.ext.isValidUrlString
 import ru.volgadev.common.log.Logger
 import ru.volgadev.downloader.Downloader
 import ru.volgadev.music_data.domain.model.MusicTrack

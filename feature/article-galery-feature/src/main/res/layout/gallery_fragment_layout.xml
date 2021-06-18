@@ -36,15 +36,15 @@
         tools:itemCount="2"
         tools:listitem="@layout/card_article" />
 
-    <ToggleButton
-        android:id="@+id/musicToggleButton"
-        android:layout_width="@dimen/sound_button_size"
+    <include
+        android:id="@+id/musicControlsLayout"
+        layout="@layout/music_controls_layout"
+        android:layout_width="wrap_content"
         android:layout_height="@dimen/sound_button_size"
-        android:layout_margin="16dp"
-        android:background="@android:color/transparent"
-        android:foreground="@drawable/ic_volume_toggle"
-        android:textOff=""
-        android:textOn=""
+        android:layout_margin="8dp"
+        android:gravity="center"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

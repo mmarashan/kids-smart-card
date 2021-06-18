@@ -23,6 +23,10 @@ internal interface ArticleGalleryInteractor {
 
     suspend fun pauseBackgroundPlayer()
 
+    suspend fun nextTrack()
+
+    suspend fun previousTrack()
+
     suspend fun playCardSounds(article: Article)
 }
 
@@ -48,8 +52,9 @@ internal class ArticleGalleryInteractorImpl(
         if (isBackgroundMusicEnabled) {
             if (musicTracks == null) {
                 loadMusicTracks()
-                val tracks = musicTracks
+                val tracks = musicTracks?.shuffled()
                 if (!tracks.isNullOrEmpty()) musicPlayer.setPlaylist(tracks)
+                musicPlayer.setRepeat(repeatAll = true)
             }
 
             musicPlayer.play()
@@ -58,6 +63,14 @@ internal class ArticleGalleryInteractorImpl(
 
     override suspend fun pauseBackgroundPlayer() {
         if (isBackgroundMusicEnabled) musicPlayer.pause()
+    }
+
+    override suspend fun nextTrack() {
+        if (isBackgroundMusicEnabled) musicPlayer.next()
+    }
+
+    override suspend fun previousTrack() {
+        if (isBackgroundMusicEnabled) musicPlayer.previous()
     }
 
     override suspend fun playCardSounds(article: Article) {

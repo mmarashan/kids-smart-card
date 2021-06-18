@@ -1,4 +1,4 @@
-package ru.volgadev.common
+package ru.volgadev.common.ext
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
@@ -7,10 +7,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.drawable.BitmapDrawable
-import android.graphics.drawable.Drawable
 import android.transition.Transition
 import android.transition.TransitionManager
 import android.util.Patterns

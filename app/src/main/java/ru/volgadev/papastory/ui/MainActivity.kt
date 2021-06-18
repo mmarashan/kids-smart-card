@@ -9,8 +9,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.collect
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import ru.volgadev.common.hideNavBar
-import ru.volgadev.common.isPermissionGranted
+import ru.volgadev.common.ext.hideNavBar
+import ru.volgadev.common.ext.isPermissionGranted
 import ru.volgadev.common.log.Logger
 import ru.volgadev.papastory.R
 import ru.volgadev.papastory.databinding.MainActivityBinding
