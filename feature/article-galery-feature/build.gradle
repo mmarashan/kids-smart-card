@@ -54,6 +54,7 @@ dependencies {
     implementation project(':core:article-repository-api')
     implementation project(':core:music-data')
     implementation project(':core:player')
+    implementation project(':core:speaking-character')
 
     testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
     testImplementation "junit:junit:${versions.junit}"

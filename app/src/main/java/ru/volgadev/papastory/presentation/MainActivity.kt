@@ -1,4 +1,4 @@
-package ru.volgadev.papastory.ui
+package ru.volgadev.papastory.presentation
 
 import android.Manifest
 import android.app.AlertDialog

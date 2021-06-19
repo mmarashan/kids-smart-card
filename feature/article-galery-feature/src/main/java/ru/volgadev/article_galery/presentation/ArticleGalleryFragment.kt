@@ -31,6 +31,9 @@ import ru.volgadev.common.ext.scaleToFitAnimatedAndBack
 import ru.volgadev.common.ext.setVisibleWithTransition
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.view.scrollToItemToCenter
+import ru.volgadev.speaking_character.api.SpeakingCharacterApi
+import ru.volgadev.speaking_character.set.gingerCat
+import ru.volgadev.speaking_character.set.mole
 
 class ArticleGalleryFragment : Fragment() {
 
@@ -40,6 +43,9 @@ class ArticleGalleryFragment : Fragment() {
 
     private var musicPanelHideDelayedJob: Job? = null
     private lateinit var musicToggleButton: ToggleButton
+
+    private val characterManager by lazy { SpeakingCharacterApi.get(requireContext()) }
+    private val characters = setOf(gingerCat, mole)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -85,6 +91,7 @@ class ArticleGalleryFragment : Fragment() {
                 highlightView(view = clickedView, onEnd = {
                     canClick = true
                 })
+                showSpeakingCharacter()
             }
         })
 
@@ -113,7 +120,6 @@ class ArticleGalleryFragment : Fragment() {
         }
 
         binding.categoryRecyclerView.run {
-            setHasFixedSize(true)
             adapter = categoryTagsAdapter
             itemAnimator = null
         }
@@ -197,6 +203,12 @@ class ArticleGalleryFragment : Fragment() {
             )
         }
     }
+
+    private fun showSpeakingCharacter() = characterManager.show(
+        activity = requireActivity(),
+        character = characters.random(),
+        showTimeMs = 3000L
+    )
 
     private companion object {
         const val MUSIC_BUTTON_SCALE_AMPLITUDE = 0.15f

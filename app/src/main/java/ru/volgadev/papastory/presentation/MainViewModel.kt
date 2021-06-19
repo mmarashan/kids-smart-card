@@ -1,4 +1,4 @@
-package ru.volgadev.papastory.ui
+package ru.volgadev.papastory.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
