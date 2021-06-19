@@ -31,6 +31,9 @@ import ru.volgadev.common.ext.scaleToFitAnimatedAndBack
 import ru.volgadev.common.ext.setVisibleWithTransition
 import ru.volgadev.common.log.Logger
 import ru.volgadev.common.view.scrollToItemToCenter
+import ru.volgadev.speaking_character.api.SpeakingCharacterApi
+import ru.volgadev.speaking_character.set.gingerCat
+import ru.volgadev.speaking_character.set.mole
 
 class ArticleGalleryFragment : Fragment() {
 
@@ -40,6 +43,9 @@ class ArticleGalleryFragment : Fragment() {
 
     private var musicPanelHideDelayedJob: Job? = null
     private lateinit var musicToggleButton: ToggleButton
+
+    private val characterManager by lazy { SpeakingCharacterApi.get(requireContext()) }
+    private val characters = setOf(gingerCat, mole)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -82,9 +88,8 @@ class ArticleGalleryFragment : Fragment() {
                 viewModel.onClickArticle(item)
 
                 canClick = false
-                highlightView(view = clickedView, onEnd = {
-                    canClick = true
-                })
+                highlightView(view = clickedView, onEnd = { canClick = true })
+                showSpeakingCharacter()
             }
         })
 
@@ -113,7 +118,6 @@ class ArticleGalleryFragment : Fragment() {
         }
 
         binding.categoryRecyclerView.run {
-            setHasFixedSize(true)
             adapter = categoryTagsAdapter
             itemAnimator = null
         }
@@ -166,10 +170,10 @@ class ArticleGalleryFragment : Fragment() {
         val startElevation = view.elevation
         view.elevation = startElevation + 1
         view.scaleToFitAnimatedAndBack(
-            1000L,
-            1000L,
-            1000L,
-            0.75f
+            SCALE_ANUMATION_DURATION_MS / 3,
+            SCALE_ANUMATION_DURATION_MS / 3,
+            SCALE_ANUMATION_DURATION_MS / 3,
+            0.85f
         ) {
             view.elevation = startElevation
             onEnd.invoke()
@@ -198,6 +202,12 @@ class ArticleGalleryFragment : Fragment() {
         }
     }
 
+    private fun showSpeakingCharacter() = characterManager.show(
+        activity = requireActivity(),
+        character = characters.random(),
+        showTimeMs = CHARACTER_SHOW_TIME_MS
+    )
+
     private companion object {
         const val MUSIC_BUTTON_SCALE_AMPLITUDE = 0.15f
         const val MUSIC_BUTTON_SCALE_DURATION_MS = 600L
@@ -205,5 +215,7 @@ class ArticleGalleryFragment : Fragment() {
 
         const val MUSIC_PANEL_TRANSITION_DURATION_MS = 600L
         const val MUSIC_PANEL_VISIBILITY_DURATION_MS = 2000L
+        const val CHARACTER_SHOW_TIME_MS = 3000L
+        const val SCALE_ANUMATION_DURATION_MS = 3000L
     }
 }

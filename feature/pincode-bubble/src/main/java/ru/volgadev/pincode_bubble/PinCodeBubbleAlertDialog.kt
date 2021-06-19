@@ -1,42 +1,27 @@
 package ru.volgadev.pincode_bubble
 
 import android.app.Activity
-import android.content.Context
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.channels.sendBlocking
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import ru.volgadev.common.ext.hideNavBar
-import ru.volgadev.common.log.Logger
-import ru.volgadev.pincode_bubble.quizgenerator.QuizGenerator
+import ru.volgadev.pincode_bubble.quizgenerator.api.QuizGenerator
 
 class PinCodeBubbleAlertDialog private constructor(
-    private val activity: Activity,
-    private val title: String,
-    private val question: String,
+    activity: Activity,
+    title: String,
+    question: String,
     private val answers: Collection<String>,
     private val hideNavigationBar: Boolean = false
 ) : AlertDialog(activity, false, null) {
 
-    fun create(
-        activity: Activity,
-        title: String,
-        quizGeneratorClass: Class<out QuizGenerator>,
-        hideNavigationBar: Boolean
-    ): PinCodeBubbleAlertDialog {
-        val quizGenerator =
-            quizGeneratorClass.getConstructor(Context::class.java).newInstance(activity)
-        val quiz = quizGenerator.getQuiz()
-        return PinCodeBubbleAlertDialog(activity, title, quiz.first, quiz.second, hideNavigationBar)
-    }
-
-    private val logger = Logger.get("PinCodeBubbleAlertDialog")
-
-    private val view = activity.layoutInflater
-        .inflate(R.layout.dialog, null) as LinearLayout
+    private val view = layoutInflater.inflate(R.layout.dialog, null) as LinearLayout
 
     private val questionTextView = view.findViewById<TextView>(R.id.questionTextView)
     private val answerEditText = view.findViewById<EditText>(R.id.answerEditText)
@@ -50,37 +35,34 @@ class PinCodeBubbleAlertDialog private constructor(
         questionTextView.text = question
     }
 
-    fun showForResult(): LiveData<Boolean> {
-        logger.debug("showForResult()")
-        val resultLiveData = MutableLiveData<Boolean>()
+    suspend fun showForResult(): Flow<Boolean> = callbackFlow {
         okBtn.setOnClickListener {
-            logger.debug("on click OK")
             val answer = answerEditText.text.toString()
             val isCorrectAnswer = answers.contains(answer)
-            logger.debug("Answer = $answer; Result = $isCorrectAnswer")
-            resultLiveData.value = isCorrectAnswer
+            sendBlocking(isCorrectAnswer)
             dismiss()
         }
         cancelBtn.setOnClickListener {
-            logger.debug("on click cancel")
-            resultLiveData.value = false
             hide()
             dismiss()
+            cancel()
         }
         answerEditText.requestFocus()
         show()
-        return resultLiveData
+
+        awaitClose {
+            hide()
+            dismiss()
+        }
     }
 
-    override fun show() {
-        logger.debug("show()")
-        super.show()
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
         if (hideNavigationBar) window?.hideNavBar()
     }
 
-    override fun onStop() {
-        logger.debug("onStop()")
-        super.onStop()
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
         if (hideNavigationBar) window?.hideNavBar()
     }
 
@@ -89,27 +71,15 @@ class PinCodeBubbleAlertDialog private constructor(
         fun create(
             activity: Activity,
             title: String,
-            question: String,
-            answers: Collection<String>,
+            quizGenerator: QuizGenerator,
             hideNavigationBar: Boolean
         ): PinCodeBubbleAlertDialog {
-            return PinCodeBubbleAlertDialog(activity, title, question, answers, hideNavigationBar)
-        }
-
-        fun create(
-            activity: Activity,
-            title: String,
-            quizGeneratorClass: Class<out QuizGenerator>,
-            hideNavigationBar: Boolean
-        ): PinCodeBubbleAlertDialog {
-            val quizGenerator =
-                quizGeneratorClass.getConstructor(Context::class.java).newInstance(activity)
             val quiz = quizGenerator.getQuiz()
             return PinCodeBubbleAlertDialog(
                 activity,
                 title,
-                quiz.first,
-                quiz.second,
+                quiz.question,
+                quiz.answers,
                 hideNavigationBar
             )
         }

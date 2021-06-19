@@ -1,4 +1,4 @@
-package ru.volgadev.speaking_character
+package ru.volgadev.speaking_character.impl
 
 import android.app.Activity
 import android.content.Context
@@ -19,82 +19,74 @@ import androidx.core.view.children
 import ru.volgadev.common.ext.dpToPx
 import ru.volgadev.common.ext.getNavigationBarHeight
 import ru.volgadev.common.ext.getScreenSize
-import ru.volgadev.common.log.Logger
 import ru.volgadev.common.ext.runSwingAnimation
+import ru.volgadev.speaking_character.api.Character
+import ru.volgadev.speaking_character.api.Direction
+import ru.volgadev.speaking_character.api.SpeakingCharacterApi
 import kotlin.math.roundToInt
 
-class SpeakingCharacterManager(private val context: Context) {
+internal class SpeakingCharacterApiImpl(private val context: Context) : SpeakingCharacterApi {
 
-    private val logger = Logger.get("SpeakingCharacterManager")
+    private val screenSize by lazy { context.getScreenSize() }
 
-    private val screenSize by lazy {
-        context.getScreenSize()
-    }
-
-    private val navigationBarHeight by lazy {
-        context.getNavigationBarHeight()
-    }
+    private val navigationBarHeight by lazy { context.getNavigationBarHeight() }
 
     private val needNavBarPaddingDirections =
-        setOf(Directon.FROM_BOTTOM, Directon.FROM_BOTTOM_RIGHT, Directon.FROM_BOTTOM_LEFT)
+        setOf(Direction.FROM_BOTTOM, Direction.FROM_BOTTOM_RIGHT, Direction.FROM_BOTTOM_LEFT)
 
-    fun show(
+    var lastDirection: Direction? = null
+
+    override fun show(
         activity: Activity,
         character: Character,
         utteranceText: String?,
         showTimeMs: Long
     ) {
-        logger.debug("show()")
-
         val viewWidth = context.dpToPx(character.size.widthDp)
         val viewHeight = context.dpToPx(character.size.heightDp)
 
-        val context = activity.applicationContext
-        val windowManager = activity.windowManager
-
-        val imageView = ImageView(context).apply {
+        val imageView = ImageView(activity).apply {
             layoutParams = FrameLayout.LayoutParams(viewWidth, viewHeight)
-            setImageDrawable(character.drawable)
+            setImageResource(character.imageRes)
             scaleType = ImageView.ScaleType.CENTER_INSIDE
         }
 
-        val textView = TextView(context).apply {
-            val textViewWidth =
-                ((character.textBound.x1 - character.textBound.x0) * viewWidth).roundToInt()
-            val textViewHeight =
-                ((character.textBound.y1 - character.textBound.y0) * viewHeight).roundToInt()
-            setAutoSizeTextTypeWithDefaults(TextView.AUTO_SIZE_TEXT_TYPE_UNIFORM)
-            setAutoSizeTextTypeUniformWithConfiguration(
-                12, 32, 1, TypedValue.COMPLEX_UNIT_SP
-            )
-            text = utteranceText
-            gravity = Gravity.CENTER
-            layoutParams = FrameLayout.LayoutParams(textViewWidth, textViewHeight).apply {
-                setMargins(
-                    (viewWidth * character.textBound.x0).roundToInt(),
-                    (viewHeight * character.textBound.y0).roundToInt(),
-                    (viewWidth - viewWidth * character.textBound.x1).roundToInt(),
-                    (viewHeight - viewHeight * character.textBound.y1).roundToInt()
-                )
-            }
-        }
-
-
-        val view = FrameLayout(context).apply {
+        val view = FrameLayout(activity).apply {
             setBackgroundColor(Color.TRANSPARENT)
             layoutParams = LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
 
             addView(imageView)
             if (utteranceText != null) {
+                val textView = TextView(activity).apply {
+                    val textViewWidth =
+                        ((character.textBound.x1 - character.textBound.x0) * viewWidth).roundToInt()
+                    val textViewHeight =
+                        ((character.textBound.y1 - character.textBound.y0) * viewHeight).roundToInt()
+                    setAutoSizeTextTypeWithDefaults(TextView.AUTO_SIZE_TEXT_TYPE_UNIFORM)
+                    setAutoSizeTextTypeUniformWithConfiguration(
+                        12, 32, 1, TypedValue.COMPLEX_UNIT_SP
+                    )
+                    text = utteranceText
+                    gravity = Gravity.CENTER
+                    layoutParams = FrameLayout.LayoutParams(textViewWidth, textViewHeight).apply {
+                        setMargins(
+                            (viewWidth * character.textBound.x0).roundToInt(),
+                            (viewHeight * character.textBound.y0).roundToInt(),
+                            (viewWidth - viewWidth * character.textBound.x1).roundToInt(),
+                            (viewHeight - viewHeight * character.textBound.y1).roundToInt()
+                        )
+                    }
+                }
+
                 addView(textView)
             }
 
             postDelayed({
-                windowManager.removeViewFromOverlay(this)
+                activity.windowManager.removeViewFromOverlay(this)
             }, showTimeMs + SLIDE_ANIMATION_TIME_MS * 2)
         }
 
-        val direction: Directon = getNewDirection(character.availableDirections)
+        val direction: Direction = getNewDirection(character.availableDirections)
 
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
@@ -110,7 +102,7 @@ class SpeakingCharacterManager(private val context: Context) {
             }
         }
 
-        windowManager.addView(view, params)
+        activity.windowManager.addView(view, params)
 
         val showCoeff = direction.showCoefficients
         view.children.iterator().forEach { child ->
@@ -124,35 +116,33 @@ class SpeakingCharacterManager(private val context: Context) {
                 SLIDE_ANIMATION_TIME_MS
             )
         }
-
-        logger.debug("show(). ok")
     }
 
-    private val Directon.layoutGravity: Int
+    private val Direction.layoutGravity: Int
         get() {
             return when (this) {
-                Directon.FROM_TOP -> (Gravity.CENTER_HORIZONTAL or Gravity.TOP)
-                Directon.FROM_BOTTOM -> (Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM)
-                Directon.FROM_LEFT -> (Gravity.CENTER_VERTICAL or Gravity.START)
-                Directon.FROM_RIGHT -> (Gravity.CENTER_VERTICAL or Gravity.END)
-                Directon.FROM_TOP_LEFT -> (Gravity.START or Gravity.TOP)
-                Directon.FROM_BOTTOM_LEFT -> (Gravity.START or Gravity.BOTTOM)
-                Directon.FROM_TOP_RIGHT -> (Gravity.END or Gravity.TOP)
-                Directon.FROM_BOTTOM_RIGHT -> (Gravity.END or Gravity.BOTTOM)
+                Direction.FROM_TOP -> (Gravity.CENTER_HORIZONTAL or Gravity.TOP)
+                Direction.FROM_BOTTOM -> (Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM)
+                Direction.FROM_LEFT -> (Gravity.CENTER_VERTICAL or Gravity.START)
+                Direction.FROM_RIGHT -> (Gravity.CENTER_VERTICAL or Gravity.END)
+                Direction.FROM_TOP_LEFT -> (Gravity.START or Gravity.TOP)
+                Direction.FROM_BOTTOM_LEFT -> (Gravity.START or Gravity.BOTTOM)
+                Direction.FROM_TOP_RIGHT -> (Gravity.END or Gravity.TOP)
+                Direction.FROM_BOTTOM_RIGHT -> (Gravity.END or Gravity.BOTTOM)
             }
         }
 
-    private val Directon.showCoefficients: Array<Int>
+    private val Direction.showCoefficients: Array<Int>
         get() {
             return when (this) {
-                Directon.FROM_TOP -> arrayOf(0, 0, -1, 1)
-                Directon.FROM_BOTTOM -> arrayOf(0, 0, 1, -1)
-                Directon.FROM_LEFT -> arrayOf(-1, 1, 0, 0)
-                Directon.FROM_RIGHT -> arrayOf(1, -1, 0, 0)
-                Directon.FROM_TOP_LEFT -> arrayOf(-1, 1, -1, 1)
-                Directon.FROM_BOTTOM_LEFT -> arrayOf(-1, 1, 1, -1)
-                Directon.FROM_TOP_RIGHT -> arrayOf(1, -1, -1, 1)
-                Directon.FROM_BOTTOM_RIGHT -> arrayOf(1, -1, 1, -1)
+                Direction.FROM_TOP -> arrayOf(0, 0, -1, 1)
+                Direction.FROM_BOTTOM -> arrayOf(0, 0, 1, -1)
+                Direction.FROM_LEFT -> arrayOf(-1, 1, 0, 0)
+                Direction.FROM_RIGHT -> arrayOf(1, -1, 0, 0)
+                Direction.FROM_TOP_LEFT -> arrayOf(-1, 1, -1, 1)
+                Direction.FROM_BOTTOM_LEFT -> arrayOf(-1, 1, 1, -1)
+                Direction.FROM_TOP_RIGHT -> arrayOf(1, -1, -1, 1)
+                Direction.FROM_BOTTOM_RIGHT -> arrayOf(1, -1, 1, -1)
             }
         }
 
@@ -206,17 +196,15 @@ class SpeakingCharacterManager(private val context: Context) {
         view.startAnimation(translateAnimation)
     }
 
-    private fun getNewDirection(availableDirections: Set<Directon>): Directon {
-        if (availableDirections.isEmpty()) lastDirection =  Directon.FROM_BOTTOM
-        if (availableDirections.size == 1) lastDirection =  availableDirections.first()
-        lastDirection = availableDirections.filter { direction -> direction!= lastDirection}.random()
+    private fun getNewDirection(availableDirections: Set<Direction>): Direction {
+        if (availableDirections.isEmpty()) lastDirection = Direction.FROM_BOTTOM
+        if (availableDirections.size == 1) lastDirection = availableDirections.first()
+        lastDirection =
+            availableDirections.filter { direction -> direction != lastDirection }.random()
         return lastDirection!!
     }
 
     private companion object {
-        const val SLIDE_ANIMATION_TIME_MS = 500L
-        const val PADDING_PX = 64
-
-        var lastDirection: Directon? = null
+        const val SLIDE_ANIMATION_TIME_MS = 600L
     }
 }
