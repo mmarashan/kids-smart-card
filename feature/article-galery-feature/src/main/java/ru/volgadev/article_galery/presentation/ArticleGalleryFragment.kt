@@ -88,9 +88,7 @@ class ArticleGalleryFragment : Fragment() {
                 viewModel.onClickArticle(item)
 
                 canClick = false
-                highlightView(view = clickedView, onEnd = {
-                    canClick = true
-                })
+                highlightView(view = clickedView, onEnd = { canClick = true })
                 showSpeakingCharacter()
             }
         })
@@ -172,10 +170,10 @@ class ArticleGalleryFragment : Fragment() {
         val startElevation = view.elevation
         view.elevation = startElevation + 1
         view.scaleToFitAnimatedAndBack(
-            1000L,
-            1000L,
-            1000L,
-            0.75f
+            SCALE_ANUMATION_DURATION_MS / 3,
+            SCALE_ANUMATION_DURATION_MS / 3,
+            SCALE_ANUMATION_DURATION_MS / 3,
+            0.85f
         ) {
             view.elevation = startElevation
             onEnd.invoke()
@@ -207,7 +205,7 @@ class ArticleGalleryFragment : Fragment() {
     private fun showSpeakingCharacter() = characterManager.show(
         activity = requireActivity(),
         character = characters.random(),
-        showTimeMs = 3000L
+        showTimeMs = CHARACTER_SHOW_TIME_MS
     )
 
     private companion object {
@@ -217,5 +215,7 @@ class ArticleGalleryFragment : Fragment() {
 
         const val MUSIC_PANEL_TRANSITION_DURATION_MS = 600L
         const val MUSIC_PANEL_VISIBILITY_DURATION_MS = 2000L
+        const val CHARACTER_SHOW_TIME_MS = 3000L
+        const val SCALE_ANUMATION_DURATION_MS = 3000L
     }
 }

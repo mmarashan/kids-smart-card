@@ -2,4 +2,5 @@
 <resources>
     <string name="collections">Collections</string>
     <string name="false_answer">False answer</string>
+    <string name="quiz_alert_title">Сначала ответьте на вопрос</string>
 </resources>
