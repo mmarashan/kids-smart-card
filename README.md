@@ -13,8 +13,8 @@ App based on:
 <table>
   <tr>
     <td><img src="screenshots/1.jpeg" width="200"></td>
+    <td><img src="screenshots/3.jpeg" width="200"></td>
     <td><img src="screenshots/2.jpeg" width="200"></td>
-    <td><img src="screenshots/3.jpeg" width="200"></td>
-    <td><img src="screenshots/3.jpeg" width="200"></td>
+    <td><img src="screenshots/4.jpeg" width="200"></td>
   </tr>
 </table>
