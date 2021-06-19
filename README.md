@@ -1,6 +1,6 @@
 ### Kids Smart Card
 
-Kids Smart Cards with sound accompaniment
+Kids Smart Cards with sound accompaniment, background music and animated characters
 
 App based on:
 
@@ -12,8 +12,9 @@ App based on:
 
 <table>
   <tr>
-    <td><img src="screenshots/1.jpeg" width="256"></td>
-    <td><img src="screenshots/2.jpeg" width="256"></td>
-    <td><img src="screenshots/3.jpeg" width="256"></td>
+    <td><img src="screenshots/1.jpeg" width="200"></td>
+    <td><img src="screenshots/2.jpeg" width="200"></td>
+    <td><img src="screenshots/3.jpeg" width="200"></td>
+    <td><img src="screenshots/3.jpeg" width="200"></td>
   </tr>
 </table>
