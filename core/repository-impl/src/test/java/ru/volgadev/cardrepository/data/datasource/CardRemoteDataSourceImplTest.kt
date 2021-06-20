@@ -1,6 +1,8 @@
 package ru.volgadev.cardrepository.data.datasource
 
 import junit.framework.Assert.assertEquals
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runBlockingTest
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
@@ -33,7 +35,7 @@ class CardRemoteDataSourceImplTest {
     }
 
     @Test
-    fun checkCategoriesParsing() {
+    fun checkCategoriesParsing() = runBlocking {
         val responseBody = readFileFromResources("response/categoriesResponse.json")
         val response = MockResponse()
             .addHeader("Content-Type", "application/json; charset=utf-8")
@@ -47,7 +49,7 @@ class CardRemoteDataSourceImplTest {
     }
 
     @Test
-    fun checkArticlesParsing() {
+    fun checkArticlesParsing() = runBlocking {
         val responseBody = readFileFromResources("response/articlesResponse.json")
         val response = MockResponse()
             .addHeader("Content-Type", "application/json; charset=utf-8")
@@ -65,7 +67,7 @@ class CardRemoteDataSourceImplTest {
             isPaid = true
         )
 
-        val articles = remoteDataSource.getArticles(someCategory)
+        val articles = remoteDataSource.getCards(someCategory)
 
         assertEquals(3, articles.size)
     }

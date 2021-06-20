@@ -26,7 +26,7 @@ internal class CardRepositoryImpl(
 
     private val scope = CoroutineScope(ioDispatcher + SupervisorJob())
 
-    private val articlesCache = HashMap<String, List<Card>>()
+    private val cardsCache = HashMap<String, List<Card>>()
 
     override val categories: SharedFlow<List<CardCategory>> =
         database.dao().categories().distinctUntilChanged().shareIn(
@@ -35,40 +35,22 @@ internal class CardRepositoryImpl(
             replay = 1
         )
 
-    @Volatile
-    private var productIds: List<String> = ArrayList()
-
     init {
         scope.launch {
-            categories.collect { categories ->
-                val categoriesSkuIds = categories.mapNotNull { it.marketItemId }
-                paymentManager.setProjectSkuIds(categoriesSkuIds, ItemSkuType.IN_APP)
-                updatePayedCategories(categories, productIds)
-            }
-        }
-
-        scope.launch {
-            paymentManager.ownedProducts.collect { items ->
-                logger.debug("On market product list: ${items.size} categories")
-                productIds = items.filter { it.isPurchased() }.map { it.skuDetails.sku }
-                val categories = database.dao().categories().first()
-                updatePayedCategories(categories, productIds)
-            }
-        }
-
-        scope.launch {
-            try {
+            val categories = try {
                 updateCategories()
             } catch (e: IOException) {
                 logger.error("Exception when load from server $e")
+                categories.firstOrNull().orEmpty()
             }
+            collectOwnedProducts(categories)
         }
     }
 
     override suspend fun getCategoryCards(category: CardCategory): List<Card> =
         withContext(ioDispatcher) {
 
-            val categoryArticles = articlesCache[category.id] ?: try {
+            val categoryArticles = cardsCache[category.id] ?: try {
                 updateCategoryArticles(category)
             } catch (e: IOException) {
                 logger.error("Exception when load from server $e")
@@ -91,17 +73,18 @@ internal class CardRepositoryImpl(
     override fun dispose() = scope.cancel()
 
     @Throws(IOException::class)
-    private suspend fun updateCategories() = withContext(ioDispatcher) {
+    private suspend fun updateCategories(): List<CardCategory> = withContext(ioDispatcher) {
         val categories = remoteDataSource.getCategories()
         database.dao().insertAllCategories(*categories.toTypedArray())
+        return@withContext categories
     }
 
     @Throws(IOException::class)
     private suspend fun updateCategoryArticles(category: CardCategory): List<Card> =
         withContext(ioDispatcher) {
-            val categoryArticles = remoteDataSource.getArticles(category)
+            val categoryArticles = remoteDataSource.getCards(category)
             database.dao().insertAllArticles(*categoryArticles.toTypedArray())
-            articlesCache[category.id] = categoryArticles
+            cardsCache[category.id] = categoryArticles
             return@withContext categoryArticles
         }
 
@@ -118,6 +101,16 @@ internal class CardRepositoryImpl(
                 category.isPaid = isPaid
                 database.dao().updateCategoryIsPaid(category.id, isPaid)
             }
+        }
+    }
+
+    private fun collectOwnedProducts(categories: List<CardCategory>) = scope.launch {
+        val categoriesSkuIds = categories.mapNotNull { it.marketItemId }
+        paymentManager.setProjectSkuIds(categoriesSkuIds, ItemSkuType.IN_APP)
+        paymentManager.ownedProducts.collect { items ->
+            logger.debug("On market product list: ${items.size} categories")
+            val productIds = items.filter { it.isPurchased() }.map { it.skuDetails.sku }
+            updatePayedCategories(categories, productIds)
         }
     }
 }

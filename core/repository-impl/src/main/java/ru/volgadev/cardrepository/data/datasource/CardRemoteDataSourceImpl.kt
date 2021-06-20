@@ -2,6 +2,7 @@ package ru.volgadev.cardrepository.data.datasource
 
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -16,26 +17,25 @@ import ru.volgadev.cardrepository.domain.model.CardCategory
 import java.io.IOException
 import javax.inject.Inject
 
+@ExperimentalCoroutinesApi
 internal class CardRemoteDataSourceImpl @Inject constructor(
-    baseUrl: String,
+    private val baseUrl: String,
     private val client: OkHttpClient
 ) : CardRemoteDataSource {
 
-    private val CATEGORIES_BACKEND_URL = "$baseUrl/category.json"
-
     @Throws(IOException::class)
-    override suspend fun getArticles(category: CardCategory): List<Card> {
+    override suspend fun getCards(category: CardCategory): List<Card> {
         val responseDto = client.executeGet(category.fileUrl, CardsResponseDto::class.java)
-            .catch { throw IOException("Bad call getArticles() ...") }.firstOrNull()
-            ?: throw IOException("Bad call getArticles() ...")
+            .catch { throw IOException("Bad call getCards() $it") }.firstOrNull()
+            ?: throw IOException("Closed call getCards() ...")
         return Mapper.map(responseDto)
     }
 
     @Throws(IOException::class)
     override suspend fun getCategories(): List<CardCategory> {
         val responseDto =
-            client.executeGet(CATEGORIES_BACKEND_URL, CategoriesResponseDto::class.java)
-                .catch { throw IOException("Bad call getCategories() ...") }.firstOrNull()
+            client.executeGet("$baseUrl/category.json", CategoriesResponseDto::class.java)
+                .catch { throw IOException("Bad call getCategories() $it") }.firstOrNull()
                 ?: throw IOException("Bad call getCategories() ...")
         return Mapper.map(responseDto)
     }
@@ -51,9 +51,8 @@ internal class CardRemoteDataSourceImpl @Inject constructor(
                     }
 
                     override fun onResponse(call: Call, response: Response) {
-                        val stringResponse =
-                            response.body?.string()
-                                ?: throw NullPointerException("Empty request body")
+                        val stringResponse = response.body?.string()
+                            ?: throw NullPointerException("Empty request body")
                         try {
                             val value = Gson().fromJson(stringResponse, classOfT)
                             offer(value)

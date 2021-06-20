@@ -7,5 +7,5 @@ import ru.volgadev.cardrepository.domain.model.CardCategory
 @WorkerThread
 internal interface CardRemoteDataSource {
     suspend fun getCategories(): List<CardCategory>
-    suspend fun getArticles(category: CardCategory): List<Card>
+    suspend fun getCards(category: CardCategory): List<Card>
 }
