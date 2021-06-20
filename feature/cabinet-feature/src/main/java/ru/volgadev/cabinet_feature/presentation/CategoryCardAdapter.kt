@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
-import ru.volgadev.article_repository.domain.model.ArticleCategory
+import ru.volgadev.cardrepository.domain.model.CardCategory
 import ru.volgadev.cabinet_feature.R
 import ru.volgadev.common.log.Logger
 
@@ -28,10 +28,10 @@ internal class CategoryCardAdapter :
 
     private val logger = Logger.get("MarketCategoryCardAdapter")
 
-    private var categoryList = ArrayList<ArticleCategory>()
+    private var categoryList = ArrayList<CardCategory>()
 
     @AnyThread
-    fun setData(dataset: Collection<ArticleCategory>) {
+    fun setData(dataset: Collection<CardCategory>) {
         logger.debug("Set dataset with ${dataset.size} members")
 
         if (categoryList.isNotEmpty()) {
@@ -75,7 +75,7 @@ internal class CategoryCardAdapter :
 
         private val notPayedAlpha = 0.6f
 
-        fun bind(category: ArticleCategory) {
+        fun bind(category: CardCategory) {
             val holder = this
             card.tag = category.name
             val image = holder.image

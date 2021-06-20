@@ -1,7 +1,7 @@
 package ru.volgadev.papastory.presentation
 
 import androidx.fragment.app.Fragment
-import ru.volgadev.article_galery.presentation.ArticleGalleryFragment
+import ru.volgadev.cardgallery.presentation.CardGalleryFragment
 import ru.volgadev.cabinet_feature.presentation.CabinetFragment
 
 interface AppScreen {
@@ -9,7 +9,7 @@ interface AppScreen {
 }
 
 object CardsScreen : AppScreen {
-    override fun getScreen(): Fragment = ArticleGalleryFragment()
+    override fun getScreen(): Fragment = CardGalleryFragment()
 
 }
 

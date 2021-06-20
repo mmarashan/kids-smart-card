@@ -9,9 +9,9 @@ interface MusicRepository {
 
     fun musicTracks(): Flow<ArrayList<MusicTrack>>
 
-    fun articleAudios(): Flow<ArrayList<MusicTrack>>
+    fun cardsAudios(): Flow<ArrayList<MusicTrack>>
 
-    suspend fun loadArticleAudio(url: String): MusicTrack?
+    suspend fun loadAudio(url: String): MusicTrack?
 
     suspend fun getTrackFromStorage(url: String): MusicTrack?
 }
