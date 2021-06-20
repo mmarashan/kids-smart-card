@@ -1,0 +1,58 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+
+android {
+    compileSdkVersion versions.compileSdkVersion
+
+    defaultConfig {
+        minSdkVersion versions.minSdkVersion
+        targetSdkVersion versions.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildFeatures {
+        buildConfig = false
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "androidx.appcompat:appcompat:${versions.appcompat}"
+    implementation "androidx.core:core-ktx:${versions.corektx}"
+    implementation "javax.inject:javax.inject:${versions.javaxinject}"
+    implementation "io.insert-koin:koin-android:${versions.koin}"
+
+    implementation "androidx.room:room-runtime:${versions.room}"
+    implementation "androidx.room:room-ktx:${versions.room}"
+    kapt "androidx.room:room-compiler:${versions.room}"
+
+    implementation "com.squareup.okhttp3:okhttp:${versions.okhttp}"
+    implementation "com.android.billingclient:billing:${versions.billingclient}"
+    implementation "com.google.code.gson:gson:${versions.gson}"
+
+    implementation project(':common')
+    implementation project(':core:repository-api')
+    implementation "com.github.mmarashan:google-billingclient-wrapper:${versions.billingclientwrapper}"
+
+    testImplementation "junit:junit:${versions.junit}"
+    testImplementation "com.squareup.okhttp3:mockwebserver:${versions.mockwebserver}"
+}

@@ -6,40 +6,40 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import ru.volgadev.article_repository.domain.ArticleRepository
-import ru.volgadev.article_repository.domain.model.ArticleCategory
+import ru.volgadev.cardrepository.domain.CardRepository
+import ru.volgadev.cardrepository.domain.model.CardCategory
 import ru.volgadev.common.BuildConfig
 import ru.volgadev.common.log.Logger
 
 internal class CabinetViewModel(
-    private val articleRepository: ArticleRepository
+    private val cardRepository: CardRepository
 ) : ViewModel() {
 
     private val logger = Logger.get("CabinetViewModel")
 
-    private val _categories = MutableLiveData<List<ArticleCategory>>()
-    val categories: LiveData<List<ArticleCategory>> = _categories
+    private val _categories = MutableLiveData<List<CardCategory>>()
+    val categories: LiveData<List<CardCategory>> = _categories
 
     init {
         logger.debug("init")
         viewModelScope.launch {
-            articleRepository.categories.collect { categories ->
+            cardRepository.categories.collect { categories ->
                 logger.debug("On update categories $categories")
                 _categories.postValue(categories)
             }
         }
     }
 
-    fun onReadyToPayment(category: ArticleCategory) {
+    fun onReadyToPayment(category: CardCategory) {
         logger.debug("onReadyToPayment ${category.name}, marketItemId = ${category.marketItemId}, isPaid = ${category.isPaid}")
         category.marketItemId?.let { itemId ->
             if (!category.isPaid) {
-                viewModelScope.launch { articleRepository.requestPaymentForCategory(category) }
+                viewModelScope.launch { cardRepository.requestPaymentForCategory(category) }
             } else {
                 viewModelScope.launch {
                     if (BuildConfig.DEBUG) {
                         logger.debug("debug consume purchase $itemId")
-                        articleRepository.consumePurchase(itemId)
+                        cardRepository.consumePurchase(itemId)
                     }
                 }
             }

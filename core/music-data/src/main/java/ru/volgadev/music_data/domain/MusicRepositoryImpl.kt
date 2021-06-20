@@ -29,9 +29,9 @@ internal class MusicRepositoryImpl(
 
     override fun musicTracks() = musicTracksFlow
 
-    override fun articleAudios() = articleAudiosFlow
+    override fun cardsAudios() = articleAudiosFlow
 
-    override suspend fun loadArticleAudio(url: String): MusicTrack? = withContext(ioDispatcher) {
+    override suspend fun loadAudio(url: String): MusicTrack? = withContext(ioDispatcher) {
         logger.debug("loadArticleAudio($url)")
         val loadedTrack = loadMusicTrack(url, MusicTrackType.ARTICLE_AUDIO)
         loadedTrack?.also {
