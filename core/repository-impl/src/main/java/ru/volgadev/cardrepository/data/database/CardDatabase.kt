@@ -1,11 +1,16 @@
 package ru.volgadev.cardrepository.data.database
 
+import android.content.Context
 import kotlinx.coroutines.flow.Flow
 import ru.volgadev.cardrepository.domain.model.Card
 import ru.volgadev.cardrepository.domain.model.CardCategory
 
 internal interface CardDatabase {
     fun dao(): CardDao
+
+    companion object {
+        fun create(context: Context): CardDatabase = CardDatabaseImpl.getInstance(context)
+    }
 }
 
 internal interface CardDao {

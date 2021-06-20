@@ -1,9 +1,8 @@
 package ru.volgadev.cardrepository.data
 
-import androidx.annotation.WorkerThread
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.flow.SharingStarted.Companion.Eagerly
+import kotlinx.coroutines.flow.SharingStarted.Companion.Lazily
 import ru.volgadev.cardrepository.data.database.CardDatabase
 import ru.volgadev.cardrepository.data.datasource.CardRemoteDataSource
 import ru.volgadev.cardrepository.domain.*
@@ -31,7 +30,7 @@ internal class CardRepositoryImpl(
     override val categories: SharedFlow<List<CardCategory>> =
         database.dao().categories().distinctUntilChanged().shareIn(
             scope = scope,
-            started = Eagerly,
+            started = Lazily,
             replay = 1
         )
 
@@ -88,29 +87,27 @@ internal class CardRepositoryImpl(
             return@withContext categoryArticles
         }
 
-    @Synchronized
-    @WorkerThread
-    private fun updatePayedCategories(
+    private fun collectOwnedProducts(categories: List<CardCategory>) = scope.launch {
+        val categoriesSkuIds = categories.mapNotNull { it.marketItemId }
+        paymentManager.setProjectSkuIds(categoriesSkuIds, ItemSkuType.IN_APP)
+        paymentManager.ownedProducts.collect { items ->
+            logger.debug("Owned market product list: ${items.size} categories")
+            val productIds = items.filter { it.isPurchased() }.map { it.skuDetails.sku }
+            updatePayedCategories(categories, productIds)
+        }
+    }
+
+    private suspend fun updatePayedCategories(
         categories: List<CardCategory>,
         payedIds: List<String>
-    ) {
-        logger.debug("updatePayedCategories(${categories.size}, ${payedIds.size})")
-        categories.forEachIndexed { index, category ->
+    ) = withContext(ioDispatcher) {
+        logger.debug("updatePayedCategories()")
+        categories.forEach { category ->
             val isPaid = payedIds.singleOrNull { id -> id == category.marketItemId } != null
             if (isPaid != category.isPaid) {
                 category.isPaid = isPaid
                 database.dao().updateCategoryIsPaid(category.id, isPaid)
             }
-        }
-    }
-
-    private fun collectOwnedProducts(categories: List<CardCategory>) = scope.launch {
-        val categoriesSkuIds = categories.mapNotNull { it.marketItemId }
-        paymentManager.setProjectSkuIds(categoriesSkuIds, ItemSkuType.IN_APP)
-        paymentManager.ownedProducts.collect { items ->
-            logger.debug("On market product list: ${items.size} categories")
-            val productIds = items.filter { it.isPurchased() }.map { it.skuDetails.sku }
-            updatePayedCategories(categories, productIds)
         }
     }
 }

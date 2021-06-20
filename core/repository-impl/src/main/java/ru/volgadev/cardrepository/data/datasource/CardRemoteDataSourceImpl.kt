@@ -2,7 +2,6 @@ package ru.volgadev.cardrepository.data.datasource
 
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -17,7 +16,6 @@ import ru.volgadev.cardrepository.domain.model.CardCategory
 import java.io.IOException
 import javax.inject.Inject
 
-@ExperimentalCoroutinesApi
 internal class CardRemoteDataSourceImpl @Inject constructor(
     private val baseUrl: String,
     private val client: OkHttpClient
