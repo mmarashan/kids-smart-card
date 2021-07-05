@@ -11,6 +11,8 @@ App based on:
 - Splash screen with logo
 - Exoplayer for working with audio
 
+Show screenshoots:
+
 <table>
   <tr>
     <td><img src="screenshots/1.jpeg" width="200"></td>
@@ -19,3 +21,5 @@ App based on:
     <td><img src="screenshots/4.jpeg" width="200"></td>
   </tr>
 </table>
+
+[![or watch this video:](https://img.youtube.com/vi/fEKEmGEiOfM/0.jpg)](https://www.youtube.com/watch?v=fEKEmGEiOfM&ab_channel=MaximMaxim)
