@@ -6,9 +6,10 @@ App based on:
 
 - MVVM (Jetpack ViewModel + Kotlin SharedFlow)
 - Repository based on Coroutines Flow and suspend functions
-- Koin DI
+- Koin as DI
 - Room and OkHttp in data module
 - Splash screen with logo
+- Exoplayer for working with audio
 
 <table>
   <tr>
