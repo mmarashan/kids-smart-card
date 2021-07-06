@@ -1,10 +1,8 @@
-package ru.volgadev.common.view
+package ru.volgadev.common.view.recyclerview
 
 import android.content.Context
-import android.util.DisplayMetrics
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
-
 
 class CenterSmoothScroller(context: Context) : LinearSmoothScroller(context) {
     override fun calculateDtToFit(

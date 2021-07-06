@@ -29,7 +29,7 @@ import ru.volgadev.cardrepository.domain.model.Card
 import ru.volgadev.common.ext.animateScaledVibration
 import ru.volgadev.common.ext.scaleToFitAnimatedAndBack
 import ru.volgadev.common.ext.setVisibleWithTransition
-import ru.volgadev.common.log.Logger
+import ru.volgadev.common.logger.Logger
 import ru.volgadev.common.view.scrollToItemToCenter
 import ru.volgadev.speaking_character.api.SpeakingCharacterApi
 import ru.volgadev.speaking_character.set.gingerCat

@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 import ru.volgadev.cardrepository.domain.CardRepository
 import ru.volgadev.cardrepository.domain.model.CardCategory
 import ru.volgadev.common.BuildConfig
-import ru.volgadev.common.log.Logger
+import ru.volgadev.common.logger.Logger
 
 internal class CabinetViewModel(
     private val cardRepository: CardRepository

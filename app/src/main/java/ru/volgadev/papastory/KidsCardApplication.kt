@@ -7,8 +7,8 @@ import org.koin.core.context.startKoin
 import ru.volgadev.cardgallery.di.articleGalleryFeatureModule
 import ru.volgadev.cardrepository.data.di.cardRepositoryModule
 import ru.volgadev.cabinet_feature.di.cabinetFeatureModule
-import ru.volgadev.common.log.AndroidLoggerDelegate
-import ru.volgadev.common.log.Logger
+import ru.volgadev.common.logger.AndroidLoggerDelegate
+import ru.volgadev.common.logger.Logger
 import ru.volgadev.music_data.di.musicRepositoryModule
 import ru.volgadev.papastory.di.appModule
 

@@ -4,7 +4,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONObject
-import ru.volgadev.common.log.Logger
+import ru.volgadev.common.logger.Logger
 import ru.volgadev.music_data.domain.MusicBackendApi
 import ru.volgadev.music_data.domain.model.MusicTrack
 import ru.volgadev.music_data.domain.model.MusicTrackType

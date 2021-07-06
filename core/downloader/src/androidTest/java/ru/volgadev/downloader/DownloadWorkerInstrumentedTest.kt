@@ -2,22 +2,18 @@ package ru.volgadev.downloader
 
 import android.Manifest
 import android.os.Environment
-import androidx.lifecycle.Observer
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.rule.GrantPermissionRule
-import androidx.work.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import ru.volgadev.common.log.Logger
-import ru.volgadev.common.log.TestLoggerDelegate
+import ru.volgadev.common.logger.Logger
+import ru.volgadev.common.logger.TestLoggerDelegate
 import java.io.File
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 class DownloadWorkerInstrumentedTest {
