@@ -37,7 +37,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:${versions.androidxlifecycle}"
 
     implementation "androidx.work:work-runtime-ktx:${versions.work}"
-    implementation project(':common')
+    implementation project(':core:common')
 
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'

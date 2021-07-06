@@ -64,7 +64,7 @@ dependencies {
 
     implementation "com.squareup.okhttp3:okhttp:${versions.okhttp}"
 
-    implementation project(':common')
+    implementation project(':core:common')
     implementation project(':feature:gallery-feature')
     implementation project(':feature:cabinet-feature')
     implementation project(':feature:pincode-bubble')
