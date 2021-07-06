@@ -51,6 +51,7 @@ dependencies {
 
     implementation project(':common')
     implementation project(':core:repository-api')
+    implementation project(':core:settings')
     implementation "com.github.mmarashan:google-billingclient-wrapper:${versions.billingclientwrapper}"
 
     testImplementation "junit:junit:${versions.junit}"

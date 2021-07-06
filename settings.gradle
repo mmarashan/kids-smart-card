@@ -13,4 +13,5 @@ include ':app',
         ':core:downloader',
         ':core:speaking-character',
         ':core:lint-rule',
-        ':core:player'
+        ':core:player',
+        ':core:settings'

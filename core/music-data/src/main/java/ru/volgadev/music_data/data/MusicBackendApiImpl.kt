@@ -4,21 +4,23 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import org.json.JSONObject
-import ru.volgadev.common.BACKEND_URL
 import ru.volgadev.common.log.Logger
 import ru.volgadev.music_data.domain.MusicBackendApi
 import ru.volgadev.music_data.domain.model.MusicTrack
 import ru.volgadev.music_data.domain.model.MusicTrackType
 import java.net.ConnectException
 
-internal class MusicBackendApiImpl(private val client: OkHttpClient) : MusicBackendApi {
+internal class MusicBackendApiImpl(
+    private val baseUrl: String,
+    private val client: OkHttpClient
+) : MusicBackendApi {
 
     private val logger = Logger.get("MusicBackendApiImpl")
 
     @Throws(ConnectException::class)
     override fun getTracks(): List<MusicTrack> {
         val request: Request = Request.Builder().apply {
-            url("$BACKEND_URL/audio.json")
+            url("$baseUrl/audio.json")
         }.build()
 
         val result = arrayListOf<MusicTrack>()

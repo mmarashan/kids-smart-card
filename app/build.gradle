@@ -71,6 +71,7 @@ dependencies {
     implementation project(':core:repository-impl')
     implementation project(':core:repository-api')
     implementation project(':core:music-data')
+    implementation project(':core:settings')
 
     lintChecks project(':core:lint-rule')
 }
