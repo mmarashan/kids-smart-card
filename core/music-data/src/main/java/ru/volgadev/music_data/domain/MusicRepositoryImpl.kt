@@ -4,8 +4,8 @@ import android.content.Context
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
-import ru.volgadev.common.ext.isValidUrlString
-import ru.volgadev.common.log.Logger
+import ru.volgadev.common.ext.isValidUrl
+import ru.volgadev.common.logger.Logger
 import ru.volgadev.downloader.Downloader
 import ru.volgadev.music_data.domain.model.MusicTrack
 import ru.volgadev.music_data.domain.model.MusicTrackType
@@ -55,7 +55,7 @@ internal class MusicRepositoryImpl(
     private suspend fun loadMusicTrack(url: String, type: MusicTrackType): MusicTrack? =
         withContext(ioDispatcher) {
             logger.debug("loadMusicTrack($url)")
-            if (url.isValidUrlString()) {
+            if (url.isValidUrl()) {
                 val filesDir = context.filesDir
                 val fileName: String = url.substring(url.lastIndexOf('/') + 1, url.length)
                 val newFilePath = File(filesDir, fileName).absolutePath

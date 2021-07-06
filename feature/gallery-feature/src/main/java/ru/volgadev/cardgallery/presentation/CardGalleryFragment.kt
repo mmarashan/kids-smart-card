@@ -28,9 +28,9 @@ import ru.volgadev.cardgallery.presentation.adapter.TagsAdapter
 import ru.volgadev.cardrepository.domain.model.Card
 import ru.volgadev.common.ext.animateScaledVibration
 import ru.volgadev.common.ext.scaleToFitAnimatedAndBack
+import ru.volgadev.common.ext.scrollToItemInCenter
 import ru.volgadev.common.ext.setVisibleWithTransition
-import ru.volgadev.common.log.Logger
-import ru.volgadev.common.view.scrollToItemToCenter
+import ru.volgadev.common.logger.Logger
 import ru.volgadev.speaking_character.api.SpeakingCharacterApi
 import ru.volgadev.speaking_character.set.gingerCat
 import ru.volgadev.speaking_character.set.mole
@@ -103,7 +103,7 @@ class CardGalleryFragment : Fragment() {
         val categoryTagsAdapter = TagsAdapter().apply {
             setOnItemClickListener(object : TagsAdapter.OnItemClickListener {
                 override fun onClick(item: String, clickedView: CardView, position: Int) {
-                    binding.categoryRecyclerView.scrollToItemToCenter(position)
+                    binding.categoryRecyclerView.scrollToItemInCenter(position)
                     lifecycleScope.launchWhenCreated {
                         val category = viewModel.availableCategories.firstOrNull()
                             ?.firstOrNull { it.name == item }

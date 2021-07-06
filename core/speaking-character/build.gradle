@@ -34,5 +34,5 @@ dependencies {
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
     implementation "androidx.core:core-ktx:${versions.corektx}"
 
-    implementation project(':common')
+    implementation project(':core:common')
 }

@@ -13,7 +13,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import ru.volgadev.cabinet_feature.R
 import ru.volgadev.cabinet_feature.databinding.CabinetFragmentBinding
 import ru.volgadev.common.BuildConfig
-import ru.volgadev.common.log.Logger
+import ru.volgadev.common.logger.Logger
 import ru.volgadev.pincode_bubble.PinCodeBubbleAlertDialog
 import ru.volgadev.pincode_bubble.quizgenerator.impl.NumbersAdditionQuizGenerator
 

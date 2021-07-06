@@ -8,7 +8,7 @@ import ru.volgadev.cardrepository.data.datasource.CardRemoteDataSource
 import ru.volgadev.cardrepository.domain.*
 import ru.volgadev.cardrepository.domain.model.Card
 import ru.volgadev.cardrepository.domain.model.CardCategory
-import ru.volgadev.common.log.Logger
+import ru.volgadev.common.logger.Logger
 import ru.volgadev.googlebillingclientwrapper.*
 import ru.volgadev.googlebillingclientwrapper.api.ItemSkuType
 import ru.volgadev.googlebillingclientwrapper.api.PaymentManager

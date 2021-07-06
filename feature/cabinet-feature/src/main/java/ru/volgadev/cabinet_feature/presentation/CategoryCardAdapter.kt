@@ -14,7 +14,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import ru.volgadev.cardrepository.domain.model.CardCategory
 import ru.volgadev.cabinet_feature.R
-import ru.volgadev.common.log.Logger
+import ru.volgadev.common.logger.Logger
 
 internal class CategoryCardAdapter :
     RecyclerView.Adapter<CategoryCardAdapter.ViewHolder>() {

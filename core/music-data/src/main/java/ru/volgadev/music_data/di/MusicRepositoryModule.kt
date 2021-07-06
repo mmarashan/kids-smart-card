@@ -2,6 +2,7 @@ package ru.volgadev.music_data.di
 
 import kotlinx.coroutines.Dispatchers
 import org.koin.dsl.module
+import ru.volgadev.core.settings.api.Settings
 import ru.volgadev.downloader.Downloader
 import ru.volgadev.music_data.data.MusicBackendApiImpl
 import ru.volgadev.music_data.data.MusicDatabaseProvider
@@ -21,7 +22,12 @@ val musicRepositoryModule = module {
         )
     }
 
-    single<MusicBackendApi> { MusicBackendApiImpl(client = get()) }
+    single<MusicBackendApi> {
+        MusicBackendApiImpl(
+            baseUrl = get<Settings>().baseUrl(),
+            client = get()
+        )
+    }
     single<MusicTrackDatabase> { MusicDatabaseProvider.createDatabase(get()) }
     single<Downloader> { Downloader(context = get(), ioDispatcher = Dispatchers.IO) }
 }

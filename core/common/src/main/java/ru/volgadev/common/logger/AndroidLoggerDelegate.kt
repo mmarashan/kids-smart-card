@@ -1,4 +1,4 @@
-package ru.volgadev.common.log
+package ru.volgadev.common.logger
 
 import android.util.Log
 

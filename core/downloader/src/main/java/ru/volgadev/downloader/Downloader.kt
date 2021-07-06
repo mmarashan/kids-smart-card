@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.work.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
-import ru.volgadev.common.log.Logger
+import ru.volgadev.common.logger.Logger
 
 class Downloader(context: Context, private val ioDispatcher: CoroutineDispatcher) {
 

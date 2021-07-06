@@ -33,6 +33,6 @@ dependencies {
     implementation "androidx.room:room-ktx:${versions.room}"
     kapt "androidx.room:room-compiler:${versions.room}"
 
-    implementation project(':common')
+    implementation project(':core:common')
     implementation "com.github.mmarashan:google-billingclient-wrapper:${versions.billingclientwrapper}"
 }

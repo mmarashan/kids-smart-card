@@ -5,9 +5,9 @@ import org.koin.dsl.module
 import ru.volgadev.cardgallery.domain.ArticleGalleryInteractor
 import ru.volgadev.cardgallery.domain.ArticleGalleryInteractorImpl
 import ru.volgadev.cardgallery.presentation.CardGalleryViewModel
-import ru.volgadev.common.FeatureToggles
 import ru.volgadev.core.musicplayer.api.MusicPlayer
 import ru.volgadev.core.musicplayer.api.MusicPlayerProvider
+import ru.volgadev.core.settings.api.Settings
 
 val articleGalleryFeatureModule = module {
     single<ArticleGalleryInteractor> {
@@ -16,7 +16,7 @@ val articleGalleryFeatureModule = module {
             musicRepository = get(),
             musicPlayer = get(),
             cardPlayer = get(),
-            isBackgroundMusicEnabled = FeatureToggles.ENABLE_BACKGROUND_MUSIC
+            isBackgroundMusicEnabled = get<Settings>().isBackgroundMusicEnabled()
         )
     }
     factory<MusicPlayer> { MusicPlayerProvider.createPlayer(context = get()) }

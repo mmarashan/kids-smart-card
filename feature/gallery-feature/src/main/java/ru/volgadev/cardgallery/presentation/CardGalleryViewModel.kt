@@ -8,7 +8,7 @@ import kotlinx.coroutines.launch
 import ru.volgadev.cardgallery.domain.ArticleGalleryInteractor
 import ru.volgadev.cardrepository.domain.model.Card
 import ru.volgadev.cardrepository.domain.model.CardCategory
-import ru.volgadev.common.log.Logger
+import ru.volgadev.common.logger.Logger
 
 internal class CardGalleryViewModel(
     private val interactor: ArticleGalleryInteractor

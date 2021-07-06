@@ -50,7 +50,7 @@ dependencies {
     implementation "jp.wasabeef:recyclerview-animators:${versions.recyclerviewanimators}"
     implementation "io.insert-koin:koin-android:${versions.koin}"
 
-    implementation project(':common')
+    implementation project(':core:common')
     implementation project(':core:repository-api')
     implementation project(':core:music-data')
     implementation project(':feature:pincode-bubble')

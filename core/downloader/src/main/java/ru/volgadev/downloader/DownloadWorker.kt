@@ -6,7 +6,7 @@ import androidx.work.Data
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import ru.volgadev.common.log.Logger
+import ru.volgadev.common.logger.Logger
 import java.io.File
 import java.io.FileOutputStream
 import java.net.URL

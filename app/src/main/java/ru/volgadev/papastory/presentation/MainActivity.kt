@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.collect
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import ru.volgadev.common.ext.hideNavBar
 import ru.volgadev.common.ext.isPermissionGranted
-import ru.volgadev.common.log.Logger
+import ru.volgadev.common.logger.Logger
 import ru.volgadev.papastory.R
 import ru.volgadev.papastory.databinding.MainActivityBinding
 
