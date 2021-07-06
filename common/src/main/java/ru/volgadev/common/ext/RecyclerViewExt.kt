@@ -1,10 +1,17 @@
-package ru.volgadev.common.view.recyclerview
+package ru.volgadev.common.ext
 
 import android.content.Context
 import androidx.recyclerview.widget.LinearSmoothScroller
 import androidx.recyclerview.widget.RecyclerView
 
-class CenterSmoothScroller(context: Context) : LinearSmoothScroller(context) {
+fun RecyclerView.scrollToItemInCenter(position: Int) {
+    val scroller = CenterSmoothScroller(this.context).apply {
+        targetPosition = position
+    }
+    layoutManager?.startSmoothScroll(scroller)
+}
+
+private class CenterSmoothScroller(context: Context) : LinearSmoothScroller(context) {
     override fun calculateDtToFit(
         viewStart: Int,
         viewEnd: Int,
@@ -12,11 +19,4 @@ class CenterSmoothScroller(context: Context) : LinearSmoothScroller(context) {
         boxEnd: Int,
         snapPreference: Int
     ): Int = (boxStart + (boxEnd - boxStart) / 2) - (viewStart + (viewEnd - viewStart) / 2)
-}
-
-fun RecyclerView.scrollToItemToCenter(position: Int) {
-    val scroller = CenterSmoothScroller(this.context).apply {
-        targetPosition = position
-    }
-    layoutManager?.startSmoothScroll(scroller)
 }
