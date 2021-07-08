@@ -7,6 +7,7 @@ import androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,10 +20,8 @@ import org.koin.dsl.module
 import ru.volgadev.cardgallery.R
 import ru.volgadev.cardgallery.domain.ArticleGalleryInteractor
 import ru.volgadev.cardgallery.presentation.adapter.TagViewHolder
-import ru.volgadev.cardrepository.domain.model.Card
 import ru.volgadev.cardrepository.domain.model.CardCategory
 import ru.volgadev.common.test.FragmentTestRule
-import java.lang.Thread.sleep
 
 /**
  * UI test on [CardGalleryFragment]
@@ -73,21 +72,27 @@ class CardGalleryFragmentTest {
             iconUrl = null,
             marketItemId = null
         )
+        val category2 = CardCategory(
+            id = "1",
+            name = "",
+            description = "",
+            fileUrl = "/",
+            isPaid = true,
+            iconUrl = null,
+            marketItemId = null
+        )
 
-        every { interactor.availableCategories() } returns MutableStateFlow(listOf(category))
-        coEvery { interactor.getCategoryArticles(category) } returns emptyList()
+        every { interactor.availableCategories() } returns MutableStateFlow(listOf(category, category2))
+        coEvery { interactor.getCategoryArticles(category2) } returns emptyList()
 
         /* action */
         fragmentTestRule.launchActivity(null)
-        sleep(3000L)
+
         onView(withId(R.id.categoryRecyclerView)).perform(
-            actionOnItemAtPosition<TagViewHolder>(
-                0,
-                click()
-            )
-        );
+            actionOnItemAtPosition<TagViewHolder>(0, click())
+        )
 
         /* assert */
-        onView(withId(R.id.categoryRecyclerView)).check(matches(isDisplayed()))
+        coVerify { interactor.getCategoryArticles(category2) }
     }
 }
