@@ -37,7 +37,12 @@ dependencies {
     implementation "androidx.core:core-ktx:${versions.corektx}"
     implementation "androidx.appcompat:appcompat:${versions.appcompat}"
     implementation "androidx.recyclerview:recyclerview:${versions.recyclerview}"
+    implementation "androidx.lifecycle:lifecycle-extensions:${versions.androidxlifecycle}"
 
     implementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:${versions.kotlinxcoroutinestest}"
+
+    implementation "androidx.test:rules:${versions.androidxtestrules}"
+    implementation "com.android.support.test:runner:${versions.androidsupporttest}"
+    implementation "com.android.support.test:rules:${versions.androidsupporttest}"
 }

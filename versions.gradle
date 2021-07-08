@@ -35,3 +35,8 @@ versions.mockitocore = "2.10.0"
 versions.mockitokotlin = "1.5.0"
 versions.mockk = "1.11.0"
 versions.mockwebserver = "4.8.0"
+
+// android tests
+versions.androidxtestrules = "1.4.0"
+versions.espresso = "3.0.2"
+versions.androidsupporttest = "1.0.2"
