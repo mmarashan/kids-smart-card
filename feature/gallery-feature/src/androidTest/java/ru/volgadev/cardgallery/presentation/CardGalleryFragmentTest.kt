@@ -64,7 +64,7 @@ class CardGalleryFragmentTest {
     @Test
     fun checkViewModelWhenCardClicked() {
         /* arrange */
-        val category1 = CardCategory(
+        val category = CardCategory(
             id = "1",
             name = "",
             description = "",
@@ -73,106 +73,21 @@ class CardGalleryFragmentTest {
             iconUrl = null,
             marketItemId = null
         )
-        val category2 = CardCategory(
-            id = "2",
-            name = "",
-            description = "",
-            fileUrl = "/",
-            isPaid = true,
-            iconUrl = null,
-            marketItemId = null
-        )
 
-        val listArticles1 = listOf(
-            Card(
-                id = 1L,
-                author = "",
-                title = "",
-                categoryId = "1",
-                tags = emptyList(),
-                iconUrl = null,
-                openPhrase = null,
-                onClickSounds = emptyList()
-            )
-        )
-        val listArticles2 = listOf(
-            Card(
-                id = 2L,
-                author = "",
-                title = "",
-                categoryId = "2",
-                tags = emptyList(),
-                iconUrl = null,
-                openPhrase = null,
-                onClickSounds = emptyList()
-            )
-        )
-
-        val categories = listOf(category1, category2)
-
-        every { interactor.availableCategories() } returns MutableStateFlow(categories)
-        coEvery { interactor.getCategoryArticles(category1) } returns listArticles1
-        coEvery { interactor.getCategoryArticles(category2) } returns listArticles2
+        every { interactor.availableCategories() } returns MutableStateFlow(listOf(category))
+        coEvery { interactor.getCategoryArticles(category) } returns emptyList()
 
         /* action */
         fragmentTestRule.launchActivity(null)
         sleep(3000L)
         onView(withId(R.id.categoryRecyclerView)).perform(
             actionOnItemAtPosition<TagViewHolder>(
-                1,
+                0,
                 click()
             )
         );
 
         /* assert */
         onView(withId(R.id.categoryRecyclerView)).check(matches(isDisplayed()))
-    }
-
-    private fun getMockCategories(): List<CardCategory> {
-        val category1 = CardCategory(
-            id = "1",
-            name = "",
-            description = "",
-            fileUrl = "/",
-            isPaid = true,
-            iconUrl = null,
-            marketItemId = null
-        )
-        val category2 = CardCategory(
-            id = "2",
-            name = "",
-            description = "",
-            fileUrl = "/",
-            isPaid = true,
-            iconUrl = null,
-            marketItemId = null
-        )
-
-        val listArticles1 = listOf(
-            Card(
-                id = 1L,
-                author = "",
-                title = "",
-                categoryId = "1",
-                tags = emptyList(),
-                iconUrl = null,
-                openPhrase = null,
-                onClickSounds = emptyList()
-            )
-        )
-        val listArticles2 = listOf(
-            Card(
-                id = 2L,
-                author = "",
-                title = "",
-                categoryId = "2",
-                tags = emptyList(),
-                iconUrl = null,
-                openPhrase = null,
-                onClickSounds = emptyList()
-            )
-        )
-
-        return listOf(category1, category2)
     }
 }
