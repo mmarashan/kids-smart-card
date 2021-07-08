@@ -2,6 +2,8 @@
     package="ru.volgadev.common">
 
     <application>
-        <activity android:name="ru.volgadev.common.test.TestActivity" />
+        <activity
+            android:name="ru.volgadev.common.test.TestActivity"
+            android:theme="@style/Theme.AppCompat" />
     </application>
 </manifest>

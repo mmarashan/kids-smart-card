@@ -45,6 +45,8 @@ android {
         exclude 'META-INF/AL2.0'
         exclude 'META-INF/LGPL2.1'
         exclude("META-INF/*.kotlin_module")
+        exclude '**/attach_hotspot_windows.dll'
+        exclude 'META-INF/licenses/*'
     }
 }
 
@@ -77,10 +79,12 @@ dependencies {
     testImplementation "com.nhaarman:mockito-kotlin-kt1.1:${versions.mockitokotlin}"
     testImplementation "io.mockk:mockk:${versions.mockk}"
 
-    androidTestImplementation 'androidx.test:rules:1.4.0'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2', {
+    androidTestImplementation "io.mockk:mockk-android:${versions.mockk}"
+    androidTestImplementation "androidx.test:rules:${versions.androidxtestrules}"
+    androidTestImplementation "com.android.support.test.espresso:espresso-core:${versions.espresso}", {
         exclude group: 'com.android.support', module: 'support-annotations'
     }
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test:rules:1.0.2'
+    androidTestImplementation "com.android.support.test.espresso:espresso-contrib:${versions.espresso}"
+    androidTestImplementation "com.android.support.test:runner:${versions.androidsupporttest}"
+    androidTestImplementation "com.android.support.test:rules:${versions.androidsupporttest}"
 }

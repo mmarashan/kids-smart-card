@@ -42,7 +42,7 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:${versions.kotlinxcoroutinestest}"
 
-    implementation 'androidx.test:rules:1.4.0'
-    implementation 'com.android.support.test:runner:1.0.2'
-    implementation 'com.android.support.test:rules:1.0.2'
+    implementation "androidx.test:rules:${versions.androidxtestrules}"
+    implementation "com.android.support.test:runner:${versions.androidsupporttest}"
+    implementation "com.android.support.test:rules:${versions.androidsupporttest}"
 }
