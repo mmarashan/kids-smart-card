@@ -23,7 +23,7 @@ fun View.animateScale(scaleAmplitude: Float, durationMs: Long, onEnd: Func? = nu
     }
     animator.scaleXBy(scaleAmplitude).scaleYBy(scaleAmplitude)
         .setListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationEnd(animation: Animator?) {
+            override fun onAnimationEnd(animation: Animator) {
                 super.onAnimationEnd(animation)
                 onEnd?.invoke()
             }
@@ -59,7 +59,7 @@ fun View.runSwingAnimation(amplitudeZ: Float, period: Long) {
         duration = period / 2
     }
     animator.rotationBy(amplitudeZ).setListener(object : AnimatorListenerAdapter() {
-        override fun onAnimationEnd(animation: Animator?) {
+        override fun onAnimationEnd(animation: Animator) {
             super.onAnimationEnd(animation)
             viewRef.get()?.runSwingAnimation(-amplitudeZ, period)
         }

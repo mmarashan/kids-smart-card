@@ -53,7 +53,7 @@ internal class CardRemoteDataSourceImpl @Inject constructor(
                             ?: throw NullPointerException("Empty request body")
                         try {
                             val value = Gson().fromJson(stringResponse, classOfT)
-                            offer(value)
+                            trySend(value)
                         } catch (e: JsonSyntaxException) {
                             close(e)
                         }
