@@ -1,15 +1,17 @@
 rootProject.name = "appsample"
 
 include ':app',
-        ':common',
         ':core',
         ':feature',
-        ':feature:article-galery-feature',
-        ':feature:article-page-feature',
+        ':feature:gallery-feature',
         ':feature:cabinet-feature',
         ':feature:pincode-bubble',
-        ':core:article-data',
+        ':core:common',
+        ':core:repository-api',
+        ':core:repository-impl',
         ':core:music-data',
         ':core:downloader',
-        ':core:pay-lib',
-        ':core:speaking-character'
+        ':core:speaking-character',
+        ':core:lint-rule',
+        ':core:player',
+        ':core:settings'

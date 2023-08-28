@@ -1,0 +1,19 @@
+apply plugin: 'io.gitlab.arturbosch.detekt'
+
+detekt {
+    toolVersion = "$detekt_version"
+    input = files("src/main/java")
+    parallel = true                                         // Builds the AST in parallel. Rules are always executed in parallel. Can lead to speedups in larger projects. `false` by default.
+    filters = ".*build.*,.*/resources/.*,.*/tmp/.*"         // Regular expression of paths that should be excluded separated by `;` or `,`.
+    config = files("$rootDir/detekt/detekt-config.yml")            // Define the detekt configuration(s) you want to use. Defaults to the default detekt configuration.
+    reports {
+        xml {
+            enabled = false                                  // Enable/Disable XML report (default: true)
+            destination = file("build/reports/detekt.xml")  // Path where XML report will be stored (default: `build/reports/detekt/detekt.xml`)
+        }
+        html {
+            enabled = true                                  // Enable/Disable HTML report (default: true)
+            destination = file("build/reports/detekt.html") // Path where HTML report will be stored (default: `build/reports/detekt/detekt.html`)
+        }
+    }
+}
