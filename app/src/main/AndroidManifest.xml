@@ -13,8 +13,8 @@
 
         <activity
             android:name="ru.volgadev.papastory.presentation.MainActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.Launcher">
+            android:theme="@style/AppTheme.Launcher"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
